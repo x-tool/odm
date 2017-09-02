@@ -8,7 +8,7 @@ type ColInterface interface {
 
 type Col struct {
 	Name      string
-	Tree      Coltree
+	Tree      *Coltree
 	detailLst []*ColDetailAttribute
 }
 
@@ -22,4 +22,5 @@ type Coltree struct {
 	Ttype  string
 	DBtype string
 	sign   string
+	child  *Coltree
 }
