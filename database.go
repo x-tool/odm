@@ -12,10 +12,8 @@ type Database struct {
 func (d *Database) NewConn() (c Conn, err error) {
 	return d.Conn()
 }
-func (d *Database) NewCol(cols ...ColInterface) error {
-	var err error
+func (d *Database) SyncCols(cols ...ColInterface) {
 	for _, col := range cols {
-		err = d.newdatabaseCol(col)
+		d.syncCol(col)
 	}
-	return err
 }

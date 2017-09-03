@@ -1,44 +1,18 @@
 package xodm
 
 import (
-	"errors"
 	"fmt"
 	"log"
-	"reflect"
 
-	"github.com/zgr126/x-tool"
+	"github.com/x-tool/tool"
 )
 
-func (d *Database) newdatabaseCol(col ColInterface) error {
-	p := reflect.ValueOf(col)
-	v := p.Elem()
-	t := v.Type()
-	if v.Kind() == reflect.Struct {
-		col := new(Col)
-		col.Name = t.Name()
-		colFieldNum := v.NumField()
-		// make ColLst in a col
-		for i := 0; i < colFieldNum; i++ {
-			field := t.Field(i)
-			FieldName := field.Name
-			FieldTag := field.Tag.Get(tagName)
-			FieldType = d.SwitchType(FieldTag)
-			if FieldTag == "" {
-				continue
-			}
-			col.detailLst = append(col.detailLst, &ColDetail{
-				Name: FieldName,
-				DetailType: 
-			})
-		}
-		d.mergeCol(colName, colFieldLst)
-	} else {
-		tool.Panic("DB", errors.New("Database Collection type is "+v.Kind().String()+"!,Type should be Struct"))
-	}
-	return nil
+func (d *Database) syncCol(colI ColInterface) {
+	col := NewCol(colI)
+	syncCol(col)
 }
 
-func (d *Database) mergeCol(colName string, fieldLst []fieldStruct) {
+func (d *Database) newCol(colName string, fieldLst []fieldStruct) {
 	conn, err := d.Conn()
 	if err != nil {
 		tool.Panic("DB", err)
