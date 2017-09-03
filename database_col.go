@@ -26,7 +26,7 @@ func (d *Database) newdatabaseCol(col ColInterface) error {
 			if FieldTag == "" {
 				continue
 			}
-			col.detailLst = append(col.detailLst, &ColDetailAttribute{
+			col.detailLst = append(col.detailLst, &ColDetail{
 				Name: FieldName,
 				DetailType: 
 			})
