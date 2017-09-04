@@ -68,17 +68,16 @@ func mergeDetail(c *Col, t reflect.Type, Pid int) {
 		FieldType := field.Type
 		FieldDBType := c.DB.SwitchType(FieldTag)
 		id := len(c.detailLst)
+		c.detailLst = append(c.detailLst, &ColDetail{
+			Name:   FieldName,
+			Type:   FieldType.Kind().String(),
+			DBType: FieldDBType,
+			Id:     id,
+			Pid:    Pid,
+		})
+		// range struct
 		if FieldType.Kind() == reflect.Struct {
 			mergeDetail(c, FieldType, id)
-		} else {
-			c.detailLst = append(c.detailLst, &ColDetail{
-				Name:   FieldName,
-				Type:   FieldType.Kind().String(),
-				DBType: FieldDBType,
-				Id:     id,
-				Pid:    Pid,
-			})
 		}
-
 	}
 }
