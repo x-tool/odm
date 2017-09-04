@@ -25,7 +25,6 @@ type ConnectionConfig struct {
 }
 
 type Index string
-type Col string
 
 type Dialect interface {
 	Init(ConnectionConfig) Dialect

@@ -1,67 +1,84 @@
 package xodm
 
 import (
+	"errors"
 	"reflect"
+
 	"github.com/x-tool/tool"
 )
 
-type ColLst []Col
-
 type ColInterface interface {
-	Name() string
+	ColName() string
 }
 
 type Col struct {
+	DB        *Database
 	Name      string
 	detailLst []*ColDetail
 }
-func (c *Col)setDetail(col ColInterface){
+
+func (c *Col) setDetail(col ColInterface) {
 	p := reflect.ValueOf(col)
 	v := p.Elem()
-	t := v.Type()
 	if v.Kind() == reflect.Struct {
-		mergoDetail(c,v, 0)
+		t := v.Type()
+		mergeDetail(c, t, -1)
 	} else {
 		tool.Panic("DB", errors.New("Database Collection type is "+v.Kind().String()+"!,Type should be Struct"))
 	}
 }
 
+func (c *Col) getRootDetails() (colLst []*ColDetail) {
+	for _, v := range c.detailLst {
+		if v.Pid == -1 {
+			colLst = append(colLst, v)
+		}
+	}
+	return
+}
+
 type ColDetail struct {
 	Name   string
 	Type   string
-	DBtype string
+	DBType string
 	Id     int
 	Pid    int
 }
 
-func NewCol(i ColInterface)( *Col){
+func NewCol(db *Database, i ColInterface) *Col {
 	c := new(Col)
-	c.mergeDetail(i)
+	c.Name = i.ColName()
+	c.DB = db
+	c.setDetail(i)
+	db.ColLst = append(db.ColLst, c)
 	return c
 }
 
-func mergeDetail(c *Col, v reflect.Value, Id int){
-	
-	col := new(Col)
-	col.Name = t.Name()
-	colFieldNum := v.NumField()
+func mergeDetail(c *Col, t reflect.Type, Pid int) {
+
+	colFieldNum := t.NumField()
 	// make ColLst in a col
 	for i := 0; i < colFieldNum; i++ {
 		field := t.Field(i)
 		FieldName := field.Name
 		FieldTag := field.Tag.Get(tagName)
-		FieldType := field.Type()
-		FieldDBType := d.SwitchType(FieldTag)
 		if FieldTag == "" {
 			continue
 		}
-		col.detailLst = append(col.detailLst, &ColDetail{
-			Name: FieldName,
-			Type: FieldType,
-			DBtype: FieldDBType,
-			Id: 
-		})
+		FieldType := field.Type
+		FieldDBType := c.DB.SwitchType(FieldTag)
+		id := len(c.detailLst)
+		if FieldType.Kind() == reflect.Struct {
+			mergeDetail(c, FieldType, id)
+		} else {
+			c.detailLst = append(c.detailLst, &ColDetail{
+				Name:   FieldName,
+				Type:   FieldType.Kind().String(),
+				DBType: FieldDBType,
+				Id:     id,
+				Pid:    Pid,
+			})
+		}
+
 	}
-	d.mergeCol(colName, colFieldLst)
-	
 }

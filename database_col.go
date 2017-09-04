@@ -8,17 +8,19 @@ import (
 )
 
 func (d *Database) syncCol(colI ColInterface) {
-	col := NewCol(colI)
-	syncCol(col)
+	col := NewCol(d, colI)
+	syncColToDB(d, col)
 }
 
-func (d *Database) newCol(colName string, fieldLst []fieldStruct) {
+func syncColToDB(d *Database, col *Col) {
 	conn, err := d.Conn()
 	if err != nil {
 		tool.Panic("DB", err)
 	}
 	var sql string
 	var colFields string
+	colName := col.Name
+	fieldLst := col.getRootDetails()
 	fieldsNum := len(fieldLst)
 
 	//output field name and typestr in colFields
@@ -26,17 +28,17 @@ func (d *Database) newCol(colName string, fieldLst []fieldStruct) {
 		var fieldPg string
 		// only one field abord ","
 		if fieldsNum == 1 {
-			fieldPg = v.name + " " + v.fieldTypeStr
+			fieldPg = v.Name + " " + v.DBType
 			colFields = colFields + fieldPg
 			break
 		}
 		// first and last rows abord tab and ","
 		if i == 0 {
-			fieldPg = v.name + " " + v.fieldTypeStr + ",\n"
+			fieldPg = v.Name + " " + v.DBType + ",\n"
 		} else if i == (fieldsNum - 1) {
-			fieldPg = "\t\t" + v.name + " " + v.fieldTypeStr
+			fieldPg = "\t\t" + v.Name + " " + v.DBType
 		} else {
-			fieldPg = "\t\t" + v.name + " " + v.fieldTypeStr + ",\n"
+			fieldPg = "\t\t" + v.Name + " " + v.DBType + ",\n"
 		}
 
 		colFields = colFields + fieldPg

@@ -22,11 +22,11 @@ func Test_connection(t *testing.T) {
 		Host:   "127.0.0.1",
 		Port:   5432,
 		User:   "postgres",
-		Passwd: "zxczxczxc",
+		Passwd: "zxczxc",
 	}
 	client := NewClient("postgresql", connectionConf)
 	db := client.Database("x")
 
-	db.NewCol(new(myDoc))
+	db.SyncCols(new(myDoc))
 	t.Log(db)
 }
