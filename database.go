@@ -17,3 +17,18 @@ func (d *Database) SyncCols(cols ...ColInterface) {
 		d.syncCol(col)
 	}
 }
+
+func (d *Database) Insert(c ColInterface) {
+
+}
+
+func (d *Database) getCol(name string) *Col {
+	var col *Col
+	for _, v := range d.ColLst {
+		if v.Name == name {
+			col = v
+			break
+		}
+	}
+	return col
+}

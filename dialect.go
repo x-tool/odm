@@ -31,6 +31,7 @@ type Dialect interface {
 	Conn() (Conn, error)
 	GetTables() ([]string, error)
 	SwitchType(string) string
+	syncCol(*Col)
 }
 
 type Conn interface {

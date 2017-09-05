@@ -1,9 +1,11 @@
 package xodm
 
 import (
+	"fmt"
 	"log"
 
 	"github.com/jackc/pgx"
+	"github.com/x-tool/tool"
 )
 
 var typeMap = map[string]string{
@@ -39,6 +41,51 @@ func (d *dialectpostgre) GetTables() ([]string, error) {
 	conn, _ := d.Conn()
 	_, err := conn.Open("SELECT tablename FROM pg_tables WHERE schemaname='public'")
 	return tablesName, err
+}
+
+func (d *dialectpostgre) syncCol(col *Col) {
+	conn, err := d.Conn()
+	if err != nil {
+		tool.Panic("DB", err)
+	}
+	var sql string
+	var colFields string
+	colName := col.Name
+	fieldLst := col.getRootDetails()
+	fieldsNum := len(fieldLst)
+
+	//output field name and typestr in colFields
+	for i, v := range fieldLst {
+		var fieldPg string
+		// only one field abord ","
+		if fieldsNum == 1 {
+			fieldPg = v.Name + " " + v.DBType
+			colFields = colFields + fieldPg
+			break
+		}
+		// first and last rows abord tab and ","
+		if i == 0 {
+			fieldPg = v.Name + " " + v.DBType + ",\n"
+		} else if i == (fieldsNum - 1) {
+			fieldPg = "\t\t" + v.Name + " " + v.DBType
+		} else {
+			fieldPg = "\t\t" + v.Name + " " + v.DBType + ",\n"
+		}
+
+		colFields = colFields + fieldPg
+	}
+	// make sql
+	sql = fmt.Sprintf(`
+		CREATE TABLE %s
+		(
+			%s
+		)
+	`, colName, colFields)
+	log.Print(sql)
+	_, err = conn.Open(sql)
+	if err != nil {
+		tool.Panic("DB", err)
+	}
 }
 
 type postgreConn struct {
