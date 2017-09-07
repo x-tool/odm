@@ -32,6 +32,7 @@ type Dialect interface {
 	GetTables() ([]string, error)
 	SwitchType(string) string
 	syncCol(*Col)
+	Session() *Session
 }
 
 type Conn interface {
@@ -40,5 +41,6 @@ type Conn interface {
 	// Begin()
 }
 
+type Session struct{}
 type Exec interface{}
 type Result interface{}

@@ -88,6 +88,10 @@ func (d *dialectpostgre) syncCol(col *Col) {
 	}
 }
 
+func (d *dialectpostgre) Session() *Session {
+	return new(Session)
+}
+
 type postgreConn struct {
 	conn *pgx.Conn
 }
