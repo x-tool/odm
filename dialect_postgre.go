@@ -91,6 +91,18 @@ func (d *dialectpostgre) syncCol(col *Col) {
 func (d *dialectpostgre) Session() *Session {
 	return new(Session)
 }
+func (d *dialectpostgre) Insert(result interface{}, o *docStruct) {
+
+}
+func (d *dialectpostgre) Update(result interface{}, o *docStruct) {
+
+}
+func (d *dialectpostgre) Delete(result interface{}, o *docStruct) {
+
+}
+func (d *dialectpostgre) Query(result interface{}, o *docStruct) {
+
+}
 
 type postgreConn struct {
 	conn *pgx.Conn

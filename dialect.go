@@ -32,6 +32,11 @@ type Dialect interface {
 	GetTables() ([]string, error)
 	SwitchType(string) string
 	syncCol(*Col)
+	// base handel
+	Insert(result interface{}, o *docStruct)
+	Update(result interface{}, o *docStruct)
+	Delete(result interface{}, o *docStruct)
+	Query(result interface{}, o *docStruct)
 	Session() *Session
 }
 
