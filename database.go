@@ -5,6 +5,7 @@ const (
 )
 
 type Database struct {
+	name   string
 	ColLst []*Col
 	Dialect
 }
@@ -19,6 +20,15 @@ func (d *Database) SyncCols(cols ...ColInterface) {
 }
 
 func (d *Database) Insert(c ColInterface) {
+
+}
+func (d *Database) Update(c ColInterface) {
+
+}
+func (d *Database) Delete(c ColInterface) {
+
+}
+func (d *Database) Query(c ColInterface) {
 
 }
 

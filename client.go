@@ -19,6 +19,7 @@ func (c *Client) Database(name string) Database {
 	config.DatabaseName = name
 	if c.db == "postgresql" {
 		_d := new(dialectpostgre)
+		d.name = name
 		d.Dialect = _d.Init(config)
 	}
 	return d

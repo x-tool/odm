@@ -9,9 +9,9 @@ type myDocLabel struct {
 	labelfeild string
 }
 type myDoc struct {
-	Name       string `xodm:"text"`
-	Id         int    `xodm:"int"`
-	myDocLabel `xodm:"struct"`
+	Name       string `xodm:""`
+	Id         int    `xodm:""`
+	myDocLabel `xodm:"extend"`
 }
 
 func (m *myDoc) ColName() string {
@@ -28,5 +28,6 @@ func Test_connection(t *testing.T) {
 	db := client.Database("x")
 
 	db.SyncCols(new(myDoc))
+	// db.Insert(new(myDoc))
 	t.Log(db)
 }
