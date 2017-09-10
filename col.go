@@ -12,9 +12,9 @@ type ColInterface interface {
 }
 
 type Col struct {
-	DB        *Database
-	Name      string
-	detailLst []*ColDetail
+	DB   *Database
+	Name string
+	Doc
 }
 
 func (c *Col) setDetail(col ColInterface) {
@@ -28,32 +28,9 @@ func (c *Col) setDetail(col ColInterface) {
 	}
 }
 
-func (c *Col) getRootDetails() (colLst []*ColDetail) {
-	for _, v := range c.detailLst {
-		if v.Pid == -1 {
-			colLst = append(colLst, v)
-		}
-	}
-	return
+func (c *Col) switchType(s string) string {
+	return c.DB.SwitchType(s)
 }
-
-type ColDetail struct {
-	Name   string
-	Type   string
-	DBType string
-	Id     int
-	Pid    int
-}
-
-func NewCol(db *Database, i ColInterface) *Col {
-	c := new(Col)
-	c.Name = i.ColName()
-	c.DB = db
-	c.setDetail(i)
-	db.ColLst = append(db.ColLst, c)
-	return c
-}
-
 func mergeDetail(c *Col, t reflect.Type, Pid int) {
 
 	colFieldNum := t.NumField()
