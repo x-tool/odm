@@ -51,7 +51,7 @@ func (d *dialectpostgre) syncCol(col *Col) {
 	var sql string
 	var colFields string
 	colName := col.Name
-	fieldLst := col.getRootDetails()
+	fieldLst := col.Doc.getRootDetails()
 	fieldsNum := len(fieldLst)
 
 	//output field name and typestr in colFields
@@ -91,16 +91,16 @@ func (d *dialectpostgre) syncCol(col *Col) {
 func (d *dialectpostgre) Session() *Session {
 	return new(Session)
 }
-func (d *dialectpostgre) Insert(result interface{}, o *doc) {
+func (d *dialectpostgre) Insert(result interface{}, o *Doc) {
 
 }
-func (d *dialectpostgre) Update(result interface{}, o *doc) {
+func (d *dialectpostgre) Update(result interface{}, o *Doc) {
 
 }
-func (d *dialectpostgre) Delete(result interface{}, o *doc) {
+func (d *dialectpostgre) Delete(result interface{}, o *Doc) {
 
 }
-func (d *dialectpostgre) Query(result interface{}, o *doc) {
+func (d *dialectpostgre) Query(result interface{}, o *Doc) {
 
 }
 
