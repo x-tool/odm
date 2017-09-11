@@ -3,15 +3,15 @@ package xodm
 import "testing"
 
 type myDocLabel struct {
-	Name       string
+	// Name       string
 	Label      string
 	labelName  string
 	labelfeild string
 }
 type myDoc struct {
-	Name       string `xodm:""`
-	Id         int    `xodm:""`
-	myDocLabel `xodm:"extend"`
+	Name   string
+	Id     int
+	Detail *myDocLabel `xodm:"extend"`
 }
 
 func (m *myDoc) ColName() string {

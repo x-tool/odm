@@ -13,22 +13,22 @@ type Database struct {
 func (d *Database) NewConn() (c Conn, err error) {
 	return d.Conn()
 }
-func (d *Database) SyncCols(cols ...ColInterface) {
+func (d *Database) SyncCols(cols ...interface{}) {
 	for _, col := range cols {
 		d.syncCol(col)
 	}
 }
 
-func (d *Database) Insert(c ColInterface) {
+func (d *Database) Insert(r interface{}, doc *Doc) {
+	d.Dialect.Insert(r, doc)
+}
+func (d *Database) Update(c interface{}) {
 
 }
-func (d *Database) Update(c ColInterface) {
+func (d *Database) Delete(c interface{}) {
 
 }
-func (d *Database) Delete(c ColInterface) {
-
-}
-func (d *Database) Query(c ColInterface) {
+func (d *Database) Query(c interface{}) {
 
 }
 

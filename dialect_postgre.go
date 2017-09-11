@@ -91,16 +91,18 @@ func (d *dialectpostgre) syncCol(col *Col) {
 func (d *dialectpostgre) Session() *Session {
 	return new(Session)
 }
-func (d *dialectpostgre) Insert(result interface{}, o *Doc) {
+func (d *dialectpostgre) Insert(result interface{}, doc *Doc) {
+	fieldLst := doc.getRootDetails()
+	var sql string
 
 }
-func (d *dialectpostgre) Update(result interface{}, o *Doc) {
+func (d *dialectpostgre) Update(result interface{}, doc *Doc) {
 
 }
-func (d *dialectpostgre) Delete(result interface{}, o *Doc) {
+func (d *dialectpostgre) Delete(result interface{}, doc *Doc) {
 
 }
-func (d *dialectpostgre) Query(result interface{}, o *Doc) {
+func (d *dialectpostgre) Query(result interface{}, doc *Doc) {
 
 }
 

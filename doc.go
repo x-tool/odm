@@ -8,14 +8,15 @@ import (
 )
 
 type docfield struct {
-	Name    string
-	Type    string
-	DBType  string
-	Id      int
-	Pid     int
-	isRoot  bool
-	Tag     string
-	funcLst map[string]string
+	Name      string
+	Type      string
+	DBType    string
+	Id        int
+	Pid       int
+	isExtend  bool
+	extendPid int
+	Tag       string
+	funcLst   map[string]string
 }
 
 type Doc struct {
@@ -24,16 +25,27 @@ type Doc struct {
 	fields []*docfield
 }
 
-func (c *Doc) getRootDetails() (doc []*docfield) {
-	for _, v := range c.fields {
-		if v.Pid == -1 {
+func (d *Doc) getRootDetails() (doc []*docfield) {
+	for _, v := range d.fields {
+		if v.extendPid == -1 && !tagExtend(v.Tag) {
 			doc = append(doc, v)
 		}
 	}
 	return
 }
 
-func NewDoc(c *Col, i ColInterface) *Doc {
+func (d *Doc) checkFieldsName() {
+	FieldsLen := len(d.fields)
+	for i := 0; i < FieldsLen; i++ {
+		for j := i + 1; j < FieldsLen; j++ {
+			if d.fields[i].Name == d.fields[j].Name && d.fields[i].extendPid == d.fields[j].extendPid {
+				tool.Panic("DB", errors.New("FieldsName Should special, Col Name is "+d.Col.Name))
+			}
+		}
+	}
+}
+
+func NewDoc(c *Col, i interface{}) *Doc {
 	doc := new(Doc)
 	doc.Col = c
 	doc.DB = c.DB
@@ -45,8 +57,10 @@ func NewDoc(c *Col, i ColInterface) *Doc {
 		cont := docSourceT.NumField()
 		for i := 0; i < cont; i++ {
 			field := docSourceT.Field(i)
-			NewDocField(doc, &field, -1, true)
+			NewDocField(doc, &field, -1, -1)
 		}
+		// check Fields Name, Can't both same name in one Col
+		doc.checkFieldsName()
 	} else {
 		tool.Panic("DB", errors.New("Database Collection type is "+docSourceT.Kind().String()+"!,Type should be Struct"))
 	}
@@ -54,19 +68,21 @@ func NewDoc(c *Col, i ColInterface) *Doc {
 	return doc
 }
 
-func NewDocField(d *Doc, t *reflect.StructField, Pid int, isRoot bool) {
+func NewDocField(d *Doc, t *reflect.StructField, Pid int, extendPid int) {
 	fieldType := *t
 	fieldTypeStr := fieldType.Type.Kind().String()
 	id := len(d.fields)
 	tag := fieldType.Tag.Get(tagName)
+	isExtend := tagExtend(tag)
 	field := &docfield{
-		Name:   fieldType.Name,
-		Type:   fieldTypeStr,
-		DBType: d.DB.SwitchType(fieldTypeStr),
-		Id:     id,
-		Pid:    Pid,
-		isRoot: isRoot,
-		Tag:    tag,
+		Name:      fieldType.Name,
+		Type:      fieldTypeStr,
+		DBType:    d.DB.SwitchType(fieldTypeStr),
+		Id:        id,
+		Pid:       Pid,
+		isExtend:  isExtend,
+		extendPid: extendPid,
+		Tag:       tag,
 	}
 	d.fields = append(d.fields, field)
 	switch t.Type.Kind() {
@@ -76,15 +92,28 @@ func NewDocField(d *Doc, t *reflect.StructField, Pid int, isRoot bool) {
 		fallthrough
 	case reflect.Map:
 		fallthrough
+	case reflect.Ptr:
+		_fieldType := fieldType.Type.Elem()
+		count := _fieldType.NumField()
+		for i := 0; i < count; i++ {
+			if isExtend {
+				extendPid = Pid
+			} else {
+				extendPid = id
+			}
+			field := _fieldType.Field(i)
+			NewDocField(d, &field, id, extendPid)
+		}
 	case reflect.Struct:
 		count := fieldType.Type.NumField()
 		for i := 0; i < count; i++ {
-			// tag extend mode
-			if Pid == -1 || tagExtend(tag) {
-				isRoot = true
+			if isExtend {
+				extendPid = Pid
+			} else {
+				extendPid = id
 			}
 			field := fieldType.Type.Field(i)
-			NewDocField(d, &field, id, isRoot)
+			NewDocField(d, &field, id, extendPid)
 		}
 
 	}
