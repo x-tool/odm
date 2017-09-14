@@ -94,6 +94,7 @@ func (d *dialectpostgre) Session() *Session {
 func (d *dialectpostgre) Insert(result interface{}, doc *Doc) {
 	fieldLst := doc.getRootDetails()
 	var sql string
+	sql = "INSERT INTO $colName ($typeLst) VALUES ($valueLst)"
 
 }
 func (d *dialectpostgre) Update(result interface{}, doc *Doc) {

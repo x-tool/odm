@@ -28,6 +28,7 @@ func Test_connection(t *testing.T) {
 	db := client.Database("x")
 
 	db.SyncCols(new(myDoc))
-	// db.Insert(new(myDoc))
+	var r interface{}
+	db.Insert(r, new(myDoc))
 	t.Log(db)
 }
