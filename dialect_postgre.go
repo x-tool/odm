@@ -91,9 +91,14 @@ func (d *dialectpostgre) syncCol(col *Col) {
 func (d *dialectpostgre) Session() *Session {
 	return new(Session)
 }
-func (d *dialectpostgre) Insert(result interface{}, doc *Doc) {
+func (d *dialectpostgre) Insert(result interface{}, i interface{}) {
+	var sql, colName, typeLst, valueLst string
 	fieldLst := doc.getRootDetails()
-	var sql string
+	for _, v := range fieldLst {
+		typeLst = append(typeLst, v.DBType)
+		valueLst = append(valueLst)
+	}
+
 	sql = "INSERT INTO $colName ($typeLst) VALUES ($valueLst)"
 
 }

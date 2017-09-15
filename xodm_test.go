@@ -9,6 +9,7 @@ type myDocLabel struct {
 	labelfeild string
 }
 type myDoc struct {
+	Normal
 	Name   string
 	Id     int
 	Detail *myDocLabel `xodm:"extend"`

@@ -19,19 +19,6 @@ func (d *Database) SyncCols(cols ...interface{}) {
 	}
 }
 
-func (d *Database) Insert(r interface{}, doc *Doc) {
-	d.Dialect.Insert(r, doc)
-}
-func (d *Database) Update(c interface{}) {
-
-}
-func (d *Database) Delete(c interface{}) {
-
-}
-func (d *Database) Query(c interface{}) {
-
-}
-
 func (d *Database) getCol(name string) *Col {
 	var col *Col
 	for _, v := range d.ColLst {
