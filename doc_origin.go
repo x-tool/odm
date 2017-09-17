@@ -7,7 +7,7 @@ import (
 	"github.com/x-tool/tool"
 )
 
-type OriginDocfieldType struct {
+type OriginDocfield struct {
 	Name      string
 	Type      string
 	DBType    string
@@ -22,10 +22,39 @@ type OriginDocfieldType struct {
 type OriginDoc struct {
 	DB     *Database
 	Col    *Col
-	fields []*OriginDocfieldType
+	fields OriginDocfields
 }
 
-func (d *OriginDoc) getRootDetails() (doc []*OriginDocfieldType) {
+type OriginDocfields []*OriginDocfield
+
+func (o OriginDocfields) getRootExtendFields() (returns OriginDocfields) {
+	for _, v := range o {
+		if v.Pid == -1 && v.extendPid != -1 {
+			returns = append(returns, v)
+		}
+	}
+	return
+}
+
+func (o OriginDocfields) getRootSinpleFields() (returns OriginDocfields) {
+	for _, v := range o {
+		if v.Pid == -1 && v.extendPid != -1 {
+			returns = append(returns, v)
+		}
+	}
+	return
+}
+
+func (o OriginDocfields) getRootComplexFields() (returns []*OriginDocfield) {
+	for _, v := range o {
+		if v.Pid == -1 && v.isExtend {
+			returns = append(returns, v)
+		}
+	}
+	return
+}
+
+func (d *OriginDoc) getRootDetails() (doc OriginDocfields) {
 	for _, v := range d.fields {
 		if v.extendPid == -1 && !tagExtend(v.Tag) {
 			doc = append(doc, v)
@@ -52,6 +81,17 @@ func (d *OriginDoc) DocModel() (docModel string, hasDocModel bool) {
 	}
 	return
 }
+
+func (d *OriginDoc) getChildFields(i *OriginDocfield) (r OriginDocfields) {
+	id := i.Id
+	for _, v := range d.fields {
+		if v.Pid == id {
+			r = append(r, v)
+		}
+	}
+	return
+}
+
 func NewOriginDoc(c *Col, i interface{}) *OriginDoc {
 	doc := new(OriginDoc)
 	doc.Col = c
@@ -64,7 +104,7 @@ func NewOriginDoc(c *Col, i interface{}) *OriginDoc {
 		cont := docSourceT.NumField()
 		for i := 0; i < cont; i++ {
 			field := docSourceT.Field(i)
-			NewOriginDocFieldType(doc, &field, -1, -1)
+			NewOriginDocField(doc, &field, -1, -1)
 		}
 		// check Fields Name, Can't both same name in one Col
 		doc.checkFieldsName()
@@ -75,13 +115,13 @@ func NewOriginDoc(c *Col, i interface{}) *OriginDoc {
 	return doc
 }
 
-func NewOriginDocFieldType(d *OriginDoc, t *reflect.StructField, Pid int, extendPid int) {
+func NewOriginDocField(d *OriginDoc, t *reflect.StructField, Pid int, extendPid int) {
 	fieldType := *t
 	fieldTypeStr := fieldType.Type.Kind().String()
 	id := len(d.fields)
 	tag := fieldType.Tag.Get(tagName)
 	isExtend := tagExtend(tag)
-	field := &OriginDocfieldType{
+	field := &OriginDocfield{
 		Name:      fieldType.Name,
 		Type:      fieldTypeStr,
 		DBType:    d.DB.SwitchType(fieldTypeStr),
@@ -109,7 +149,7 @@ func NewOriginDocFieldType(d *OriginDoc, t *reflect.StructField, Pid int, extend
 				extendPid = id
 			}
 			field := _fieldType.Field(i)
-			NewOriginDocFieldType(d, &field, id, extendPid)
+			NewOriginDocField(d, &field, id, extendPid)
 		}
 	case reflect.Struct:
 		count := fieldType.Type.NumField()
@@ -120,7 +160,7 @@ func NewOriginDocFieldType(d *OriginDoc, t *reflect.StructField, Pid int, extend
 				extendPid = id
 			}
 			field := fieldType.Type.Field(i)
-			NewOriginDocFieldType(d, &field, id, extendPid)
+			NewOriginDocField(d, &field, id, extendPid)
 		}
 
 	}

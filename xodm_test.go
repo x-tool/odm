@@ -9,7 +9,7 @@ type myDocLabel struct {
 	labelfeild string
 }
 type myDoc struct {
-	Normal
+	NormalCol
 	Name   string
 	Id     int
 	Detail *myDocLabel `xodm:"extend"`
@@ -30,6 +30,7 @@ func Test_connection(t *testing.T) {
 
 	db.SyncCols(new(myDoc))
 	var r interface{}
-	db.Insert(r, new(myDoc))
+	col := db.GetCol(new(myDoc))
+	col.Insert(r, new(myDoc))
 	t.Log(db)
 }

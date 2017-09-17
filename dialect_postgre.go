@@ -3,15 +3,16 @@ package xodm
 import (
 	"fmt"
 	"log"
+	"strings"
 
 	"github.com/jackc/pgx"
 	"github.com/x-tool/tool"
 )
 
 var typeMap = map[string]string{
-	"int":    "int",
-	"float":  "float8",
-	"text":   "text",
+	"int":     "int",
+	"float64": "float8",
+	// "text":   "text",
 	"[]byte": "bytea",
 	"time":   "date",
 	"array":  "json",
@@ -33,13 +34,28 @@ func (d *dialectpostgre) Init(c ConnectionConfig) Dialect {
 	return d
 }
 
+func pg_valueToString(i interface{}) (r string) {
+	switch i.(type) {
+	case string:
+		r = i.(string)
+	case int:
+		r = i.(string)
+	case float64:
+		r = i.(string)
+		// case byte:
+		// 	r = string()
+	}
+	return
+}
+
 func (d *dialectpostgre) SwitchType(s string) string {
 	return typeMap[s]
 }
 func (d *dialectpostgre) GetTables() ([]string, error) {
 	var tablesName []string
 	conn, _ := d.Conn()
-	_, err := conn.Open("SELECT tablename FROM pg_tables WHERE schemaname='public'")
+	r, err := conn.Open("SELECT tablename FROM pg_tables WHERE schemaname='public'")
+	log.Println(r, err)
 	return tablesName, err
 }
 
@@ -51,7 +67,7 @@ func (d *dialectpostgre) syncCol(col *Col) {
 	var sql string
 	var colFields string
 	colName := col.Name
-	fieldLst := col.Doc.getRootDetails()
+	fieldLst := col.OriginDocs.getRootDetails()
 	fieldsNum := len(fieldLst)
 
 	//output field name and typestr in colFields
@@ -91,24 +107,33 @@ func (d *dialectpostgre) syncCol(col *Col) {
 func (d *dialectpostgre) Session() *Session {
 	return new(Session)
 }
-func (d *dialectpostgre) Insert(result interface{}, i interface{}) {
-	var sql, colName, typeLst, valueLst string
-	fieldLst := doc.getRootDetails()
-	for _, v := range fieldLst {
-		typeLst = append(typeLst, v.DBType)
-		valueLst = append(valueLst)
+func (d *dialectpostgre) Insert(c *Col, result interface{}, i interface{}) {
+	var typeLst, valueLst []string
+	rootFields := c.getRootfields(i)
+	for _, v := range rootFields {
+		typeLst = append(typeLst, v.DBtypeName)
+		valueLst = append(valueLst, pg_valueToString(v.value))
 	}
-
-	sql = "INSERT INTO $colName ($typeLst) VALUES ($valueLst)"
+	typeLstStr := strings.Join(typeLst, ",")
+	valueLstStr := strings.Join(valueLst, ",")
+	sql := "INSERT INTO $colName ($typeLst) VALUES ($valueLst)"
+	rawsql := tool.ReplaceStrings(sql, map[string]string{
+		"$colName":  c.Name,
+		"$typeLst":  typeLstStr,
+		"$valueLst": valueLstStr,
+	})
+	conn, _ := d.Conn()
+	r, err := conn.Open(rawsql)
+	log.Println(r)
+	log.Println(err)
+}
+func (d *dialectpostgre) Update(c *Col, result interface{}, i interface{}) {
 
 }
-func (d *dialectpostgre) Update(result interface{}, doc *Doc) {
+func (d *dialectpostgre) Delete(c *Col, result interface{}, i interface{}) {
 
 }
-func (d *dialectpostgre) Delete(result interface{}, doc *Doc) {
-
-}
-func (d *dialectpostgre) Query(result interface{}, doc *Doc) {
+func (d *dialectpostgre) Query(c *Col, result interface{}, i interface{}) {
 
 }
 

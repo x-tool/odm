@@ -23,6 +23,10 @@ type NormalMode interface {
 	Create()
 }
 
-func getRootfields(i interface{}) (r map[string]string) {
-
+func isDocMode(s string) bool {
+	var check bool
+	if s == "NormalCol" {
+		check = true
+	}
+	return check
 }
