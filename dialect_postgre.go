@@ -165,11 +165,17 @@ func (p *postgreConn) Open(s ...Exec) (result Result, err error) {
 			sql = s
 		}
 	}
-	re, err := p.conn.Query(sql)
+	rows, err := p.conn.Query(sql)
 	defer p.conn.Close()
-	log.Print(re)
-	b, _ := re.Values()
-	log.Print(b)
+	log.Print(rows)
+	for rows.Next() {
+		// var tableName string
+		s, err := rows.Values()
+		if err != nil {
+			break
+		}
+		log.Println(s)
+	}
 	return result, err
 }
 
