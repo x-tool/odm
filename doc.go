@@ -2,20 +2,40 @@ package xodm
 
 import "reflect"
 
+type Question struct{}
+type Answer struct{}
 type Doc struct {
+	Col      *Col
+	DB       *Database
+	raw      interface{}
+	Answer   *Answer
+	Question *Question
 }
-type rootField struct {
+
+func newDoc(c *Col, i interface{}) *Doc {
+	d := &Doc{
+		Col:      c,
+		DB:       c.DB,
+		raw:      i,
+		Answer:   new(Answer),
+		Question: new(Question),
+	}
+	d.formatRaw()
+	return d
+}
+
+type docRootField struct {
 	name       string
 	typeName   string
 	DBtypeName string
 	value      interface{}
 }
 
-func (c *Col) getRootfields(i interface{}) (r []*rootField) {
-	ivalue := reflect.ValueOf(i).Elem()
-	rootDetails := c.OriginDocs.getRootDetails()
+func (d *Doc) getRootfields() (r []*docRootField) {
+	ivalue := reflect.ValueOf(d.raw).Elem()
+	rootDetails := d.Col.OriginDocs.getRootDetails()
 	for _, v := range rootDetails.getRootSinpleFields() {
-		f := &rootField{
+		f := &docRootField{
 			name:       v.Name,
 			typeName:   v.Type,
 			DBtypeName: v.DBType,
@@ -24,9 +44,9 @@ func (c *Col) getRootfields(i interface{}) (r []*rootField) {
 		r = append(r, f)
 	}
 	for _, v := range rootDetails.getRootComplexFields() {
-		fields := c.OriginDocs.getChildFields(v)
+		fields := d.Col.OriginDocs.getChildFields(v)
 		for _, val := range fields {
-			f := &rootField{
+			f := &docRootField{
 				name:       val.Name,
 				typeName:   val.Type,
 				DBtypeName: val.DBType,

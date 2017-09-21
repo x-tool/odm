@@ -29,8 +29,10 @@ func Test_connection(t *testing.T) {
 	db := client.Database("x")
 
 	db.SyncCols(new(myDoc))
-	var r interface{}
+	var r struct {
+		a string
+	}
 	col := db.GetCol(new(myDoc))
-	col.Insert(r, new(myDoc))
+	err := col.Insert(new(myDoc))
 	t.Log(db)
 }

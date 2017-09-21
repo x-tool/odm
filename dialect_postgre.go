@@ -107,9 +107,10 @@ func (d *dialectpostgre) syncCol(col *Col) {
 func (d *dialectpostgre) Session() *Session {
 	return new(Session)
 }
-func (d *dialectpostgre) Insert(c *Col, result interface{}, i interface{}) {
+func (d *dialectpostgre) Insert(c *Col) (r interface{}, err error) {
 	var typeLst, valueLst []string
-	rootFields := c.getRootfields(i)
+	doc := c.newDoc(i)
+	rootFields := doc.getRootfields()
 	for _, v := range rootFields {
 		typeLst = append(typeLst, v.DBtypeName)
 		valueLst = append(valueLst, pg_valueToString(v.value))
@@ -127,13 +128,13 @@ func (d *dialectpostgre) Insert(c *Col, result interface{}, i interface{}) {
 	log.Println(r)
 	log.Println(err)
 }
-func (d *dialectpostgre) Update(c *Col, result interface{}, i interface{}) {
+func (d *dialectpostgre) Update(c *Col) (r interface{}, err error) {
 
 }
-func (d *dialectpostgre) Delete(c *Col, result interface{}, i interface{}) {
+func (d *dialectpostgre) Delete(c *Col) (r interface{}, err error) {
 
 }
-func (d *dialectpostgre) Query(c *Col, result interface{}, i interface{}) {
+func (d *dialectpostgre) Query(c *Col) (r interface{}, err error) {
 
 }
 
