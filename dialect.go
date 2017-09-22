@@ -33,10 +33,10 @@ type Dialect interface {
 	SwitchType(string) string
 	syncCol(*Col)
 	// base handel
-	Insert(col *Col) (interface{}, error)
-	Update(col *Col) (interface{}, error)
-	Delete(col *Col) (interface{}, error)
-	Query(col *Col) (interface{}, error)
+	Insert(doc *Doc) (interface{}, error)
+	Update(doc *Doc) (interface{}, error)
+	Delete(doc *Doc) (interface{}, error)
+	Query(doc *Doc) (interface{}, error)
 	Session() *Session
 }
 

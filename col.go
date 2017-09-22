@@ -40,21 +40,15 @@ func GetColName(i interface{}) (name string) {
 	return
 }
 
-func (c *Col) Insert(r interface{}, i interface{}) (result interface{}, err error) {
-	// colName := GetColName(i)
-	r, err = c.DB.Insert(c, r, i)
-	return
+func (c *Col) Insert(i interface{}) *Doc {
+	return c.DB.Insert(c, i)
 }
-func (c *Col) Update(r interface{}) {
+func (c *Col) Update() {
 
 }
-func (c *Col) Delete(r interface{}) {
+func (c *Col) Delete() {
 
 }
-func (c *Col) Query(r interface{}) {
+func (c *Col) Query() {
 
-}
-
-func (c *Col) newDoc(i interface{}) *Doc {
-	return newDoc(c, i)
 }

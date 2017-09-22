@@ -107,9 +107,8 @@ func (d *dialectpostgre) syncCol(col *Col) {
 func (d *dialectpostgre) Session() *Session {
 	return new(Session)
 }
-func (d *dialectpostgre) Insert(c *Col) (r interface{}, err error) {
+func (d *dialectpostgre) Insert(doc *Doc) (r interface{}, err error) {
 	var typeLst, valueLst []string
-	doc := c.newDoc(i)
 	rootFields := doc.getRootfields()
 	for _, v := range rootFields {
 		typeLst = append(typeLst, v.DBtypeName)
@@ -119,22 +118,22 @@ func (d *dialectpostgre) Insert(c *Col) (r interface{}, err error) {
 	valueLstStr := strings.Join(valueLst, ",")
 	sql := "INSERT INTO $colName ($typeLst) VALUES ($valueLst)"
 	rawsql := tool.ReplaceStrings(sql, map[string]string{
-		"$colName":  c.Name,
+		"$colName":  doc.Col.Name,
 		"$typeLst":  typeLstStr,
 		"$valueLst": valueLstStr,
 	})
 	conn, _ := d.Conn()
-	r, err := conn.Open(rawsql)
-	log.Println(r)
+	result, err := conn.Open(rawsql)
+	log.Println(result)
 	log.Println(err)
 }
-func (d *dialectpostgre) Update(c *Col) (r interface{}, err error) {
+func (d *dialectpostgre) Update(doc *Doc) (r interface{}, err error) {
 
 }
-func (d *dialectpostgre) Delete(c *Col) (r interface{}, err error) {
+func (d *dialectpostgre) Delete(doc *Doc) (r interface{}, err error) {
 
 }
-func (d *dialectpostgre) Query(c *Col) (r interface{}, err error) {
+func (d *dialectpostgre) Query(doc *Doc) (r interface{}, err error) {
 
 }
 

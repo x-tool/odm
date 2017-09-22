@@ -2,25 +2,30 @@ package xodm
 
 import "reflect"
 
-type Question struct{}
-type Answer struct{}
+type Question struct {
+	dbName  string
+	colName string
+	limit   string
+	where   string
+}
+
 type Doc struct {
 	Col      *Col
 	DB       *Database
 	raw      interface{}
-	Answer   *Answer
+	Answer   interface{}
 	Question *Question
+	Err      error
 }
 
-func newDoc(c *Col, i interface{}) *Doc {
+func newDoc(c *Col) *Doc {
 	d := &Doc{
 		Col:      c,
 		DB:       c.DB,
-		raw:      i,
-		Answer:   new(Answer),
+		raw:      nil,
+		Answer:   nil,
 		Question: new(Question),
 	}
-	d.formatRaw()
 	return d
 }
 
@@ -56,4 +61,25 @@ func (d *Doc) getRootfields() (r []*docRootField) {
 		}
 	}
 	return
+}
+
+func (d *Doc) formatRaw() {
+	t := reflect.TypeOf(d.raw)
+	newV := reflect.New(t)
+
+}
+
+func (d *Doc) insert(i interface{}) {
+
+}
+
+func (d *Doc) update(i interface{}) {
+
+}
+func (d *Doc) delete(i interface{}) {
+
+}
+
+func (d *Doc) query(i interface{}) {
+
 }

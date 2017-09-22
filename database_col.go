@@ -20,3 +20,18 @@ func (d *Database) GetCol(i interface{}) (c *Col) {
 	}
 	return
 }
+
+func (d *Database) Insert(c *Col, i interface{}) *Doc {
+	doc := newDoc(c)
+	doc.insert(i)
+	return doc
+}
+func (d *Database) Update(c *Col) *Doc {
+
+}
+func (d *Database) Delete(c *Col) *Doc {
+
+}
+func (d *Database) Query(c *Col) *Doc {
+
+}
