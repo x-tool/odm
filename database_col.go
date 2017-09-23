@@ -21,10 +21,10 @@ func (d *Database) GetCol(i interface{}) (c *Col) {
 	return
 }
 
-func (d *Database) Insert(c *Col, i interface{}) *Doc {
+func (d *Database) Insert(c *Col, i interface{}) (r interface{}, err error) {
 	doc := newDoc(c)
-	doc.insert(i)
-	return doc
+	r, err = doc.insert(i)
+	return r, err
 }
 func (d *Database) Update(c *Col) *Doc {
 
