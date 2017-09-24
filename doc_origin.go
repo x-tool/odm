@@ -8,16 +8,15 @@ import (
 )
 
 type OriginDocfield struct {
-	Name          string
-	Type          string
-	DBType        string
-	Id            int
-	Pid           int
-	isExtend      bool
-	extendPid     int
-	Tag           string
-	funcLst       map[string]string
-	docRootFields []*docRootField
+	Name      string
+	Type      string
+	DBType    string
+	Id        int
+	Pid       int
+	isExtend  bool
+	extendPid int
+	Tag       string
+	funcLst   map[string]string
 }
 
 type OriginDoc struct {

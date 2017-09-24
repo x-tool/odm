@@ -10,11 +10,15 @@ type Question struct {
 	where         string
 }
 
+type Answer struct {
+	result interface{}
+}
+
 type Doc struct {
 	Col      *Col
 	DB       *Database
 	raw      interface{}
-	Answer   interface{}
+	Answer   *Answer
 	Question *Question
 	Err      error
 }
@@ -23,11 +27,12 @@ func newDoc(c *Col) *Doc {
 	q := new(Question)
 	q.colName = c.Name
 	q.dbName = c.DB.name
+	a := new(Answer)
 	d := &Doc{
 		Col:      c,
 		DB:       c.DB,
 		raw:      nil,
-		Answer:   nil,
+		Answer:   a,
 		Question: q,
 	}
 	return d
@@ -70,7 +75,7 @@ func (d *Doc) formatQuery() {
 
 }
 
-func (d *Doc) formatInsertRootfields() {
+func (d *Doc) formatRootfields() {
 	var r []*docRootField
 	ivalue := reflect.ValueOf(d.raw).Elem()
 	rootDetails := d.Col.OriginDocs.getRootDetails()
