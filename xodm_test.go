@@ -1,6 +1,9 @@
 package xodm
 
-import "testing"
+import (
+	"log"
+	"testing"
+)
 
 type myDocLabel struct {
 	// Name       string
@@ -29,10 +32,11 @@ func Test_connection(t *testing.T) {
 	db := client.Database("x")
 
 	db.SyncCols(new(myDoc))
-	var r struct {
-		a string
-	}
+	// var r struct {
+	// 	Name string
+	// }
 	col := db.GetCol(new(myDoc))
-	err := col.Insert(new(myDoc))
+	_, err := col.Insert(new(myDoc))
+	log.Print(err)
 	t.Log(db)
 }

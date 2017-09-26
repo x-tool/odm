@@ -124,17 +124,19 @@ func (d *dialectpostgre) Insert(doc *Doc) (r interface{}, err error) {
 	})
 	conn, _ := d.Conn()
 	result, err := conn.Open(rawsql)
+	log.Println(rawsql)
 	log.Println(result)
 	log.Println(err)
+	return
 }
 func (d *dialectpostgre) Update(doc *Doc) (r interface{}, err error) {
-
+	return
 }
 func (d *dialectpostgre) Delete(doc *Doc) (r interface{}, err error) {
-
+	return
 }
 func (d *dialectpostgre) Query(doc *Doc) (r interface{}, err error) {
-
+	return
 }
 
 type postgreConn struct {
@@ -179,6 +181,9 @@ func (p *postgreConn) Open(s ...Exec) (result Result, err error) {
 	return result, err
 }
 
+// func (p *postgreConn)Q(sql string)(r interface{},err error){
+
+// }
 // func (p *postgredb) Close(ql string) (result []byte, err error) {
 // 	result = []byte{}
 // 	return result, err

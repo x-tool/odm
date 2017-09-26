@@ -38,7 +38,7 @@ func (o OriginDocfields) getRootExtendFields() (returns OriginDocfields) {
 
 func (o OriginDocfields) getRootSinpleFields() (returns OriginDocfields) {
 	for _, v := range o {
-		if v.Pid == -1 && v.extendPid != -1 {
+		if v.Pid == -1 && v.extendPid == -1 && v.isExtend == false {
 			returns = append(returns, v)
 		}
 	}
@@ -56,7 +56,7 @@ func (o OriginDocfields) getRootComplexFields() (returns []*OriginDocfield) {
 
 func (d *OriginDoc) getRootDetails() (doc OriginDocfields) {
 	for _, v := range d.fields {
-		if v.extendPid == -1 && !tagExtend(v.Tag) {
+		if v.extendPid == -1 && !tagIsExtend(v.Tag) {
 			doc = append(doc, v)
 		}
 	}
@@ -120,7 +120,7 @@ func NewOriginDocField(d *OriginDoc, t *reflect.StructField, Pid int, extendPid 
 	fieldTypeStr := fieldType.Type.Kind().String()
 	id := len(d.fields)
 	tag := fieldType.Tag.Get(tagName)
-	isExtend := tagExtend(tag)
+	isExtend := checkOriginDocFieldisExtend(t)
 	field := &OriginDocfield{
 		Name:      fieldType.Name,
 		Type:      fieldTypeStr,
@@ -164,4 +164,10 @@ func NewOriginDocField(d *OriginDoc, t *reflect.StructField, Pid int, extendPid 
 		}
 
 	}
+}
+
+func checkOriginDocFieldisExtend(r *reflect.StructField) bool {
+	isMode := isDocMode(r.Name)
+	isExtend := tagisExtendField(r)
+	return isMode || isExtend
 }

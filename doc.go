@@ -2,38 +2,30 @@ package xodm
 
 import "reflect"
 
-type Question struct {
-	docRootFields []*docRootField
-	dbName        string
-	colName       string
-	limit         string
-	where         string
-}
-
-type Answer struct {
-	result interface{}
-}
-
 type Doc struct {
-	Col      *Col
-	DB       *Database
-	raw      interface{}
-	Answer   *Answer
-	Question *Question
-	Err      error
+	Col    *Col
+	DB     *Database
+	raw    interface{}
+	Handle *docHandle
+	Err    error
+}
+type docHandle struct {
+	WantFields []*docRootField
+	dbName     string
+	colName    string
+	limit      string
+	where      string
 }
 
 func newDoc(c *Col) *Doc {
-	q := new(Question)
+	q := new(docHandle)
 	q.colName = c.Name
 	q.dbName = c.DB.name
-	a := new(Answer)
 	d := &Doc{
-		Col:      c,
-		DB:       c.DB,
-		raw:      nil,
-		Answer:   a,
-		Question: q,
+		Col:    c,
+		DB:     c.DB,
+		raw:    nil,
+		Handle: q,
 	}
 	return d
 }
@@ -42,7 +34,7 @@ type docRootField struct {
 	name       string
 	typeName   string
 	DBtypeName string
-	value      interface{}
+	value      reflect.Value
 }
 
 func (d *Doc) insert(i interface{}) (r interface{}, err error) {
@@ -62,12 +54,12 @@ func (d *Doc) query(i interface{}) {
 }
 
 func (d *Doc) Where(s string) *Doc {
-	d.Question.where = s
+	d.Handle.where = s
 	return d
 }
 
 func (d *Doc) Limit(s string) *Doc {
-	d.Question.limit = s
+	d.Handle.limit = s
 	return d
 }
 
@@ -75,9 +67,9 @@ func (d *Doc) formatQuery() {
 
 }
 
-func (d *Doc) formatRootfields() {
+func (d *Doc) getRootfields() []*docRootField {
 	var r []*docRootField
-	ivalue := reflect.ValueOf(d.raw).Elem()
+	ivalue := reflect.ValueOf(d.raw)
 	rootDetails := d.Col.OriginDocs.getRootDetails()
 	for _, v := range rootDetails.getRootSinpleFields() {
 		f := &docRootField{
@@ -100,5 +92,5 @@ func (d *Doc) formatRootfields() {
 			r = append(r, f)
 		}
 	}
-	d.Question.docRootFields = r
+	return r
 }

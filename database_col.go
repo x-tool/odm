@@ -26,12 +26,12 @@ func (d *Database) Insert(c *Col, i interface{}) (r interface{}, err error) {
 	r, err = doc.insert(i)
 	return r, err
 }
-func (d *Database) Update(c *Col) *Doc {
-
+func (d *Database) Update(c *Col) (r interface{}, err error) {
+	return
 }
-func (d *Database) Delete(c *Col) *Doc {
-
+func (d *Database) Delete(c *Col) (r interface{}, err error) {
+	return
 }
-func (d *Database) Query(c *Col) *Doc {
-
+func (d *Database) Query(c *Col) (r interface{}, err error) {
+	return
 }
