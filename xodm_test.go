@@ -1,8 +1,8 @@
-package xodm
+package odm
 
 import (
-	"log"
 	"testing"
+	"time"
 )
 
 type myDocLabel struct {
@@ -15,7 +15,7 @@ type myDoc struct {
 	NormalCol
 	Name   string
 	Id     int
-	Detail *myDocLabel `xodm:"extend"`
+	Detail *myDocLabel `odm:"extend"`
 }
 
 func (m *myDoc) ColName() string {
@@ -36,7 +36,13 @@ func Test_connection(t *testing.T) {
 	// 	Name string
 	// }
 	col := db.GetCol(new(myDoc))
-	_, err := col.Insert(new(myDoc))
-	log.Print(err)
-	t.Log(db)
+	testInsert := new(myDoc)
+	testInsert.Name = "haha,I get"
+	_, err := col.Insert(testInsert)
+	t.Log(err)
+}
+
+func Test_formatType(t *testing.T) {
+	var a time.Time
+	t.Log(formatTypeToString(a))
 }

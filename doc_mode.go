@@ -1,4 +1,4 @@
-package xodm
+package odm
 
 import (
 	"time"

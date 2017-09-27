@@ -1,11 +1,11 @@
-package xodm
+package odm
 
 import (
 	"github.com/x-tool/tool"
 )
 
 const (
-	tagName = "xodm"
+	tagName = "odm"
 )
 
 type Database struct {

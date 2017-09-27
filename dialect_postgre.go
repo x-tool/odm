@@ -1,8 +1,10 @@
-package xodm
+package odm
 
 import (
 	"fmt"
 	"log"
+	"reflect"
+	"strconv"
 	"strings"
 
 	"github.com/jackc/pgx"
@@ -34,18 +36,17 @@ func (d *dialectpostgre) Init(c ConnectionConfig) Dialect {
 	return d
 }
 
-func pg_valueToString(i interface{}) (r string) {
-	switch i.(type) {
-	case string:
-		r = i.(string)
-	case int:
-		r = i.(string)
-	case float64:
-		r = i.(string)
-		// case byte:
-		// 	r = string()
+func pg_valueToString(v reflect.Value) (r string) {
+	_type := v.Kind().String()
+	switch _type {
+	case "string":
+		r = "'" + v.String() + "'"
+	case "int":
+		r = strconv.FormatInt(v.Int(), 10)
+	default:
+		r = v.String()
 	}
-	return
+	return r
 }
 
 func (d *dialectpostgre) SwitchType(s string) string {
@@ -55,7 +56,7 @@ func (d *dialectpostgre) GetTables() ([]string, error) {
 	var tablesName []string
 	conn, _ := d.Conn()
 	r, err := conn.Open("SELECT tablename FROM pg_tables WHERE schemaname='public'")
-	log.Println(r, err)
+	log.Print(r)
 	return tablesName, err
 }
 
@@ -97,7 +98,6 @@ func (d *dialectpostgre) syncCol(col *Col) {
 			%s
 		)
 	`, colName, colFields)
-	log.Print(sql)
 	_, err = conn.Open(sql)
 	if err != nil {
 		tool.Panic("DB", err)
@@ -108,25 +108,23 @@ func (d *dialectpostgre) Session() *Session {
 	return new(Session)
 }
 func (d *dialectpostgre) Insert(doc *Doc) (r interface{}, err error) {
-	var typeLst, valueLst []string
+	var nameLst, valueLst []string
 	rootFields := doc.getRootfields()
 	for _, v := range rootFields {
-		typeLst = append(typeLst, v.DBtypeName)
+		nameLst = append(nameLst, v.name)
 		valueLst = append(valueLst, pg_valueToString(v.value))
 	}
-	typeLstStr := strings.Join(typeLst, ",")
+	nameLstStr := strings.Join(nameLst, ",")
 	valueLstStr := strings.Join(valueLst, ",")
 	sql := "INSERT INTO $colName ($typeLst) VALUES ($valueLst)"
-	rawsql := tool.ReplaceStrings(sql, map[string]string{
-		"$colName":  doc.Col.Name,
-		"$typeLst":  typeLstStr,
-		"$valueLst": valueLstStr,
+	rawsql := tool.ReplaceStrings(sql, []string{
+		"$colName", doc.Col.Name,
+		"$typeLst", nameLstStr,
+		"$valueLst", valueLstStr,
 	})
 	conn, _ := d.Conn()
 	result, err := conn.Open(rawsql)
-	log.Println(rawsql)
 	log.Println(result)
-	log.Println(err)
 	return
 }
 func (d *dialectpostgre) Update(doc *Doc) (r interface{}, err error) {
@@ -144,7 +142,6 @@ type postgreConn struct {
 }
 
 func (d *dialectpostgre) Conn() (Conn, error) {
-	log.Print(d.config)
 	var pgxConf pgx.ConnConfig
 	pgxConf = pgx.ConnConfig{
 		Host:     d.config.Host,
@@ -167,16 +164,16 @@ func (p *postgreConn) Open(s ...Exec) (result Result, err error) {
 			sql = s
 		}
 	}
+	log.Print(sql)
 	rows, err := p.conn.Query(sql)
 	defer p.conn.Close()
-	log.Print(rows)
 	for rows.Next() {
 		// var tableName string
 		s, err := rows.Values()
+		log.Print(s)
 		if err != nil {
 			break
 		}
-		log.Println(s)
 	}
 	return result, err
 }

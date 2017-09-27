@@ -1,4 +1,4 @@
-package xodm
+package odm
 
 import "reflect"
 
@@ -17,14 +17,14 @@ type docHandle struct {
 	where      string
 }
 
-func newDoc(c *Col) *Doc {
+func newDoc(c *Col, i interface{}) *Doc {
 	q := new(docHandle)
 	q.colName = c.Name
 	q.dbName = c.DB.name
 	d := &Doc{
 		Col:    c,
 		DB:     c.DB,
-		raw:    nil,
+		raw:    i,
 		Handle: q,
 	}
 	return d
@@ -37,7 +37,7 @@ type docRootField struct {
 	value      reflect.Value
 }
 
-func (d *Doc) insert(i interface{}) (r interface{}, err error) {
+func (d *Doc) insert() (r interface{}, err error) {
 	r, err = d.DB.Dialect.Insert(d)
 	return
 }
@@ -69,7 +69,7 @@ func (d *Doc) formatQuery() {
 
 func (d *Doc) getRootfields() []*docRootField {
 	var r []*docRootField
-	ivalue := reflect.ValueOf(d.raw)
+	ivalue := reflect.ValueOf(d.raw).Elem()
 	rootDetails := d.Col.OriginDocs.getRootDetails()
 	for _, v := range rootDetails.getRootSinpleFields() {
 		f := &docRootField{

@@ -1,4 +1,4 @@
-package xodm
+package odm
 
 func (d *Database) syncCol(colI interface{}) {
 	col := d.NewCol(colI)
@@ -22,8 +22,8 @@ func (d *Database) GetCol(i interface{}) (c *Col) {
 }
 
 func (d *Database) Insert(c *Col, i interface{}) (r interface{}, err error) {
-	doc := newDoc(c)
-	r, err = doc.insert(i)
+	doc := newDoc(c, i)
+	r, err = doc.insert()
 	return r, err
 }
 func (d *Database) Update(c *Col) (r interface{}, err error) {
