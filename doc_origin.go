@@ -19,12 +19,6 @@ type OriginDocfield struct {
 	funcLst   map[string]string
 }
 
-type OriginDoc struct {
-	DB     *Database
-	Col    *Col
-	fields OriginDocfields
-}
-
 type OriginDocfields []*OriginDocfield
 
 func (o OriginDocfields) getRootExtendFields() (returns OriginDocfields) {
@@ -54,6 +48,12 @@ func (o OriginDocfields) getRootComplexFields() (returns []*OriginDocfield) {
 	return
 }
 
+type OriginDoc struct {
+	DB     *Database
+	Col    *Col
+	fields OriginDocfields
+}
+
 func (d *OriginDoc) getRootDetails() (doc OriginDocfields) {
 	for _, v := range d.fields {
 		if v.extendPid == -1 && !v.isExtend {
@@ -62,7 +62,14 @@ func (d *OriginDoc) getRootDetails() (doc OriginDocfields) {
 	}
 	return
 }
-
+func (d *OriginDoc) getAllRootDetails() (doc OriginDocfields) {
+	for _, v := range d.fields {
+		if v.extendPid == -1 {
+			doc = append(doc, v)
+		}
+	}
+	return
+}
 func (d *OriginDoc) checkFieldsName() {
 	FieldsLen := len(d.fields)
 	for i := 0; i < FieldsLen; i++ {

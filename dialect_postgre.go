@@ -156,20 +156,14 @@ func (d *dialectpostgre) Conn() (Conn, error) {
 	return &c, err
 }
 
-func (p *postgreConn) Open(s ...Exec) (result Result, err error) {
-	var sql string
-	if len(s) == 1 {
-		s, ok := s[0].(string)
-		if ok {
-			sql = s
-		}
-	}
+func (p *postgreConn) Open(s string, result interface{}) (err error) {
+	sql := s
 	log.Print(sql)
 	rows, err := p.conn.Query(sql)
 	defer p.conn.Close()
 	for rows.Next() {
 		// var tableName string
-		s, err := rows.Values()
+		s, err := rows.Scan(result)
 		log.Print(s)
 		if err != nil {
 			break

@@ -1,8 +1,8 @@
 package odm
 
 import (
+	"reflect"
 	"testing"
-	"time"
 )
 
 type myDocLabel struct {
@@ -43,6 +43,7 @@ func Test_connection(t *testing.T) {
 }
 
 func Test_formatType(t *testing.T) {
-	var a time.Time
-	t.Log(formatTypeToString(a))
+	var a string
+	s := reflect.TypeOf(a)
+	t.Log(formatTypeToString(&s))
 }
