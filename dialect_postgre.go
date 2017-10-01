@@ -156,7 +156,7 @@ func (d *dialectpostgre) Conn() (Conn, error) {
 	return &c, err
 }
 
-func (p *postgreConn) Open(s string, result interface{}) (err error) {
+func (p *postgreConn) Open(s string, result ...interface{}) (err error) {
 	sql := s
 	log.Print(sql)
 	rows, err := p.conn.Query(sql)
