@@ -15,6 +15,7 @@ type OriginDocfield struct {
 	Pid       int
 	isExtend  bool
 	extendPid int
+	dependLst OriginDocfields
 	Tag       string
 	funcLst   map[string]string
 }
@@ -98,6 +99,14 @@ func (d *OriginDoc) getChildFields(i *OriginDocfield) (r OriginDocfields) {
 	}
 	return
 }
+func (d *OriginDoc) getFieldsById(id int) (o *OriginDocfield) {
+	for _, v := range d.fields {
+		if v.Id == id {
+			o = v
+			return o
+		}
+	}
+}
 
 func NewOriginDoc(c *Col, i interface{}) *OriginDoc {
 	doc := new(OriginDoc)
@@ -128,6 +137,8 @@ func NewOriginDocField(d *OriginDoc, t *reflect.StructField, Pid int, extendPid 
 	id := len(d.fields)
 	tag := fieldType.Tag.Get(tagName)
 	isExtend := checkOriginDocFieldisExtend(fieldType.Name, tag)
+	extendField := d.getFieldsById(extendPid)
+	dependLst := append(extendField.dependLst, extendField)
 	field := &OriginDocfield{
 		Name:      fieldType.Name,
 		Type:      fieldTypeStr,
@@ -135,6 +146,7 @@ func NewOriginDocField(d *OriginDoc, t *reflect.StructField, Pid int, extendPid 
 		Id:        id,
 		Pid:       Pid,
 		isExtend:  isExtend,
+		dependLst: dependLst,
 		extendPid: extendPid,
 		Tag:       tag,
 	}
