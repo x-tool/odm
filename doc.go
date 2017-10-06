@@ -25,7 +25,7 @@ func (d *Doc) dbName() string {
 	return d.DB.name
 }
 func (d *Doc) colName() string {
-	return d.Col.Name
+	return d.Col.name
 }
 func (d *Doc) insert() (r interface{}, err error) {
 	r, err = d.DB.Dialect.Insert(d)
@@ -44,11 +44,11 @@ func (d *Doc) query(i interface{}) {
 }
 
 func (d *Doc) Where(s string) *Doc {
-	d.Handle.where = s
+	// d.Handle.where = s
 	return d
 }
 
 func (d *Doc) Limit(s string) *Doc {
-	d.Handle.limit = s
+	// d.Handle.limit = s
 	return d
 }

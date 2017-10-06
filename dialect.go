@@ -41,7 +41,7 @@ type Dialect interface {
 }
 
 type Conn interface {
-	Open(sql string, result interface{}) (Result, error)
+	Open(sql string, result interface{}) error
 	// Close()
 	// Begin()
 }

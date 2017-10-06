@@ -76,7 +76,7 @@ func (d *OriginDoc) checkFieldsName() {
 	for i := 0; i < FieldsLen; i++ {
 		for j := i + 1; j < FieldsLen; j++ {
 			if d.fields[i].Name == d.fields[j].Name && d.fields[i].extendPid == d.fields[j].extendPid {
-				tool.Panic("DB", errors.New("FieldsName Should special, Col Name is "+d.Col.Name))
+				tool.Panic("DB", errors.New("FieldsName Should special, Col Name is "+d.Col.name))
 			}
 		}
 	}
@@ -106,6 +106,7 @@ func (d *OriginDoc) getFieldsById(id int) (o *OriginDocfield) {
 			return o
 		}
 	}
+	return
 }
 
 func NewOriginDoc(c *Col, i interface{}) *OriginDoc {

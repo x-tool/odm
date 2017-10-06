@@ -46,7 +46,7 @@ func (d *Database) findColINactiveCol(s string) (b bool) {
 func (d *Database) getCol(name string) *Col {
 	var col *Col
 	for _, v := range d.ColLst {
-		if v.Name == name {
+		if v.name == name {
 			col = v
 			break
 		}

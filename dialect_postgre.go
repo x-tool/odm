@@ -55,7 +55,8 @@ func (d *dialectpostgre) SwitchType(s string) string {
 func (d *dialectpostgre) GetTables() ([]string, error) {
 	var tablesName []string
 	conn, _ := d.Conn()
-	r, err := conn.Open("SELECT tablename FROM pg_tables WHERE schemaname='public'")
+	var r interface{}
+	err := conn.Open("SELECT tablename FROM pg_tables WHERE schemaname='public'", r)
 	log.Print(r)
 	return tablesName, err
 }
@@ -67,7 +68,7 @@ func (d *dialectpostgre) syncCol(col *Col) {
 	}
 	var sql string
 	var colFields string
-	colName := col.Name
+	colName := col.name
 	fieldLst := col.OriginDocs.getRootDetails()
 	fieldsNum := len(fieldLst)
 
@@ -98,7 +99,7 @@ func (d *dialectpostgre) syncCol(col *Col) {
 			%s
 		)
 	`, colName, colFields)
-	_, err = conn.Open(sql)
+	err = conn.Open(sql, nil)
 	if err != nil {
 		tool.Panic("DB", err)
 	}
@@ -107,9 +108,9 @@ func (d *dialectpostgre) syncCol(col *Col) {
 func (d *dialectpostgre) Session() *Session {
 	return new(Session)
 }
-func (d *dialectpostgre) Insert(doc *Doc) (r interface{}, err error) {
+func (d *dialectpostgre) Insert(doc *Doc) (result interface{}, err error) {
 	var nameLst, valueLst []string
-	rootFields := doc.getRootfields()
+	rootFields := doc.getRootFields()
 	for _, v := range rootFields {
 		nameLst = append(nameLst, v.name)
 		valueLst = append(valueLst, pg_valueToString(v.value))
@@ -118,12 +119,12 @@ func (d *dialectpostgre) Insert(doc *Doc) (r interface{}, err error) {
 	valueLstStr := strings.Join(valueLst, ",")
 	sql := "INSERT INTO $colName ($typeLst) VALUES ($valueLst)"
 	rawsql := tool.ReplaceStrings(sql, []string{
-		"$colName", doc.Col.Name,
+		"$colName", doc.Col.name,
 		"$typeLst", nameLstStr,
 		"$valueLst", valueLstStr,
 	})
 	conn, _ := d.Conn()
-	result, err := conn.Open(rawsql)
+	err = conn.Open(rawsql, result)
 	log.Println(result)
 	return
 }
@@ -156,20 +157,20 @@ func (d *dialectpostgre) Conn() (Conn, error) {
 	return &c, err
 }
 
-func (p *postgreConn) Open(s string, result ...interface{}) (err error) {
+func (p *postgreConn) Open(s string, result interface{}) (err error) {
 	sql := s
 	log.Print(sql)
 	rows, err := p.conn.Query(sql)
 	defer p.conn.Close()
 	for rows.Next() {
 		// var tableName string
-		s, err := rows.Scan(result)
-		log.Print(s)
+		err := rows.Scan(result)
+		// log.Print(s)
 		if err != nil {
 			break
 		}
 	}
-	return result, err
+	return err
 }
 
 // func (p *postgreConn)Q(sql string)(r interface{},err error){

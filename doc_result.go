@@ -33,7 +33,7 @@ func (r *result) NewResult() (v *reflect.Value) {
 	return
 }
 
-func (r *result) getRootfields() []*docRootField {
+func (r *result) getRootFields() []*docRootField {
 	var rootField []*docRootField
 	ivalue := reflect.ValueOf(r.raw).Elem()
 	rootDetails := r.OriginDoc.getRootDetails()
@@ -44,10 +44,10 @@ func (r *result) getRootfields() []*docRootField {
 			DBtypeName: v.DBType,
 			value:      ivalue.FieldByName(v.Name),
 		}
-		r = append(rootField, f)
+		rootField = append(rootField, f)
 	}
 	for _, v := range rootDetails.getRootComplexFields() {
-		fields := d.Col.OriginDocs.getChildFields(v)
+		fields := r.OriginDoc.getChildFields(v)
 		for _, val := range fields {
 			f := &docRootField{
 				name:       val.Name,
@@ -55,7 +55,7 @@ func (r *result) getRootfields() []*docRootField {
 				DBtypeName: val.DBType,
 				value:      ivalue.FieldByName(val.Name),
 			}
-			r = append(rootField, f)
+			rootField = append(rootField, f)
 		}
 	}
 	return rootField

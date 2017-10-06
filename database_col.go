@@ -13,7 +13,7 @@ func (d *Database) NewCol(i interface{}) *Col {
 func (d *Database) GetCol(i interface{}) (c *Col) {
 	colName := GetColName(i)
 	for _, v := range d.ColLst {
-		if v.Name == colName {
+		if v.name == colName {
 			c = v
 			break
 		}

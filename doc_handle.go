@@ -4,9 +4,16 @@ type handle struct {
 	handleType string
 }
 
-func newHandle(handleType string) *handle {
+func newHandle() *handle {
 	h := &handle{
-		handleType: handleType,
+	// handleType: handleType,
 	}
-	return
+	return h
+}
+
+func (h *handle) where() {
+
+}
+func (h *handle) limit() {
+
 }
