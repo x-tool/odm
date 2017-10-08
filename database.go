@@ -15,11 +15,11 @@ type Database struct {
 	Dialect
 }
 
-func (d *Database) NewConn() (c Conn, err error) {
-	return d.Conn()
-}
+// func (d *Database) NewConn() (c Conn, err error) {
+// 	return d.Conn()
+// }
 func (d *Database) SyncCols(cols ...interface{}) {
-	activeCols, err := d.GetTables()
+	activeCols, err := d.GetTables(d)
 	if err != nil {
 		tool.Panic("DB", err)
 	}

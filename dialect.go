@@ -28,8 +28,8 @@ type Index string
 
 type Dialect interface {
 	Init(ConnectionConfig) Dialect
-	Conn() (Conn, error)
-	GetTables() ([]string, error)
+	// Conn() (Conn, error)
+	GetTables(db *Database) ([]string, error)
 	SwitchType(string) string
 	syncCol(*Col)
 	// base handel
@@ -38,6 +38,17 @@ type Dialect interface {
 	Delete(doc *Doc) (interface{}, error)
 	Query(doc *Doc) (interface{}, error)
 	Session() *Session
+}
+
+func initDialect(c ConnectionConfig) (d Dialect) {
+	switch c.DatabaseName {
+	case "postgresql":
+		fallthrough
+	default:
+		_d := new(dialectpostgre)
+		d = _d.Init(c)
+		return d
+	}
 }
 
 type Conn interface {

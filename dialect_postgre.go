@@ -52,12 +52,15 @@ func pg_valueToString(v reflect.Value) (r string) {
 func (d *dialectpostgre) SwitchType(s string) string {
 	return typeMap[s]
 }
-func (d *dialectpostgre) GetTables() ([]string, error) {
+func (d *dialectpostgre) GetTables(db *Database) ([]string, error) {
 	var tablesName []string
 	conn, _ := d.Conn()
-	var r interface{}
-	err := conn.Open("SELECT tablename FROM pg_tables WHERE schemaname='public'", r)
-	log.Print(r)
+	type r struct {
+		tablesName string
+	}
+	var rLst []r
+	err := conn.Open("SELECT tablename FROM pg_tables WHERE schemaname='public'", rLst)
+	log.Print(rLst)
 	return tablesName, err
 }
 
@@ -110,7 +113,7 @@ func (d *dialectpostgre) Session() *Session {
 }
 func (d *dialectpostgre) Insert(doc *Doc) (result interface{}, err error) {
 	var nameLst, valueLst []string
-	rootFields := doc.getRootFields()
+	rootFields := doc.Result.getRootFields()
 	for _, v := range rootFields {
 		nameLst = append(nameLst, v.name)
 		valueLst = append(valueLst, pg_valueToString(v.value))

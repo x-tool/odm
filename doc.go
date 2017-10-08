@@ -9,13 +9,13 @@ type Doc struct {
 	Err    error
 }
 
-func newDoc(c *Col, i interface{}) *Doc {
+func newDoc(i interface{}, db *Database, c *Col) *Doc {
 	d := &Doc{
 		Col:    c,
-		DB:     c.DB,
+		DB:     db,
 		Handle: newHandle(),
 		Query:  newQuery(),
-		Result: newResult(c, i),
+		Result: newResult(i, c),
 		Err:    nil,
 	}
 	return d

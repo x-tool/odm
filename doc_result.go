@@ -22,7 +22,7 @@ type routeResult struct {
 	v reflect.Type
 }
 
-func newResult(c *Col, i interface{}) *result {
+func newResult(i interface{}, c *Col) *result {
 	r := &result{
 		OriginDoc: c.OriginDocs,
 	}

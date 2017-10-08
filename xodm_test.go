@@ -45,5 +45,6 @@ func Test_connection(t *testing.T) {
 func Test_formatType(t *testing.T) {
 	var a string
 	s := reflect.TypeOf(a)
-	t.Log(formatTypeToString(&s))
+	str := formatTypeToString(&s)
+	t.Log(str)
 }
