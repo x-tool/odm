@@ -25,7 +25,8 @@ var typeMap = map[string]string{
 }
 
 type dialectpostgre struct {
-	config ConnectionConfig
+	config    ConnectionConfig
+	pgxConfig pgx.ConnConfig
 }
 type postgredb struct {
 	conn *pgx.Conn
@@ -33,6 +34,13 @@ type postgredb struct {
 
 func (d *dialectpostgre) Init(c ConnectionConfig) Dialect {
 	d.config = c
+	d.pgxConfig = pgx.ConnConfig{
+		Host:     d.config.Host,
+		Port:     uint16(d.config.Port),
+		Database: d.config.DatabaseName,
+		User:     d.config.User,
+		Password: d.config.Passwd,
+	}
 	return d
 }
 
@@ -141,23 +149,15 @@ func (d *dialectpostgre) Query(doc *Doc) (r interface{}, err error) {
 	return
 }
 
-type postgreConn struct {
-	conn *pgx.Conn
-}
-
 func (d *dialectpostgre) Conn() (Conn, error) {
-	var pgxConf pgx.ConnConfig
-	pgxConf = pgx.ConnConfig{
-		Host:     d.config.Host,
-		Port:     uint16(d.config.Port),
-		Database: d.config.DatabaseName,
-		User:     d.config.User,
-		Password: d.config.Passwd,
-	}
-	conn, err := pgx.Connect(pgxConf)
+	conn, err := pgx.Connect(d.pgxConfig)
 	var c postgreConn
 	c.conn = conn
 	return &c, err
+}
+
+type postgreConn struct {
+	conn *pgx.Conn
 }
 
 func (p *postgreConn) Open(s string, result interface{}) (err error) {
@@ -165,14 +165,17 @@ func (p *postgreConn) Open(s string, result interface{}) (err error) {
 	log.Print(sql)
 	rows, err := p.conn.Query(sql)
 	defer p.conn.Close()
+	var rLst [][]interface{}
 	for rows.Next() {
 		// var tableName string
-		err := rows.Scan(result)
+		byteLst, err := rows.Values()
+		rLst = append(rLst, byteLst)
 		// log.Print(s)
 		if err != nil {
 			break
 		}
 	}
+	log.Println(rLst)
 	return err
 }
 

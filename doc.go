@@ -2,7 +2,7 @@ package odm
 
 type Doc struct {
 	Col    *Col
-	DB     *Database
+	DB     *Database // col has db,but it can't use col when handle needless col. Ex: getColLst()
 	Handle *handle
 	Query  *query
 	Result *result

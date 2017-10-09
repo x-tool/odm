@@ -35,14 +35,23 @@ func (r *result) NewResult() (v *reflect.Value) {
 
 func (r *result) getRootFields() []*docRootField {
 	var rootField []*docRootField
-	ivalue := reflect.ValueOf(r.raw).Elem()
+	ivalue := reflect.ValueOf(r.raw)
+	if ivalue.Kind() == reflect.Ptr || ivalue.Kind() == reflect.Interface {
+		ivalue = ivalue.Elem()
+	}
 	rootDetails := r.OriginDoc.getRootDetails()
 	for _, v := range rootDetails.getRootSinpleFields() {
+		var value reflect.Value
+		if ivalue.Kind() == reflect.Struct {
+			value = ivalue.FieldByName(v.Name)
+		} else {
+			value = ivalue
+		}
 		f := &docRootField{
 			name:       v.Name,
 			typeName:   v.Type,
 			DBtypeName: v.DBType,
-			value:      ivalue.FieldByName(v.Name),
+			value:      value,
 		}
 		rootField = append(rootField, f)
 	}

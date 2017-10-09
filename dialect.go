@@ -21,6 +21,7 @@ type ConnectionConfig struct {
 	User         string
 	Passwd       string
 	DatabaseName string
+	Database     string
 	TLs          bool
 }
 
@@ -41,7 +42,7 @@ type Dialect interface {
 }
 
 func initDialect(c ConnectionConfig) (d Dialect) {
-	switch c.DatabaseName {
+	switch c.Database {
 	case "postgresql":
 		fallthrough
 	default:

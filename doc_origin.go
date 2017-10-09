@@ -139,7 +139,12 @@ func NewOriginDocField(d *OriginDoc, t *reflect.StructField, Pid int, extendPid 
 	tag := fieldType.Tag.Get(tagName)
 	isExtend := checkOriginDocFieldisExtend(fieldType.Name, tag)
 	extendField := d.getFieldsById(extendPid)
-	dependLst := append(extendField.dependLst, extendField)
+	var dependLst OriginDocfields
+	if extendField == nil {
+	} else {
+		dependLst = append(extendField.dependLst, extendField)
+	}
+
 	field := &OriginDocfield{
 		Name:      fieldType.Name,
 		Type:      fieldTypeStr,

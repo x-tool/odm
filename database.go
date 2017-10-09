@@ -9,6 +9,7 @@ const (
 )
 
 type Database struct {
+	Client       *Client
 	name         string
 	activeColLst []string
 	ColLst       []*Col

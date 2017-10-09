@@ -23,10 +23,11 @@ func (m *myDoc) ColName() string {
 }
 func Test_connection(t *testing.T) {
 	connectionConf := ConnectionConfig{
-		Host:   "127.0.0.1",
-		Port:   5432,
-		User:   "postgres",
-		Passwd: "zxczxc",
+		Host:     "127.0.0.1",
+		Port:     5432,
+		User:     "postgres",
+		Passwd:   "zxczxczxc",
+		Database: "postgresql",
 	}
 	client := NewClient("postgresql", connectionConf)
 	db := client.Database("x")
