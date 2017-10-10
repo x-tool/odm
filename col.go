@@ -13,7 +13,7 @@ type Col struct {
 	name        string
 	hasDocModel bool
 	DocModel    string
-	Doc
+	Doc         *Doc
 }
 
 func NewCol(d *Database, i interface{}) *Col {
@@ -21,7 +21,7 @@ func NewCol(d *Database, i interface{}) *Col {
 	c.name = GetColName(i)
 	c.DB = d
 	c.Doc = NewDoc(c, i)
-	c.DocModel, c.hasDocModel = c.OriginDocs.DocModel()
+	c.DocModel, c.hasDocModel = c.Doc.DocModel()
 	return c
 }
 

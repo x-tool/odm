@@ -8,6 +8,11 @@ import (
 )
 
 type Doc struct {
+	col    *Col
+	fields DocFields
+}
+type DocFields []*DocField
+type DocField struct {
 	Name      string
 	Type      string
 	DBType    string
@@ -20,43 +25,36 @@ type Doc struct {
 	funcLst map[string]string
 }
 
-type Docs []*Doc
-type dependLst []*Doc
+type dependLst []*DocField
 
-func (o dependLst) getRootExtendFields() (returns Docs) {
-	for _, v := range o {
+func (doc *Doc) getRootExtendFields() (d DocFields) {
+	for _, v := range doc.fields {
 		if v.Pid == -1 && v.extendPid != -1 && v.isExtend {
-			returns = append(returns, v)
+			d = append(d, v)
 		}
 	}
 	return
 }
 
-func (o dependLst) getRootSinpleFields() (returns Docs) {
-	for _, v := range o {
+func (doc *Doc) getRootSinpleFields() (d DocFields) {
+	for _, v := range doc.fields {
 		if v.Pid == -1 && v.extendPid == -1 && !v.isExtend {
-			returns = append(returns, v)
+			d = append(d, v)
 		}
 	}
 	return
 }
 
-func (o dependLst) getRootComplexFields() (returns Docs) {
-	for _, v := range o {
+func (doc *Doc) getRootComplexFields() (d DocFields) {
+	for _, v := range doc.fields {
 		if v.Pid == -1 && v.extendPid != -1 && !v.isExtend {
-			returns = append(returns, v)
+			d = append(d, v)
 		}
 	}
 	return
 }
 
-type OriginDoc struct {
-	DB     *Database
-	Col    *Col
-	fields dependLst
-}
-
-func (d *OriginDoc) getRootDetails() (doc dependLst) {
+func (d *Doc) getRootDetails() (doc dependLst) {
 	for _, v := range d.fields {
 		if v.extendPid == -1 && !v.isExtend {
 			doc = append(doc, v)
@@ -64,7 +62,7 @@ func (d *OriginDoc) getRootDetails() (doc dependLst) {
 	}
 	return
 }
-func (d *OriginDoc) getAllRootDetails() (doc dependLst) {
+func (d *Doc) getAllRootDetails() (doc dependLst) {
 	for _, v := range d.fields {
 		if v.extendPid == -1 {
 			doc = append(doc, v)
@@ -72,17 +70,17 @@ func (d *OriginDoc) getAllRootDetails() (doc dependLst) {
 	}
 	return
 }
-func (d *OriginDoc) checkFieldsName() {
+func (d *Doc) checkFieldsName() {
 	FieldsLen := len(d.fields)
 	for i := 0; i < FieldsLen; i++ {
 		for j := i + 1; j < FieldsLen; j++ {
 			if d.fields[i].Name == d.fields[j].Name && d.fields[i].extendPid == d.fields[j].extendPid {
-				tool.Panic("DB", errors.New("FieldsName Should special, Col Name is "+d.Col.name))
+				tool.Panic("DB", errors.New("FieldsName Should special, Col Name is "+d.col.name))
 			}
 		}
 	}
 }
-func (d *OriginDoc) DocModel() (docModel string, hasDocModel bool) {
+func (d *Doc) DocModel() (docModel string, hasDocModel bool) {
 	for _, v := range d.fields {
 		if isDocMode(v.Name) {
 			return v.Name, true
@@ -91,7 +89,7 @@ func (d *OriginDoc) DocModel() (docModel string, hasDocModel bool) {
 	return
 }
 
-func (d *OriginDoc) getChildFields(i *Doc) (r dependLst) {
+func (d *Doc) getChildFields(i *DocField) (r DocFields) {
 	id := i.Id
 	for _, v := range d.fields {
 		if v.Pid == id {
@@ -100,7 +98,7 @@ func (d *OriginDoc) getChildFields(i *Doc) (r dependLst) {
 	}
 	return
 }
-func (d *OriginDoc) getFieldsById(id int) (o *Doc) {
+func (d *Doc) getFieldById(id int) (o *DocField) {
 	for _, v := range d.fields {
 		if v.Id == id {
 			o = v
@@ -110,10 +108,9 @@ func (d *OriginDoc) getFieldsById(id int) (o *Doc) {
 	return
 }
 
-func NewDoc(c *Col, i interface{}) *OriginDoc {
-	doc := new(OriginDoc)
-	doc.Col = c
-	doc.DB = c.DB
+func NewDoc(c *Col, i interface{}) *Doc {
+	doc := new(Doc)
+	doc.col = c
 	// append doc.fields
 	docSource := reflect.ValueOf(i)
 	docSourceV := docSource.Elem()
@@ -133,23 +130,23 @@ func NewDoc(c *Col, i interface{}) *OriginDoc {
 	return doc
 }
 
-func newDocField(d *OriginDoc, t *reflect.StructField, Pid int, extendPid int) {
+func newDocField(d *Doc, t *reflect.StructField, Pid int, extendPid int) {
 	fieldType := *t
 	fieldTypeStr := formatTypeToString(&fieldType.Type)
 	id := len(d.fields)
 	tag := fieldType.Tag.Get(tagName)
 	isExtend := checkDocFieldisExtend(fieldType.Name, tag)
-	extendField := d.getFieldsById(extendPid)
+	extendField := d.getFieldById(extendPid)
 	var dependLst dependLst
 	if extendField == nil {
 	} else {
 		dependLst = append(extendField.dependLst, extendField)
 	}
 
-	field := &Doc{
+	field := &DocField{
 		Name:      fieldType.Name,
 		Type:      fieldTypeStr,
-		DBType:    d.DB.SwitchType(fieldTypeStr),
+		DBType:    d.col.DB.SwitchType(fieldTypeStr),
 		Id:        id,
 		Pid:       Pid,
 		isExtend:  isExtend,

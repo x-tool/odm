@@ -5,10 +5,10 @@ import (
 )
 
 type result struct {
-	OriginDoc *OriginDoc
-	routeR    []routeResult
-	routeT    reflect.Type
-	raw       interface{}
+	Doc    *Doc
+	routeR []routeResult
+	routeT reflect.Type
+	raw    interface{}
 }
 
 type docRootField struct {
@@ -24,7 +24,7 @@ type routeResult struct {
 
 func newResult(i interface{}, c *Col) *result {
 	r := &result{
-		OriginDoc: c.OriginDocs,
+		Doc: c.Doc,
 	}
 	return r
 }
@@ -39,8 +39,7 @@ func (r *result) getRootFields() []*docRootField {
 	if ivalue.Kind() == reflect.Ptr || ivalue.Kind() == reflect.Interface {
 		ivalue = ivalue.Elem()
 	}
-	rootDetails := r.OriginDoc.getRootDetails()
-	for _, v := range rootDetails.getRootSinpleFields() {
+	for _, v := range r.Doc.getRootSinpleFields() {
 		var value reflect.Value
 		if ivalue.Kind() == reflect.Struct {
 			value = ivalue.FieldByName(v.Name)
@@ -55,8 +54,8 @@ func (r *result) getRootFields() []*docRootField {
 		}
 		rootField = append(rootField, f)
 	}
-	for _, v := range rootDetails.getRootComplexFields() {
-		fields := r.OriginDoc.getChildFields(v)
+	for _, v := range r.Doc.getRootComplexFields() {
+		fields := r.Doc.getChildFields(v)
 		for _, val := range fields {
 			f := &docRootField{
 				name:       val.Name,

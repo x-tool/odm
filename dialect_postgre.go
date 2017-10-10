@@ -80,7 +80,7 @@ func (d *dialectpostgre) syncCol(col *Col) {
 	var sql string
 	var colFields string
 	colName := col.name
-	fieldLst := col.OriginDocs.getRootDetails()
+	fieldLst := col.Doc.getRootDetails()
 	fieldsNum := len(fieldLst)
 
 	//output field name and typestr in colFields
