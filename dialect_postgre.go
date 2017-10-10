@@ -119,7 +119,7 @@ func (d *dialectpostgre) syncCol(col *Col) {
 func (d *dialectpostgre) Session() *Session {
 	return new(Session)
 }
-func (d *dialectpostgre) Insert(doc *Doc) (result interface{}, err error) {
+func (d *dialectpostgre) Insert(doc *ODM) (result interface{}, err error) {
 	var nameLst, valueLst []string
 	rootFields := doc.Result.getRootFields()
 	for _, v := range rootFields {
@@ -139,13 +139,13 @@ func (d *dialectpostgre) Insert(doc *Doc) (result interface{}, err error) {
 	log.Println(result)
 	return
 }
-func (d *dialectpostgre) Update(doc *Doc) (r interface{}, err error) {
+func (d *dialectpostgre) Update(doc *ODM) (r interface{}, err error) {
 	return
 }
-func (d *dialectpostgre) Delete(doc *Doc) (r interface{}, err error) {
+func (d *dialectpostgre) Delete(doc *ODM) (r interface{}, err error) {
 	return
 }
-func (d *dialectpostgre) Query(doc *Doc) (r interface{}, err error) {
+func (d *dialectpostgre) Query(doc *ODM) (r interface{}, err error) {
 	return
 }
 

@@ -1,6 +1,6 @@
 package odm
 
-type Doc struct {
+type ODM struct {
 	Col    *Col
 	DB     *Database // col has db,but it can't use col when handle needless col. Ex: getColLst()
 	Handle *handle
@@ -9,8 +9,8 @@ type Doc struct {
 	Err    error
 }
 
-func newDoc(i interface{}, db *Database, c *Col) *Doc {
-	d := &Doc{
+func newODM(i interface{}, db *Database, c *Col) *ODM {
+	d := &ODM{
 		Col:    c,
 		DB:     db,
 		Handle: newHandle(),
@@ -21,34 +21,34 @@ func newDoc(i interface{}, db *Database, c *Col) *Doc {
 	return d
 }
 
-func (d *Doc) dbName() string {
+func (d *ODM) dbName() string {
 	return d.DB.name
 }
-func (d *Doc) colName() string {
+func (d *ODM) colName() string {
 	return d.Col.name
 }
-func (d *Doc) insert() (r interface{}, err error) {
+func (d *ODM) insert() (r interface{}, err error) {
 	r, err = d.DB.Dialect.Insert(d)
 	return
 }
 
-func (d *Doc) update(i interface{}) {
+func (d *ODM) update(i interface{}) {
 
 }
-func (d *Doc) delete(i interface{}) {
-
-}
-
-func (d *Doc) query(i interface{}) {
+func (d *ODM) delete(i interface{}) {
 
 }
 
-func (d *Doc) Where(s string) *Doc {
+func (d *ODM) query(i interface{}) {
+
+}
+
+func (d *ODM) Where(s string) *ODM {
 	// d.Handle.where = s
 	return d
 }
 
-func (d *Doc) Limit(s string) *Doc {
+func (d *ODM) Limit(s string) *ODM {
 	// d.Handle.limit = s
 	return d
 }

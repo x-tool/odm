@@ -22,7 +22,7 @@ func (d *Database) GetCol(i interface{}) (c *Col) {
 }
 
 func (d *Database) Insert(c *Col, i interface{}) (r interface{}, err error) {
-	doc := newDoc(i, c.DB, c)
+	doc := newODM(i, c.DB, c)
 	r, err = doc.insert()
 	return r, err
 }
