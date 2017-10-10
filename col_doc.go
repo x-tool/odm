@@ -20,9 +20,10 @@ type Doc struct {
 	funcLst map[string]string
 }
 
+type Docs []*Doc
 type dependLst []*Doc
 
-func (o dependLst) getRootExtendFields() (returns dependLst) {
+func (o dependLst) getRootExtendFields() (returns Docs) {
 	for _, v := range o {
 		if v.Pid == -1 && v.extendPid != -1 && v.isExtend {
 			returns = append(returns, v)
@@ -31,7 +32,7 @@ func (o dependLst) getRootExtendFields() (returns dependLst) {
 	return
 }
 
-func (o dependLst) getRootSinpleFields() (returns dependLst) {
+func (o dependLst) getRootSinpleFields() (returns Docs) {
 	for _, v := range o {
 		if v.Pid == -1 && v.extendPid == -1 && !v.isExtend {
 			returns = append(returns, v)
@@ -40,7 +41,7 @@ func (o dependLst) getRootSinpleFields() (returns dependLst) {
 	return
 }
 
-func (o dependLst) getRootComplexFields() (returns []*Doc) {
+func (o dependLst) getRootComplexFields() (returns Docs) {
 	for _, v := range o {
 		if v.Pid == -1 && v.extendPid != -1 && !v.isExtend {
 			returns = append(returns, v)
@@ -109,7 +110,7 @@ func (d *OriginDoc) getFieldsById(id int) (o *Doc) {
 	return
 }
 
-func NewOriginDoc(c *Col, i interface{}) *OriginDoc {
+func NewDoc(c *Col, i interface{}) *OriginDoc {
 	doc := new(OriginDoc)
 	doc.Col = c
 	doc.DB = c.DB
@@ -121,7 +122,7 @@ func NewOriginDoc(c *Col, i interface{}) *OriginDoc {
 		cont := docSourceT.NumField()
 		for i := 0; i < cont; i++ {
 			field := docSourceT.Field(i)
-			newODM(doc, &field, -1, -1)
+			newDocField(doc, &field, -1, -1)
 		}
 		// check Fields Name, Can't both same name in one Col
 		doc.checkFieldsName()
@@ -132,12 +133,12 @@ func NewOriginDoc(c *Col, i interface{}) *OriginDoc {
 	return doc
 }
 
-func newODM(d *OriginDoc, t *reflect.StructField, Pid int, extendPid int) {
+func newDocField(d *OriginDoc, t *reflect.StructField, Pid int, extendPid int) {
 	fieldType := *t
 	fieldTypeStr := formatTypeToString(&fieldType.Type)
 	id := len(d.fields)
 	tag := fieldType.Tag.Get(tagName)
-	isExtend := checkDocisExtend(fieldType.Name, tag)
+	isExtend := checkDocFieldisExtend(fieldType.Name, tag)
 	extendField := d.getFieldsById(extendPid)
 	var dependLst dependLst
 	if extendField == nil {
@@ -174,7 +175,7 @@ func newODM(d *OriginDoc, t *reflect.StructField, Pid int, extendPid int) {
 				extendPid = id
 			}
 			field := _fieldType.Field(i)
-			newODM(d, &field, id, extendPid)
+			newDocField(d, &field, id, extendPid)
 		}
 	case reflect.Struct:
 		count := fieldType.Type.NumField()
@@ -185,13 +186,13 @@ func newODM(d *OriginDoc, t *reflect.StructField, Pid int, extendPid int) {
 				extendPid = id
 			}
 			field := fieldType.Type.Field(i)
-			newODM(d, &field, id, extendPid)
+			newDocField(d, &field, id, extendPid)
 		}
 
 	}
 }
 
-func checkDocisExtend(name, tag string) bool {
+func checkDocFieldisExtend(name, tag string) bool {
 	isMode := isDocMode(name)
 	isExtend := tagIsExtend(tag)
 	return isMode || isExtend

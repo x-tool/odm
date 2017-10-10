@@ -13,14 +13,14 @@ type Col struct {
 	name        string
 	hasDocModel bool
 	DocModel    string
-	OriginDocs  *OriginDoc
+	Doc
 }
 
 func NewCol(d *Database, i interface{}) *Col {
 	c := new(Col)
 	c.name = GetColName(i)
 	c.DB = d
-	c.OriginDocs = NewOriginDoc(c, i)
+	c.Doc = NewDoc(c, i)
 	c.DocModel, c.hasDocModel = c.OriginDocs.DocModel()
 	return c
 }
