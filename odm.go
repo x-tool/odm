@@ -21,6 +21,18 @@ func newODM(i interface{}, db *Database, c *Col) *ODM {
 	return d
 }
 
+func newODMwithoutCol(i interface{}, db *Database) *ODM {
+	d := &ODM{
+		Col:    nil,
+		DB:     db,
+		Handle: nil,
+		Query:  newQuery(),
+		Result: newResult(i, c),
+		Err:    nil,
+	}
+	return d
+}
+
 func (d *ODM) dbName() string {
 	return d.DB.name
 }

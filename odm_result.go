@@ -1,6 +1,7 @@
 package odm
 
 import (
+	"log"
 	"reflect"
 )
 
@@ -25,10 +26,17 @@ type routeResult struct {
 func newResult(i interface{}, c *Col) *result {
 	r := &result{
 		Doc: c.Doc,
+		raw: i,
 	}
 	return r
 }
-
+func newResultWithoutCol(i interface{}) *result {
+	r := &result{
+		Doc: nil,
+		raw: i,
+	}
+	return r
+}
 func (r *result) NewResult() (v *reflect.Value) {
 	return
 }
@@ -41,6 +49,7 @@ func (r *result) getRootFields() []*docRootField {
 	}
 	for _, v := range r.Doc.getRootSinpleFields() {
 		var value reflect.Value
+		log.Print(ivalue.Kind())
 		if ivalue.Kind() == reflect.Struct {
 			value = ivalue.FieldByName(v.Name)
 		} else {

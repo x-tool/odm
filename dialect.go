@@ -52,11 +52,11 @@ func initDialect(c ConnectionConfig) (d Dialect) {
 	}
 }
 
-type Conn interface {
-	Open(sql string, result interface{}) error
-	// Close()
-	// Begin()
-}
+// type Conn interface {
+// 	Open(sql string) error
+// 	// Close()
+// 	// Begin()
+// }
 
 type Session struct{}
 type Exec interface{}

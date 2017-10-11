@@ -28,7 +28,7 @@ type dialectpostgre struct {
 	config    ConnectionConfig
 	pgxConfig pgx.ConnConfig
 }
-type postgredb struct {
+type postgreConn struct {
 	conn *pgx.Conn
 }
 
@@ -62,21 +62,16 @@ func (d *dialectpostgre) SwitchType(s string) string {
 }
 func (d *dialectpostgre) GetTables(db *Database) ([]string, error) {
 	var tablesName []string
-	conn, _ := d.Conn()
 	type r struct {
 		tablesName string
 	}
 	var rLst []r
-	err := conn.Open("SELECT tablename FROM pg_tables WHERE schemaname='public'", rLst)
+	err := d.Open("SELECT tablename FROM pg_tables WHERE schemaname='public'", rLst)
 	log.Print(rLst)
 	return tablesName, err
 }
 
 func (d *dialectpostgre) syncCol(col *Col) {
-	conn, err := d.Conn()
-	if err != nil {
-		tool.Panic("DB", err)
-	}
 	var sql string
 	var colFields string
 	colName := col.name
@@ -110,7 +105,7 @@ func (d *dialectpostgre) syncCol(col *Col) {
 			%s
 		)
 	`, colName, colFields)
-	err = conn.Open(sql, nil)
+	err := d.Open(sql, nil)
 	if err != nil {
 		tool.Panic("DB", err)
 	}
@@ -134,8 +129,7 @@ func (d *dialectpostgre) Insert(doc *ODM) (result interface{}, err error) {
 		"$typeLst", nameLstStr,
 		"$valueLst", valueLstStr,
 	})
-	conn, _ := d.Conn()
-	err = conn.Open(rawsql, result)
+	err = d.Open(rawsql, result)
 	log.Println(result)
 	return
 }
@@ -149,40 +143,28 @@ func (d *dialectpostgre) Query(doc *ODM) (r interface{}, err error) {
 	return
 }
 
-func (d *dialectpostgre) Conn() (Conn, error) {
+func (d *dialectpostgre) newConn() (*postgreConn, error) {
 	conn, err := pgx.Connect(d.pgxConfig)
 	var c postgreConn
 	c.conn = conn
 	return &c, err
 }
 
-type postgreConn struct {
-	conn *pgx.Conn
-}
-
-func (p *postgreConn) Open(s string, result interface{}) (err error) {
-	sql := s
+func (d *dialectpostgre) Open(sql string, result interface{}) (err error) {
+	_conn, err := d.newConn()
+	if err != nil {
+		return err
+	}
+	pgConn := _conn.conn
 	log.Print(sql)
-	rows, err := p.conn.Query(sql)
-	defer p.conn.Close()
-	var rLst [][]interface{}
+	rows, err := pgConn.Query(sql)
+	defer pgConn.Close()
 	for rows.Next() {
-		// var tableName string
 		byteLst, err := rows.Values()
-		rLst = append(rLst, byteLst)
-		// log.Print(s)
+		pg_ByteToValue(byteLst)
 		if err != nil {
 			break
 		}
 	}
-	log.Println(rLst)
 	return err
 }
-
-// func (p *postgreConn)Q(sql string)(r interface{},err error){
-
-// }
-// func (p *postgredb) Close(ql string) (result []byte, err error) {
-// 	result = []byte{}
-// 	return result, err
-// }
