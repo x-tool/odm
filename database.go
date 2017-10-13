@@ -20,7 +20,7 @@ type Database struct {
 // 	return d.Conn()
 // }
 func (d *Database) SyncCols(cols ...interface{}) {
-	activeCols, err := d.GetTables(d)
+	activeCols, err := d.GetColNames(d)
 	if err != nil {
 		tool.Panic("DB", err)
 	}

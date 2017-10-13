@@ -1,6 +1,7 @@
 package odm
 
 import (
+	"errors"
 	"fmt"
 	"log"
 	"reflect"
@@ -28,6 +29,7 @@ type dialectpostgre struct {
 	config    ConnectionConfig
 	pgxConfig pgx.ConnConfig
 }
+type postgreSimpleResult [][][]byte
 type postgreConn struct {
 	conn *pgx.Conn
 }
@@ -60,15 +62,12 @@ func pg_valueToString(v reflect.Value) (r string) {
 func (d *dialectpostgre) SwitchType(s string) string {
 	return typeMap[s]
 }
-func (d *dialectpostgre) GetTables(db *Database) ([]string, error) {
-	var tablesName []string
-	type r struct {
-		tablesName string
-	}
-	var rLst []r
-	err := d.Open("SELECT tablename FROM pg_tables WHERE schemaname='public'", rLst)
-	log.Print(rLst)
-	return tablesName, err
+func (d *dialectpostgre) GetColNames(db *Database) (ColNames []string, err error) {
+	var results postgreSimpleResult
+	// err = d.Open("SELECT tablename,tableowner FROM pg_tables WHERE schemaname='public'", results)
+	err = d.Open("SELECT key,id FROM doc", results)
+	log.Print(results)
+	return ColNames, err
 }
 
 func (d *dialectpostgre) syncCol(col *Col) {
@@ -87,25 +86,17 @@ func (d *dialectpostgre) syncCol(col *Col) {
 			colFields = colFields + fieldPg
 			break
 		}
-		// first and last rows abord tab and ","
-		if i == 0 {
-			fieldPg = v.Name + " " + v.DBType + ",\n"
-		} else if i == (fieldsNum - 1) {
-			fieldPg = "\t\t" + v.Name + " " + v.DBType
+		if i == (fieldsNum - 1) {
+			fieldPg = v.Name + " " + v.DBType
 		} else {
-			fieldPg = "\t\t" + v.Name + " " + v.DBType + ",\n"
+			fieldPg = v.Name + " " + v.DBType + ",\n"
 		}
 
 		colFields = colFields + fieldPg
 	}
 	// make sql
-	sql = fmt.Sprintf(`
-		CREATE TABLE %s
-		(
-			%s
-		)
-	`, colName, colFields)
-	err := d.Open(sql, nil)
+	sql = fmt.Sprintf("CREATE TABLE %s ( %s ) ", colName, colFields)
+	err := d.OpenWithODM(sql, nil)
 	if err != nil {
 		tool.Panic("DB", err)
 	}
@@ -129,7 +120,7 @@ func (d *dialectpostgre) Insert(doc *ODM) (result interface{}, err error) {
 		"$typeLst", nameLstStr,
 		"$valueLst", valueLstStr,
 	})
-	err = d.Open(rawsql, result)
+	err = d.OpenWithODM(rawsql, result)
 	log.Println(result)
 	return
 }
@@ -150,7 +141,33 @@ func (d *dialectpostgre) newConn() (*postgreConn, error) {
 	return &c, err
 }
 
-func (d *dialectpostgre) Open(sql string, result interface{}) (err error) {
+func (d *dialectpostgre) Open(sql string, result interface{}) (results []interface{}, err error) {
+	_conn, err := d.newConn()
+	if err != nil {
+		return nil, err
+	}
+	pgConn := _conn.conn
+	log.Print(sql)
+	rows, err := pgConn.Query(sql)
+	defer pgConn.Close()
+	resultT := reflect.TypeOf(result)
+	if resultT.Kind() != reflect.Struct {
+		return nil, errors.New("ss")
+	}
+	resultSlice := reflect.MakeSlice(resultT, 1, 1)
+	for rows.Next() {
+		newResult := reflect.New(resultT)
+		err := rows.Scan(newResult)
+		log.Print(newResult)
+
+		if err != nil {
+			break
+		}
+	}
+	return nil, err
+
+}
+func (d *dialectpostgre) OpenUseODM(sql string, result *ODM) (err error) {
 	_conn, err := d.newConn()
 	if err != nil {
 		return err
@@ -159,12 +176,14 @@ func (d *dialectpostgre) Open(sql string, result interface{}) (err error) {
 	log.Print(sql)
 	rows, err := pgConn.Query(sql)
 	defer pgConn.Close()
+
 	for rows.Next() {
-		byteLst, err := rows.Values()
-		pg_ByteToValue(byteLst)
+		_, err := rows.Values()
+		// pg_ByteToValue(byteLst, result)
 		if err != nil {
 			break
 		}
 	}
 	return err
+
 }

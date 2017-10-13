@@ -30,7 +30,7 @@ type Index string
 type Dialect interface {
 	Init(ConnectionConfig) Dialect
 	// Conn() (Conn, error)
-	GetTables(db *Database) ([]string, error)
+	GetColNames(db *Database) ([]string, error)
 	SwitchType(string) string
 	syncCol(*Col)
 	// base handel

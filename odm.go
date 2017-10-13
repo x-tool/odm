@@ -27,7 +27,7 @@ func newODMwithoutCol(i interface{}, db *Database) *ODM {
 		DB:     db,
 		Handle: nil,
 		Query:  newQuery(),
-		Result: newResult(i, c),
+		Result: newResultWithoutCol(i),
 		Err:    nil,
 	}
 	return d
