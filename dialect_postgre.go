@@ -63,9 +63,12 @@ func (d *dialectpostgre) SwitchType(s string) string {
 	return typeMap[s]
 }
 func (d *dialectpostgre) GetColNames(db *Database) (ColNames []string, err error) {
-	var results postgreSimpleResult
-	// err = d.Open("SELECT tablename,tableowner FROM pg_tables WHERE schemaname='public'", results)
-	err = d.Open("SELECT key,id FROM doc", results)
+	type _result struct {
+		Tablename  string
+		Tableowner string
+	}
+	var results []_result
+	err = d.Open("SELECT tablename,tableowner FROM pg_tables WHERE schemaname='public'", &results)
 	log.Print(results)
 	return ColNames, err
 }
@@ -120,7 +123,7 @@ func (d *dialectpostgre) Insert(doc *ODM) (result interface{}, err error) {
 		"$typeLst", nameLstStr,
 		"$valueLst", valueLstStr,
 	})
-	err = d.OpenWithODM(rawsql, result)
+	err = d.OpenWithODM(rawsql, nil)
 	log.Println(result)
 	return
 }
@@ -141,33 +144,44 @@ func (d *dialectpostgre) newConn() (*postgreConn, error) {
 	return &c, err
 }
 
-func (d *dialectpostgre) Open(sql string, result interface{}) (results []interface{}, err error) {
+func (d *dialectpostgre) Open(sql string, results interface{}) (err error) {
 	_conn, err := d.newConn()
 	if err != nil {
-		return nil, err
+		return err
 	}
 	pgConn := _conn.conn
 	log.Print(sql)
 	rows, err := pgConn.Query(sql)
 	defer pgConn.Close()
-	resultT := reflect.TypeOf(result)
-	if resultT.Kind() != reflect.Struct {
-		return nil, errors.New("ss")
-	}
-	resultSlice := reflect.MakeSlice(resultT, 1, 1)
-	for rows.Next() {
-		newResult := reflect.New(resultT)
-		err := rows.Scan(newResult)
-		log.Print(newResult)
-
-		if err != nil {
-			break
+	resultV := reflect.ValueOf(results)
+	resultVElem := reflect.Indirect(resultV)
+	resultT := resultVElem.Type()
+	if resultT.Kind() != reflect.Slice {
+		resultSlice := reflect.SliceOf(resultT)
+		log.Print(resultSlice.Kind())
+		return errors.New("result type should be slice")
+	} else {
+		resultItemT := resultT.Elem()
+		_tempResultItemLst := reflect.New(reflect.SliceOf(resultItemT))
+		tempResultItemLst := reflect.Indirect(_tempResultItemLst)
+		for rows.Next() {
+			newResult := reflect.Indirect(reflect.New(resultItemT))
+			var resultSlicePtr []interface{}
+			for i := 0; i < newResult.NumField(); i++ {
+				newResultField := newResult.Field(i).Addr().Interface()
+				resultSlicePtr = append(resultSlicePtr, newResultField)
+			}
+			err := rows.Scan(resultSlicePtr...)
+			tempResultItemLst.Set(reflect.Append(tempResultItemLst, newResult))
+			if err != nil {
+				break
+			}
 		}
+		resultVElem.Set(tempResultItemLst)
+		return err
 	}
-	return nil, err
-
 }
-func (d *dialectpostgre) OpenUseODM(sql string, result *ODM) (err error) {
+func (d *dialectpostgre) OpenWithODM(sql string, result *ODM) (err error) {
 	_conn, err := d.newConn()
 	if err != nil {
 		return err
