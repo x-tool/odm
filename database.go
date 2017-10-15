@@ -9,10 +9,10 @@ const (
 )
 
 type Database struct {
-	Client       *Client
-	name         string
-	activeColLst []string
-	ColLst       []*Col
+	Client           *Client
+	name             string
+	activeColNameLst []string
+	ColLst           []*Col
 	Dialect
 }
 
@@ -24,26 +24,18 @@ func (d *Database) SyncCols(cols ...interface{}) {
 	if err != nil {
 		tool.Panic("DB", err)
 	}
-	d.activeColLst = activeCols
+	d.activeColNameLst = activeCols
 	for _, col := range cols {
-		colName := GetColName(col)
-		if d.findColINactiveCol(colName) {
+		// colName := GetColName(col)
+		// if d.findColINactiveCol(colName) {
 
-		} else {
-			d.syncCol(col)
-		}
+		// } else {
+		d.syncCol(col)
+		// }
 
 	}
 }
 
-func (d *Database) findColINactiveCol(s string) (b bool) {
-	for _, v := range d.activeColLst {
-		if v == s {
-			b = true
-		}
-	}
-	return
-}
 func (d *Database) getCol(name string) *Col {
 	var col *Col
 	for _, v := range d.ColLst {

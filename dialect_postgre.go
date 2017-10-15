@@ -53,6 +53,8 @@ func pg_valueToString(v reflect.Value) (r string) {
 		r = "'" + v.String() + "'"
 	case "int":
 		r = strconv.FormatInt(v.Int(), 10)
+	// case "time":
+	// 	if v
 	default:
 		r = v.String()
 	}
@@ -69,7 +71,9 @@ func (d *dialectpostgre) GetColNames(db *Database) (ColNames []string, err error
 	}
 	var results []_result
 	err = d.Open("SELECT tablename,tableowner FROM pg_tables WHERE schemaname='public'", &results)
-	log.Print(results)
+	for _, v := range results {
+		ColNames = append(ColNames, v.Tablename)
+	}
 	return ColNames, err
 }
 

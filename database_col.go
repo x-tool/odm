@@ -3,7 +3,20 @@ package odm
 func (d *Database) syncCol(colI interface{}) {
 	col := d.NewCol(colI)
 	d.ColLst = append(d.ColLst, col)
-	d.Dialect.syncCol(col)
+	if !d.checkNativeCol(col.name) {
+		d.Dialect.syncCol(col)
+	}
+
+}
+
+// check col sync to database
+func (d *Database) checkNativeCol(s string) bool {
+	for _, v := range d.activeColNameLst {
+		if v == s {
+			return true
+		}
+	}
+	return false
 }
 
 func (d *Database) NewCol(i interface{}) *Col {

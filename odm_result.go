@@ -1,7 +1,6 @@
 package odm
 
 import (
-	"log"
 	"reflect"
 )
 
@@ -49,7 +48,6 @@ func (r *result) getRootFields() []*docRootField {
 	}
 	for _, v := range r.Doc.getRootSinpleFields() {
 		var value reflect.Value
-		log.Print(ivalue.Kind())
 		if ivalue.Kind() == reflect.Struct {
 			value = ivalue.FieldByName(v.Name)
 		} else {
@@ -76,4 +74,13 @@ func (r *result) getRootFields() []*docRootField {
 		}
 	}
 	return rootField
+}
+
+func (r *result) selectValidFields(dLst []*docRootField) (vLst []*docRootField) {
+	for _, v := range dLst {
+		if v.value.IsValid() {
+			vLst = append(vLst, v)
+		}
+	}
+	return
 }

@@ -33,13 +33,11 @@ func Test_connection(t *testing.T) {
 	db := client.Database("x")
 
 	db.SyncCols(new(myDoc))
-	// var r struct {
-	// 	Name string
-	// }
 	col := db.GetCol(new(myDoc))
 	testInsert := new(myDoc)
 	testInsert.Name = "haha,I get"
 	_, err := col.Insert(testInsert)
+	t.Log(testInsert)
 	t.Log(err)
 }
 
