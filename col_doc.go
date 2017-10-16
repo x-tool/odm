@@ -17,9 +17,9 @@ type DocField struct {
 	Type      string
 	DBType    string
 	Id        int
-	Pid       int
+	Pid       int // field golang parent real ID
 	isExtend  bool
-	extendPid int
+	extendPid int // field odm parent ID
 	dependLst
 	Tag     string
 	funcLst map[string]string
@@ -38,7 +38,7 @@ func (doc *Doc) getRootExtendFields() (d DocFields) {
 
 func (doc *Doc) getRootSinpleFields() (d DocFields) {
 	for _, v := range doc.fields {
-		if v.Pid == -1 && v.extendPid == -1 && !v.isExtend {
+		if v.extendPid == -1 && !v.isExtend {
 			d = append(d, v)
 		}
 	}
@@ -47,7 +47,7 @@ func (doc *Doc) getRootSinpleFields() (d DocFields) {
 
 func (doc *Doc) getRootComplexFields() (d DocFields) {
 	for _, v := range doc.fields {
-		if v.Pid == -1 && v.extendPid != -1 && !v.isExtend {
+		if v.extendPid != -1 && !v.isExtend {
 			d = append(d, v)
 		}
 	}
@@ -175,6 +175,10 @@ func newDocField(d *Doc, t *reflect.StructField, Pid int, extendPid int) {
 			newDocField(d, &field, id, extendPid)
 		}
 	case reflect.Struct:
+		// if time package not range time struct
+		if t.Type.PkgPath() == "time" {
+			return
+		}
 		count := fieldType.Type.NumField()
 		for i := 0; i < count; i++ {
 			if isExtend {
