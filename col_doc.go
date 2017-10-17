@@ -38,7 +38,7 @@ func (doc *Doc) getRootExtendFields() (d DocFields) {
 
 func (doc *Doc) getRootSinpleFields() (d DocFields) {
 	for _, v := range doc.fields {
-		if v.extendPid == -1 && !v.isExtend {
+		if v.extendPid == -1 && !v.isExtend && !doc.checkComplexField(v) {
 			d = append(d, v)
 		}
 	}
@@ -47,11 +47,19 @@ func (doc *Doc) getRootSinpleFields() (d DocFields) {
 
 func (doc *Doc) getRootComplexFields() (d DocFields) {
 	for _, v := range doc.fields {
-		if v.extendPid != -1 && !v.isExtend {
+		if v.extendPid == -1 && !v.isExtend && doc.checkComplexField(v) {
 			d = append(d, v)
 		}
 	}
 	return
+}
+
+func (doc *Doc) checkComplexField(d *DocField) bool {
+	if d.Type == "struct" || d.Type == "map" || d.Type == "slice" {
+		return true
+	}
+	return false
+
 }
 
 func (d *Doc) getRootDetails() (doc dependLst) {

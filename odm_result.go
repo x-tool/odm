@@ -2,24 +2,17 @@ package odm
 
 import (
 	"reflect"
+	"time"
+
+	"github.com/x-tool/tool"
 )
 
 type result struct {
-	Doc    *Doc
-	routeR []routeResult
-	routeT reflect.Type
-	raw    interface{}
+	Doc       *Doc
+	resultLst []*resultItem
+	raw       interface{}
 }
-
-type docRootField struct {
-	name       string
-	typeName   string
-	DBtypeName string
-	value      reflect.Value
-}
-
-type routeResult struct {
-	v reflect.Type
+type resultItem struct {
 }
 
 func newResult(i interface{}, c *Col) *result {
@@ -27,6 +20,7 @@ func newResult(i interface{}, c *Col) *result {
 		Doc: c.Doc,
 		raw: i,
 	}
+	r.format()
 	return r
 }
 func newResultWithoutCol(i interface{}) *result {
@@ -36,51 +30,62 @@ func newResultWithoutCol(i interface{}) *result {
 	}
 	return r
 }
-func (r *result) NewResult() (v *reflect.Value) {
-	return
-}
 
-func (r *result) getRootFields() []*docRootField {
-	var rootField []*docRootField
-	ivalue := reflect.ValueOf(r.raw)
-	if ivalue.Kind() == reflect.Ptr || ivalue.Kind() == reflect.Interface {
-		ivalue = ivalue.Elem()
+func (r *result) format() {
+	T := reflect.TypeOf(r.raw)
+	var value reflect.Type
+	if T.Kind() != reflect.Ptr {
+		tool.Panic("ODM", "have not Ptr, Can't write In")
+	} else {
+		value = T.Elem()
 	}
-	for _, v := range r.Doc.getRootSinpleFields() {
-		var value reflect.Value
-		if ivalue.Kind() == reflect.Struct {
-			value = ivalue.FieldByName(v.Name)
-		} else {
-			value = ivalue
-		}
-		f := &docRootField{
-			name:       v.Name,
-			typeName:   v.Type,
-			DBtypeName: v.DBType,
-			value:      value,
-		}
-		rootField = append(rootField, f)
+	if value.Kind() == reflect.Slice {
+
 	}
-	for _, v := range r.Doc.getRootComplexFields() {
-		fields := r.Doc.getChildFields(v)
-		for _, val := range fields {
-			f := &docRootField{
-				name:       val.Name,
-				typeName:   val.Type,
-				DBtypeName: val.DBType,
-				value:      ivalue.FieldByName(val.Name),
-			}
-			rootField = append(rootField, f)
-		}
-	}
-	return rootField
 }
 
 func (r *result) selectValidFields(dLst []*docRootField) (vLst []*docRootField) {
 	for _, v := range dLst {
-		if v.value.IsValid() {
+		if !v.zero {
 			vLst = append(vLst, v)
 		}
 	}
 	return
+}
+
+func (r *result) checkZero(v reflect.Value) bool {
+
+	var isValid bool
+	value := v.Interface()
+	switch v.Kind() {
+	case reflect.String:
+		if value.(string) == "" {
+			isValid = true
+		}
+	case reflect.Bool:
+		if value.(bool) {
+			isValid = true
+		}
+	case reflect.Int:
+		if value.(int) == 0 {
+			isValid = true
+		}
+	case reflect.Array:
+		fallthrough
+	case reflect.Slice:
+		fallthrough
+	case reflect.Map:
+		if v.Len() != 0 {
+			isValid = true
+		}
+	case reflect.Struct:
+		if _v, ok := value.(time.Time); ok {
+			if !_v.IsZero() {
+				isValid = true
+			}
+		}
+	default:
+		isValid = false
+	}
+	return isValid
 }

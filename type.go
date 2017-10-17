@@ -10,6 +10,9 @@ var mapType = map[string]string{
 	"int":     "int",
 	"float64": "float64",
 	"struct":  "struct",
+	"slice":   "slice",
+	"array":   "array",
+	"map":     "map",
 }
 
 func formatTypeToString(t *reflect.Type) (s string) {
