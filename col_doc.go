@@ -9,6 +9,7 @@ import (
 
 type Doc struct {
 	col    *Col
+	t      *reflect.Type
 	fields DocFields
 }
 type DocFields []*DocField
@@ -115,14 +116,24 @@ func (d *Doc) getFieldById(id int) (o *DocField) {
 	}
 	return
 }
-
+func (d *Doc) getFieldByName(name string) (o DocFields) {
+	for _, v := range d.fields {
+		if v.Name == name {
+			o = append(o, v)
+		}
+	}
+	return
+}
 func NewDoc(c *Col, i interface{}) *Doc {
-	doc := new(Doc)
-	doc.col = c
+
 	// append doc.fields
 	docSource := reflect.ValueOf(i)
 	docSourceV := docSource.Elem()
 	docSourceT := docSourceV.Type()
+	doc := &Doc{
+		col: c,
+		t:   &docSourceT,
+	}
 	if docSourceT.Kind() == reflect.Struct {
 		cont := docSourceT.NumField()
 		for i := 0; i < cont; i++ {

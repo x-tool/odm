@@ -1,34 +1,28 @@
 package odm
 
+import "reflect"
+
 type ODM struct {
 	Col    *Col
 	DB     *Database // col has db,but it can't use col when handle needless col. Ex: getColLst()
 	Handle *handle
 	Query  *query
 	Result *result
+	R      *reflect.Value
 	Err    error
 }
 
-func newODM(i interface{}, db *Database, c *Col) *ODM {
+func newODM(db *Database, c *Col) *ODM {
 	d := &ODM{
-		Col:    c,
-		DB:     db,
-		Handle: newHandle(),
-		Query:  newQuery(),
-		Result: newResult(i, c),
-		Err:    nil,
+		Col: c,
+		DB:  db,
 	}
 	return d
 }
 
-func newODMwithoutCol(i interface{}, db *Database) *ODM {
+func newODMwithoutCol(db *Database) *ODM {
 	d := &ODM{
-		Col:    nil,
-		DB:     db,
-		Handle: nil,
-		Query:  newQuery(),
-		Result: newResultWithoutCol(i),
-		Err:    nil,
+		DB: db,
 	}
 	return d
 }
@@ -39,7 +33,7 @@ func (d *ODM) dbName() string {
 func (d *ODM) colName() string {
 	return d.Col.name
 }
-func (d *ODM) insert() (r interface{}, err error) {
+func (d *ODM) insert(i interface{}) (err error) {
 	r, err = d.DB.Dialect.Insert(d)
 	return
 }
