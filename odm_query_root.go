@@ -1,6 +1,10 @@
 package odm
 
-import "reflect"
+import (
+	"reflect"
+
+	"github.com/x-tool/tool"
+)
 
 type docRootField struct {
 	DocField *DocField
@@ -8,13 +12,14 @@ type docRootField struct {
 	value    reflect.Value
 }
 
-func (r *result) getRootFields() []*docRootField {
+func (q *query) getRootFields() []*docRootField {
 	var rootField []*docRootField
-	ivalue := reflect.ValueOf(r.raw)
+	ivalue := *q.queryValue
 	if ivalue.Kind() == reflect.Ptr || ivalue.Kind() == reflect.Interface {
 		ivalue = ivalue.Elem()
 	}
-	for _, v := range r.Doc.getRootSinpleFields() {
+	_d := q.Col.Doc.getRootSinpleFields()
+	for _, v := range _d {
 		var value reflect.Value
 		if ivalue.Kind() == reflect.Struct {
 			value = ivalue.FieldByName(v.Name)
@@ -23,18 +28,19 @@ func (r *result) getRootFields() []*docRootField {
 		}
 		f := &docRootField{
 			DocField: v,
-			zero:     r.checkZero(value),
+			zero:     tool.CheckZero(value),
 			value:    value,
 		}
 		rootField = append(rootField, f)
 	}
-	for _, val := range r.Doc.getRootComplexFields() {
-		fields := r.Doc.getChildFields(val)
+	for _, val := range q.Col.Doc.getRootComplexFields() {
+		fields := q.Col.Doc.getChildFields(val)
 		for _, v := range fields {
+			value := ivalue.FieldByName(v.Name)
 			f := &docRootField{
 				DocField: v,
-				zero:     r.checkZero(value),
-				value:    ivalue.FieldByName(v.Name),
+				zero:     tool.CheckZero(value),
+				value:    value,
 			}
 			rootField = append(rootField, f)
 		}

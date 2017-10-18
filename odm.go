@@ -34,7 +34,12 @@ func (d *ODM) colName() string {
 	return d.Col.name
 }
 func (d *ODM) insert(i interface{}) (err error) {
-	r, err = d.DB.Dialect.Insert(d)
+	r := reflect.ValueOf(i)
+	d.R = &r
+	d.Handle = newHandle(HandleInsert)
+	d.Query = newQuery(&r, d.Col)
+	d.Result = newResult(&r, d.Col)
+	err = d.DB.Dialect.Insert(d)
 	return
 }
 

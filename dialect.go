@@ -34,7 +34,7 @@ type Dialect interface {
 	SwitchType(string) string
 	syncCol(*Col)
 	// base handel
-	Insert(doc *ODM) (interface{}, error)
+	Insert(doc *ODM) error
 	Update(doc *ODM) (interface{}, error)
 	Delete(doc *ODM) (interface{}, error)
 	Query(doc *ODM) (interface{}, error)

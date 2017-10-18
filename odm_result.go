@@ -4,35 +4,34 @@ import (
 	"errors"
 	"reflect"
 	"strings"
-	"time"
 
 	"github.com/x-tool/tool"
 )
 
 type result struct {
-	Doc       *Doc
-	resultLst []*DocField
-	odm       *ODM
+	Doc            *Doc
+	resultFieldLst []*DocField
+	resultV        *reflect.Value
 }
 
 func newResult(rV *reflect.Value, c *Col) *result {
 	r := &result{
-		Doc: c.Doc,
-		odm: i,
+		Doc:     c.Doc,
+		resultV: rV,
 	}
 	r.format()
 	return r
 }
-func newResultWithoutCol(i interface{}) *result {
+func newResultWithoutCol(rV *reflect.Value) *result {
 	r := &result{
-		Doc: nil,
-		raw: i,
+		Doc:     nil,
+		resultV: rV,
 	}
 	return r
 }
 
 func (r *result) format() {
-	T := reflect.TypeOf(r.raw)
+	T := r.resultV.Type()
 	var value reflect.Type
 	if T.Kind() != reflect.Ptr {
 		tool.Panic("ODM", errors.New("have not Ptr, Can't write In"))
@@ -44,7 +43,7 @@ func (r *result) format() {
 		for i := 0; i < valueItem.NumField(); i++ {
 			field := valueItem.Field(i)
 			newResultItem := r.DependToDoc(field.Tag.Get(tagName), field.Name)
-			r.resultLst = append(r.resultLst, newResultItem)
+			r.resultFieldLst = append(r.resultFieldLst, newResultItem)
 		}
 	}
 }
@@ -86,41 +85,4 @@ func (r *result) selectValidFields(dLst []*docRootField) (vLst []*docRootField) 
 		}
 	}
 	return
-}
-
-func (r *result) checkZero(v reflect.Value) bool {
-
-	var isValid bool
-	value := v.Interface()
-	switch v.Kind() {
-	case reflect.String:
-		if value.(string) == "" {
-			isValid = true
-		}
-	case reflect.Bool:
-		if value.(bool) {
-			isValid = true
-		}
-	case reflect.Int:
-		if value.(int) == 0 {
-			isValid = true
-		}
-	case reflect.Array:
-		fallthrough
-	case reflect.Slice:
-		fallthrough
-	case reflect.Map:
-		if v.Len() != 0 {
-			isValid = true
-		}
-	case reflect.Struct:
-		if _v, ok := value.(time.Time); ok {
-			if !_v.IsZero() {
-				isValid = true
-			}
-		}
-	default:
-		isValid = false
-	}
-	return isValid
 }

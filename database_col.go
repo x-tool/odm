@@ -36,7 +36,7 @@ func (d *Database) GetCol(i interface{}) (c *Col) {
 
 func (d *Database) Insert(c *Col, i interface{}) (r interface{}, err error) {
 	odm := newODM(c.DB, c)
-	r, err = odm.insert()
+	err = odm.insert(i)
 	return r, err
 }
 func (d *Database) Get(c *Col) (r interface{}, err error) {

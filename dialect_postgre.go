@@ -112,7 +112,7 @@ func (d *dialectpostgre) syncCol(col *Col) {
 func (d *dialectpostgre) Session() *Session {
 	return new(Session)
 }
-func (d *dialectpostgre) Insert(doc *ODM) (result interface{}, err error) {
+func (d *dialectpostgre) Insert(doc *ODM) (err error) {
 	var nameLst, valueLst []string
 	rootFields := doc.Result.getRootFields()
 	rootFields = doc.Result.selectValidFields(rootFields)
@@ -129,7 +129,7 @@ func (d *dialectpostgre) Insert(doc *ODM) (result interface{}, err error) {
 		"$valueLst", valueLstStr,
 	})
 	err = d.OpenWithODM(rawsql, nil)
-	log.Println(result)
+	log.Println("ok")
 	return
 }
 func (d *dialectpostgre) Update(doc *ODM) (r interface{}, err error) {
