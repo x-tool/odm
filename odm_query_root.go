@@ -28,7 +28,7 @@ func (q *query) getRootFields() []*queryRootField {
 		}
 		f := &queryRootField{
 			DocField: v,
-			zero:     tool.CheckZero(value),
+			zero:     tool.IsZero(value),
 			value:    value,
 		}
 		rootField = append(rootField, f)
@@ -39,7 +39,7 @@ func (q *query) getRootFields() []*queryRootField {
 			value := *q.Col.Doc.getRootDetailValue(&ivalue, v)
 			f := &queryRootField{
 				DocField: v,
-				zero:     tool.CheckZero(value),
+				zero:     tool.IsZero(value),
 				value:    value,
 			}
 			rootField = append(rootField, f)
