@@ -114,8 +114,8 @@ func (d *dialectpostgre) Session() *Session {
 }
 func (d *dialectpostgre) Insert(doc *ODM) (err error) {
 	var nameLst, valueLst []string
-	rootFields := doc.Result.getRootFields()
-	rootFields = doc.Result.selectValidFields(rootFields)
+	rootFields := doc.Query.getRootFields()
+	rootFields = doc.selectValidFields(rootFields)
 	for _, v := range rootFields {
 		nameLst = append(nameLst, v.DocField.Name)
 		valueLst = append(valueLst, pg_valueToString(v.value))

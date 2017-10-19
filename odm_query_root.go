@@ -6,14 +6,14 @@ import (
 	"github.com/x-tool/tool"
 )
 
-type docRootField struct {
+type queryRootField struct {
 	DocField *DocField
 	zero     bool
 	value    reflect.Value
 }
 
-func (q *query) getRootFields() []*docRootField {
-	var rootField []*docRootField
+func (q *query) getRootFields() []*queryRootField {
+	var rootField []*queryRootField
 	ivalue := *q.queryValue
 	if ivalue.Kind() == reflect.Ptr || ivalue.Kind() == reflect.Interface {
 		ivalue = ivalue.Elem()
@@ -22,11 +22,11 @@ func (q *query) getRootFields() []*docRootField {
 	for _, v := range _d {
 		var value reflect.Value
 		if ivalue.Kind() == reflect.Struct {
-			value = ivalue.FieldByName(v.Name)
+			value = *q.Col.Doc.getRootDetailValue(&ivalue, v)
 		} else {
 			value = ivalue
 		}
-		f := &docRootField{
+		f := &queryRootField{
 			DocField: v,
 			zero:     tool.CheckZero(value),
 			value:    value,
@@ -36,8 +36,8 @@ func (q *query) getRootFields() []*docRootField {
 	for _, val := range q.Col.Doc.getRootComplexFields() {
 		fields := q.Col.Doc.getChildFields(val)
 		for _, v := range fields {
-			value := ivalue.FieldByName(v.Name)
-			f := &docRootField{
+			value := *q.Col.Doc.getRootDetailValue(&ivalue, v)
+			f := &queryRootField{
 				DocField: v,
 				zero:     tool.CheckZero(value),
 				value:    value,

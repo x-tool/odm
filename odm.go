@@ -63,3 +63,12 @@ func (d *ODM) Limit(s string) *ODM {
 	// d.Handle.limit = s
 	return d
 }
+
+func (d *ODM) selectValidFields(dLst []*queryRootField) (vLst []*queryRootField) {
+	for _, v := range dLst {
+		if !v.zero {
+			vLst = append(vLst, v)
+		}
+	}
+	return
+}

@@ -78,11 +78,3 @@ func (r *result) DependToDoc(tag string, name string) (d *DocField) {
 	}
 	return
 }
-func (r *result) selectValidFields(dLst []*docRootField) (vLst []*docRootField) {
-	for _, v := range dLst {
-		if !v.zero {
-			vLst = append(vLst, v)
-		}
-	}
-	return
-}

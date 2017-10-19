@@ -8,14 +8,14 @@ import (
 type myDocLabel struct {
 	// Name       string
 	Label      string
-	labelName  string
-	labelfeild string
+	LabelName  string
+	Labelfeild string
 }
 type myDoc struct {
 	NormalCol
-	Name   string
-	Id     int
-	Detail *myDocLabel `odm:"extend"`
+	Name       string
+	Id         int
+	myDocLabel `odm:"extend"`
 }
 
 func (m *myDoc) ColName() string {
