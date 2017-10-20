@@ -3,7 +3,6 @@ package odm
 import (
 	"errors"
 	"fmt"
-	"log"
 	"reflect"
 	"strconv"
 	"strings"
@@ -114,7 +113,7 @@ func (d *dialectpostgre) Session() *Session {
 }
 func (d *dialectpostgre) Insert(doc *ODM) (err error) {
 	var nameLst, valueLst []string
-	rootFields := doc.Query.getRootFields()
+	rootFields := doc.Result.getRootFields()
 	rootFields = doc.selectValidFields(rootFields)
 	for _, v := range rootFields {
 		nameLst = append(nameLst, v.DocField.Name)
@@ -122,14 +121,13 @@ func (d *dialectpostgre) Insert(doc *ODM) (err error) {
 	}
 	nameLstStr := strings.Join(nameLst, ",")
 	valueLstStr := strings.Join(valueLst, ",")
-	sql := "INSERT INTO $colName ($typeLst) VALUES ($valueLst)"
+	sql := "INSERT INTO $colName ($typeLst) VALUES ($valueLst) RETURNING *"
 	rawsql := tool.ReplaceStrings(sql, []string{
 		"$colName", doc.Col.name,
 		"$typeLst", nameLstStr,
 		"$valueLst", valueLstStr,
 	})
 	err = d.OpenWithODM(rawsql, nil)
-	log.Println("ok")
 	return
 }
 func (d *dialectpostgre) Update(doc *ODM) (r interface{}, err error) {
@@ -148,23 +146,24 @@ func (d *dialectpostgre) newConn() (*postgreConn, error) {
 	c.conn = conn
 	return &c, err
 }
-
+func (d *dialectpostgre) LogSql(sql string) {
+	tool.Console.Log("XODM", sql)
+}
 func (d *dialectpostgre) Open(sql string, results interface{}) (err error) {
 	_conn, err := d.newConn()
 	if err != nil {
 		return err
 	}
 	pgConn := _conn.conn
-	log.Print(sql)
+	d.LogSql(sql)
 	rows, err := pgConn.Query(sql)
 	defer pgConn.Close()
+
 	resultV := reflect.ValueOf(results)
 	resultVElem := reflect.Indirect(resultV)
 	resultT := resultVElem.Type()
 	if resultT.Kind() != reflect.Slice {
-		resultSlice := reflect.SliceOf(resultT)
-		log.Print(resultSlice.Kind())
-		return errors.New("result type should be slice")
+		return errors.New("result type should be slice, Not Be " + resultT.Kind().String())
 	} else {
 		resultItemT := resultT.Elem()
 		_tempResultItemLst := reflect.New(reflect.SliceOf(resultItemT))
@@ -192,17 +191,33 @@ func (d *dialectpostgre) OpenWithODM(sql string, result *ODM) (err error) {
 		return err
 	}
 	pgConn := _conn.conn
-	log.Print(sql)
+	d.LogSql(sql)
 	rows, err := pgConn.Query(sql)
 	defer pgConn.Close()
 
-	for rows.Next() {
-		_, err := rows.Values()
-		// pg_ByteToValue(byteLst, result)
-		if err != nil {
-			break
+	resultV := *(result.R)
+	resultT := resultV.Type()
+	if resultT.Kind() != reflect.Slice {
+		return errors.New("result type should be slice, Not Be " + resultT.Kind().String())
+	} else {
+		resultItemT := resultT.Elem()
+		_tempResultItemLst := reflect.New(reflect.SliceOf(resultItemT))
+		tempResultItemLst := reflect.Indirect(_tempResultItemLst)
+		for rows.Next() {
+			newResult := reflect.Indirect(reflect.New(resultItemT))
+			var resultSlicePtr []interface{}
+			for i := 0; i < newResult.NumField(); i++ {
+				newResultField := newResult.Field(i).Addr().Interface()
+				resultSlicePtr = append(resultSlicePtr, newResultField)
+			}
+			err := rows.Scan(resultSlicePtr...)
+			tempResultItemLst.Set(reflect.Append(tempResultItemLst, newResult))
+			if err != nil {
+				break
+			}
 		}
+		resultV.Set(tempResultItemLst)
+		return err
 	}
-	return err
 
 }

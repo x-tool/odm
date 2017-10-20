@@ -19,8 +19,17 @@ func (n *NormalCol) Create() {
 	n.CreatedTime = time.Now()
 }
 
+func (n *NormalCol) Update() {
+	n.UpdateTime = time.Now()
+}
+func (n *NormalCol) Delete() {
+	n.DeleteTime = time.Now()
+}
+
 type NormalMode interface {
 	Create()
+	Update()
+	Delete()
 }
 
 func isDocMode(s string) bool {
@@ -30,4 +39,3 @@ func isDocMode(s string) bool {
 	}
 	return check
 }
-

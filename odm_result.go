@@ -9,14 +9,14 @@ import (
 )
 
 type result struct {
-	Doc            *Doc
+	Col            *Col
 	resultFieldLst []*DocField
 	resultV        *reflect.Value
 }
 
 func newResult(rV *reflect.Value, c *Col) *result {
 	r := &result{
-		Doc:     c.Doc,
+		Col:     c,
 		resultV: rV,
 	}
 	r.format()
@@ -24,7 +24,6 @@ func newResult(rV *reflect.Value, c *Col) *result {
 }
 func newResultWithoutCol(rV *reflect.Value) *result {
 	r := &result{
-		Doc:     nil,
 		resultV: rV,
 	}
 	return r
@@ -50,7 +49,7 @@ func (r *result) format() {
 
 func (r *result) DependToDoc(tag string, name string) (d *DocField) {
 	if tag == "" {
-		field := r.Doc.getFieldByName(name)
+		field := r.Col.Doc.getFieldByName(name)
 		if len(field) != 1 {
 			tool.Panic("ODM", errors.New("name not be single, you should add tag to find doc field"))
 		} else {
@@ -58,7 +57,7 @@ func (r *result) DependToDoc(tag string, name string) (d *DocField) {
 		}
 	} else {
 		dependLst := strings.Split(tag, ".")
-		docFieldLst := r.Doc.getFieldByName(name)
+		docFieldLst := r.Col.Doc.getFieldByName(name)
 		for _, val := range docFieldLst {
 			if len(dependLst) != len(val.dependLst) {
 				continue

@@ -12,17 +12,17 @@ type queryRootField struct {
 	value    reflect.Value
 }
 
-func (q *query) getRootFields() []*queryRootField {
+func (r *result) getRootFields() []*queryRootField {
 	var rootField []*queryRootField
-	ivalue := *q.queryValue
+	ivalue := *r.resultV
 	if ivalue.Kind() == reflect.Ptr || ivalue.Kind() == reflect.Interface {
 		ivalue = ivalue.Elem()
 	}
-	_d := q.Col.Doc.getRootSinpleFields()
+	_d := r.Col.Doc.getRootSinpleFields()
 	for _, v := range _d {
 		var value reflect.Value
 		if ivalue.Kind() == reflect.Struct {
-			value = *q.Col.Doc.getRootDetailValue(&ivalue, v)
+			value = *r.Col.Doc.getRootDetailValue(&ivalue, v)
 		} else {
 			value = ivalue
 		}
@@ -33,10 +33,10 @@ func (q *query) getRootFields() []*queryRootField {
 		}
 		rootField = append(rootField, f)
 	}
-	for _, val := range q.Col.Doc.getRootComplexFields() {
-		fields := q.Col.Doc.getChildFields(val)
+	for _, val := range r.Col.Doc.getRootComplexFields() {
+		fields := r.Col.Doc.getChildFields(val)
 		for _, v := range fields {
-			value := *q.Col.Doc.getRootDetailValue(&ivalue, v)
+			value := *r.Col.Doc.getRootDetailValue(&ivalue, v)
 			f := &queryRootField{
 				DocField: v,
 				zero:     tool.IsZero(value),

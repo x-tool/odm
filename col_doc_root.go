@@ -37,7 +37,7 @@ func (d *Doc) getRootDetails() (doc dependLst) {
 	}
 	return
 }
-func (d *Doc) getRootDetailsWithoutExtend() (doc dependLst) {
+func (d *Doc) getRootDetailsWithExtend() (doc dependLst) {
 	for _, v := range d.fields {
 		if v.extendPid == -1 {
 			doc = append(doc, v)
