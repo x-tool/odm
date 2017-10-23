@@ -33,4 +33,4 @@ xodm only support postgresql now, it may support orther sql future.
 
 ## Performance
 
-Use reflect package. I don't think performance beautiful. but it write for develop The most simple.
+Use reflect package. I don't think performance beautiful. but it write for develop simple.
