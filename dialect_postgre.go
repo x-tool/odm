@@ -3,6 +3,7 @@ package odm
 import (
 	"errors"
 	"fmt"
+	"log"
 	"reflect"
 	"strconv"
 	"strings"
@@ -102,7 +103,7 @@ func (d *dialectpostgre) syncCol(col *Col) {
 	}
 	// make sql
 	sql = fmt.Sprintf("CREATE TABLE %s ( %s ) ", colName, colFields)
-	err := d.OpenWithODM(sql, nil)
+	err := d.Open(sql, nil)
 	if err != nil {
 		tool.Panic("DB", err)
 	}
@@ -127,7 +128,8 @@ func (d *dialectpostgre) Insert(doc *ODM) (err error) {
 		"$typeLst", nameLstStr,
 		"$valueLst", valueLstStr,
 	})
-	err = d.OpenWithODM(rawsql, nil)
+	err = d.OpenWithODM(rawsql, doc)
+	log.Print(*doc.R)
 	return
 }
 func (d *dialectpostgre) Update(doc *ODM) (r interface{}, err error) {
@@ -147,7 +149,7 @@ func (d *dialectpostgre) newConn() (*postgreConn, error) {
 	return &c, err
 }
 func (d *dialectpostgre) LogSql(sql string) {
-	tool.Console.Log("XODM", sql)
+	tool.Console.LogWithLabel("XODM", sql)
 }
 func (d *dialectpostgre) Open(sql string, results interface{}) (err error) {
 	_conn, err := d.newConn()
@@ -195,28 +197,45 @@ func (d *dialectpostgre) OpenWithODM(sql string, result *ODM) (err error) {
 	rows, err := pgConn.Query(sql)
 	defer pgConn.Close()
 
-	resultV := *(result.R)
+	resultV := *result.R
 	resultT := resultV.Type()
-	if resultT.Kind() != reflect.Slice {
-		return errors.New("result type should be slice, Not Be " + resultT.Kind().String())
-	} else {
-		resultItemT := resultT.Elem()
-		_tempResultItemLst := reflect.New(reflect.SliceOf(resultItemT))
-		tempResultItemLst := reflect.Indirect(_tempResultItemLst)
+	if resultT.Kind() == reflect.Slice {
 		for rows.Next() {
-			newResult := reflect.Indirect(reflect.New(resultItemT))
+			resultItemV := result.Col.Doc.newItemValue()
 			var resultSlicePtr []interface{}
-			for i := 0; i < newResult.NumField(); i++ {
-				newResultField := newResult.Field(i).Addr().Interface()
-				resultSlicePtr = append(resultSlicePtr, newResultField)
+			for _, v := range result.Col.Doc.getNewItemRootValue(resultItemV) {
+				resultSlicePtr = append(resultSlicePtr, (*v).Interface())
 			}
-			err := rows.Scan(resultSlicePtr...)
-			tempResultItemLst.Set(reflect.Append(tempResultItemLst, newResult))
+			err = rows.Scan(resultSlicePtr...)
+			resultV.Set(reflect.Append(resultV, *resultItemV))
 			if err != nil {
 				break
 			}
 		}
-		resultV.Set(tempResultItemLst)
+		return err
+	} else {
+		for rows.Next() {
+			_resultItemV := result.Col.Doc.newItemValue()
+			resultItemV := reflect.Indirect(*_resultItemV)
+			resultItemVPtr := &resultItemV
+			var resultSlicePtr []interface{}
+			for _, v := range result.Col.Doc.getNewItemRootValue(resultItemVPtr) {
+				if (*v).Kind() != reflect.Ptr {
+					_v := v.Addr()
+					v = &_v
+				}
+				resultSlicePtr = append(resultSlicePtr, (*v).Interface())
+			}
+
+			err = rows.Scan(resultSlicePtr...)
+			if err != nil {
+				log.Println(err)
+			}
+			log.Print(resultV)
+			resultV.Set(*resultItemVPtr)
+			log.Print(resultV)
+			break
+		}
 		return err
 	}
 

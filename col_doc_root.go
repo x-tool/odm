@@ -48,6 +48,13 @@ func (d *Doc) getRootDetailsWithExtend() (doc dependLst) {
 
 func (d *Doc) getRootDetailValue(rootValue *reflect.Value, doc *DocField) (v *reflect.Value) {
 	rV := *rootValue
+	if rV.Kind() == reflect.Ptr {
+		rV = reflect.Indirect(rV)
+		if rV.Kind() != reflect.Struct {
+			return nil
+		}
+	}
+
 	if doc.Pid == -1 {
 		value := rV.FieldByName(doc.Name)
 		return &value

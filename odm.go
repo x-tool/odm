@@ -34,7 +34,7 @@ func (d *ODM) colName() string {
 	return d.Col.name
 }
 func (d *ODM) insert(i interface{}) (err error) {
-	r := reflect.ValueOf(i)
+	r := reflect.Indirect(reflect.ValueOf(i))
 	d.R = &r
 	d.Handle = newHandle(HandleInsert)
 	d.Query = newQuery(&r, d.Col)

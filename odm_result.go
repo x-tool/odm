@@ -32,10 +32,10 @@ func newResultWithoutCol(rV *reflect.Value) *result {
 func (r *result) format() {
 	T := r.resultV.Type()
 	var value reflect.Type
-	if T.Kind() != reflect.Ptr {
-		tool.Panic("ODM", errors.New("have not Ptr, Can't write In"))
-	} else {
+	if T.Kind() == reflect.Slice {
 		value = T.Elem()
+	} else {
+		value = T
 	}
 	if value.Kind() == reflect.Slice {
 		valueItem := value.Elem()

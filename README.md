@@ -1,8 +1,8 @@
 # xodm - sql & nosql odm
 
-xodm is a pure Go orm for SQL or NoSQL. xodm is different from other orm or odm because it make for compatible SQL or NoSQL to simplify develop.
+xodm is a pure Go odm for SQL or NoSQL. xodm is different from other orm or odm because it make for compatible SQL or NoSQL to simplify develop.
 
-One Second Learn
+Five Seconds Learn
 ```go
 client := NewClient("postgresql", connectionConf)
 db := client.Database("x")
@@ -18,14 +18,18 @@ _, err := col.Insert(testInsert)
 ## Features
 
 * JSON support, You can get field in struct from database simple.
-* more bug.
-* I will add more :)
+* I will add more Features :)
 
 ## Support database
 
 xodm only support postgresql now, it may support orther sql future.
 
 * postgresql -- github.com/jackc/pgx
+
+## Todo
+
+* [ ] fix bugs
+* [ ] add arangodb
 
 ## Performance
 
