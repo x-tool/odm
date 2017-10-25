@@ -220,11 +220,9 @@ func (d *dialectpostgre) OpenWithODM(sql string, result *ODM) (err error) {
 			resultItemVPtr := &resultItemV
 			var resultSlicePtr []interface{}
 			for _, v := range result.Col.Doc.getNewItemRootValue(resultItemVPtr) {
-				if (*v).Kind() != reflect.Ptr {
-					_v := v.Addr()
-					v = &_v
-				}
-				resultSlicePtr = append(resultSlicePtr, (*v).Interface())
+				_v := v.Addr()
+				log.Print(_v.Addr())
+				resultSlicePtr = append(resultSlicePtr, v.Interface())
 			}
 
 			err = rows.Scan(resultSlicePtr...)
