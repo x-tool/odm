@@ -18,6 +18,7 @@ _, err := col.Insert(testInsert)
 ## Features
 
 * JSON support, You can get field in struct from database simple.
+* Usual Mode.
 * I will add more Features :)
 
 ## Support database
