@@ -217,21 +217,21 @@ func (d *dialectpostgre) OpenWithODM(sql string, result *ODM) (err error) {
 		for rows.Next() {
 			_resultItemV := result.Col.Doc.newItemValue()
 			resultItemV := reflect.Indirect(*_resultItemV)
-			resultItemVPtr := &resultItemV
-			var resultSlicePtr []interface{}
-			for _, v := range result.Col.Doc.getNewItemRootValue(resultItemVPtr) {
-				_v := v.Addr()
-				log.Print(_v.Addr())
-				resultSlicePtr = append(resultSlicePtr, v.Interface())
+
+			returnValues, err := rows.Values()
+			if err != nil {
+				return err
 			}
 
-			err = rows.Scan(resultSlicePtr...)
-			if err != nil {
-				log.Println(err)
+			itemRootvalues := result.Col.Doc.getNewItemRootValue(&resultItemV)
+			if len(itemRootvalues) != len(returnValues) {
+				return errors.New("len values not same")
 			}
-			log.Print(resultV)
-			resultV.Set(*resultItemVPtr)
-			log.Print(resultV)
+			for i := 0; i < len(itemRootvalues); i++ {
+				
+			}
+
+			resultV.Set(resultItemV)
 			break
 		}
 		return err
