@@ -222,13 +222,15 @@ func (d *dialectpostgre) OpenWithODM(sql string, result *ODM) (err error) {
 			if err != nil {
 				return err
 			}
-
+			for _, v := range returnValues {
+				fmt.Print(v)
+			}
 			itemRootvalues := result.Col.Doc.getNewItemRootValue(&resultItemV)
 			if len(itemRootvalues) != len(returnValues) {
 				return errors.New("len values not same")
 			}
 			for i := 0; i < len(itemRootvalues); i++ {
-				
+				//byteMap(returnValues[i], itemRootvalues[i])
 			}
 
 			resultV.Set(resultItemV)
