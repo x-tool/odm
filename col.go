@@ -13,6 +13,7 @@ type Col struct {
 	name        string
 	hasDocModel bool
 	DocModel    string
+	deleteField string
 	Doc         *Doc
 }
 
@@ -21,7 +22,8 @@ func NewCol(d *Database, i interface{}) *Col {
 	c.name = GetColName(i)
 	c.DB = d
 	c.Doc = NewDoc(c, i)
-	c.DocModel, c.hasDocModel = c.Doc.DocModel()
+	c.hasDocModel, c.DocModel = c.Doc.DocModel()
+	c.deleteField = c.Doc.getDeleteFieldName()
 	return c
 }
 
@@ -51,4 +53,7 @@ func (c *Col) Delete() {
 }
 func (c *Col) Query() {
 
+}
+func (c *Col) Key(s string) (o *ODM) {
+	return c.DB.Key(s)
 }

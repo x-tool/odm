@@ -35,8 +35,8 @@ type Dialect interface {
 	syncCol(*Col)
 	// base handel
 	Insert(*ODM) error
-	Update(*ODM) (interface{}, error)
-	Delete(*ODM) (interface{}, error)
+	Update(*ODM) error
+	Delete(*ODM) error
 	Query(*ODM) (interface{}, error)
 	LogSql(string)
 	Session() *Session

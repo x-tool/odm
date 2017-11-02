@@ -14,6 +14,7 @@ type query struct {
 	queryKind int
 	queryV    *reflect.Value
 	modeV     *reflect.Value
+	Key       string
 }
 
 func newQuery(rV *reflect.Value, c *Col) *query {

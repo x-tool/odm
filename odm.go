@@ -48,11 +48,17 @@ func (d *ODM) insert(i interface{}) (err error) {
 func (d *ODM) update(i interface{}) {
 
 }
-func (d *ODM) delete(i interface{}) {
+func (d *ODM) delete(err error) {
+	if d.getDeleteFieldName() != "" {
+		err = d.DB.Dialect.Update(d)
+	} else {
+		err = d.DB.Dialect.Delete(d)
+	}
 
+	return
 }
 
-func (d *ODM) query(i interface{}) {
+func (d *ODM) get(i interface{}) {
 
 }
 

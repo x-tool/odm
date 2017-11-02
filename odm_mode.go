@@ -10,7 +10,7 @@ type NormalCol struct {
 	Key         string
 	CreatedTime time.Time
 	UpdateTime  time.Time
-	DeleteTime  time.Time
+	DeleteTime  time.Time `xodm:"delete"`
 	State       int
 }
 
@@ -25,11 +25,15 @@ func (n *NormalCol) Update() {
 func (n *NormalCol) Delete() {
 	n.DeleteTime = time.Now()
 }
+func (n *NormalCol) Name() (s string) {
+	return "NormalCol"
+}
 
 type Mode interface {
 	Create()
 	Update()
 	Delete()
+	Name()
 }
 
 func isDocMode(s string) bool {
@@ -39,7 +43,13 @@ func isDocMode(s string) bool {
 	}
 	return check
 }
-
+func isDelete(s string) bool {
+	var check bool
+	if s == "NormalCol" {
+		check = true
+	}
+	return check
+}
 func modeInsert(d *ODM) {
 	if d.Col.hasDocModel {
 		modeVInterface := d.Query.modeV.Addr().Interface()

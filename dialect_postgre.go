@@ -137,10 +137,10 @@ func (d *dialectpostgre) Insert(doc *ODM) (err error) {
 	err = d.OpenWithODM(rawsql, doc)
 	return
 }
-func (d *dialectpostgre) Update(doc *ODM) (r interface{}, err error) {
+func (d *dialectpostgre) Update(doc *ODM) (err error) {
 	return
 }
-func (d *dialectpostgre) Delete(doc *ODM) (r interface{}, err error) {
+func (d *dialectpostgre) Delete(doc *ODM) (err error) {
 	return
 }
 func (d *dialectpostgre) Query(doc *ODM) (r interface{}, err error) {

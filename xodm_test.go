@@ -40,6 +40,7 @@ func Test_connection(t *testing.T) {
 	testInsert.Id = 1
 	_, err := col.Insert(testInsert)
 	log.Print(testInsert)
+	col.Key(testInsert.Key).Delete()
 	t.Log(err)
 }
 

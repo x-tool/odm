@@ -51,3 +51,9 @@ func (d *Database) Query(c *Col) (r interface{}, err error) {
 func (d *Database) All(c *Col) (r interface{}, err error) {
 	return
 }
+
+func (d *Database) Key(s string, c *Col) *ODM {
+	o := newODM(c.DB, c)
+	o.Query.Key(s)
+	return o
+}

@@ -10,6 +10,13 @@ func tagIsExtend(tag string) bool {
 	}
 	return matched
 }
+func tagIsDelete(tag string) bool {
+	matched, err := regexp.MatchString("delete", tag)
+	if err != nil {
+		return false
+	}
+	return matched
+}
 
 func tagisExtendField(r *reflect.StructField) bool {
 	tag := r.Tag.Get(tagName)
