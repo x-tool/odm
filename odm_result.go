@@ -1,78 +1,50 @@
 package odm
 
 import (
-	"errors"
 	"reflect"
-	"strings"
-
-	"github.com/x-tool/tool"
 )
 
 type result struct {
 	Col            *Col
 	resultFieldLst []*DocField
 	resultV        *reflect.Value
+	resultKind     int
+	resultElem     *reflect.Value
 }
 
-func newResult(rV *reflect.Value, c *Col) *result {
-	r := &result{
-		Col:     c,
-		resultV: rV,
-	}
-	r.format()
-	return r
-}
-func newResultWithoutCol(rV *reflect.Value) *result {
-	r := &result{
-		resultV: rV,
-	}
-	return r
-}
-
-func (r *result) format() {
-	T := r.resultV.Type()
-	var value reflect.Type
-	if T.Kind() == reflect.Slice {
-		value = T.Elem()
+func newResult(rV *reflect.Value, c *Col) (r *result) {
+	var vK int
+	var vE reflect.Value
+	if rV.Kind() == reflect.Slice {
+		vK = 0
+		vE = rV.Elem()
 	} else {
-		value = T
+		vK = 1
+		vE = *rV
 	}
-	if value.Kind() == reflect.Slice {
-		valueItem := value.Elem()
-		for i := 0; i < valueItem.NumField(); i++ {
-			field := valueItem.Field(i)
-			newResultItem := r.DependToDoc(field.Tag.Get(tagName), field.Name)
-			r.resultFieldLst = append(r.resultFieldLst, newResultItem)
-		}
+	r = &result{
+		Col:        c,
+		resultV:    rV,
+		resultKind: vK,
+		resultElem: &vE,
 	}
+	return
 }
-
-func (r *result) DependToDoc(tag string, name string) (d *DocField) {
-	if tag == "" {
-		field := r.Col.Doc.getFieldByName(name)
-		if len(field) != 1 {
-			tool.Panic("ODM", errors.New("name not be single, you should add tag to find doc field"))
-		} else {
-			return field[0]
-		}
+func (r *result) newResultItem() (v *reflect.Value) {
+	var rV reflect.Value
+	if r.resultKind == 0 {
+		rV = reflect.New(r.resultElem.Type())
 	} else {
-		dependLst := strings.Split(tag, ".")
-		docFieldLst := r.Col.Doc.getFieldByName(name)
-		for _, val := range docFieldLst {
-			if len(dependLst) != len(val.dependLst) {
-				continue
-			}
-			var check bool = true
-			for i, _ := range val.dependLst {
-				if val.dependLst[i].Name != dependLst[i] {
-					check = false
-					break
-				}
-			}
-			if check {
-				d = val
-				break
-			}
+		rV = reflect.New(r.resultV.Type())
+	}
+	return &rV
+}
+func (r *result) getResultRootItemFieldAddr(rootV *reflect.Value) (v []reflect.Value) {
+	if rootV.Kind() == reflect.Struct {
+		lenR := rootV.NumField()
+		for i := 0; i < lenR; i++ {
+			_v := rootV.Field(i).Addr()
+			v = append(v, _v)
 		}
 	}
 	return

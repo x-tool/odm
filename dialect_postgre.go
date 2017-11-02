@@ -3,13 +3,17 @@ package odm
 import (
 	"errors"
 	"fmt"
-	"log"
 	"reflect"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/jackc/pgx"
 	"github.com/x-tool/tool"
+)
+
+const (
+	pg_timeFormat = "2006-01-02 03:04:05"
 )
 
 var typeMap = map[string]string{
@@ -17,7 +21,7 @@ var typeMap = map[string]string{
 	"float64": "float8",
 	// "text":   "text",
 	"[]byte": "bytea",
-	"time":   "date",
+	"time":   "timestamp",
 	"array":  "json",
 	"bool":   "json",
 	"string": "text",
@@ -46,17 +50,19 @@ func (d *dialectpostgre) Init(c ConnectionConfig) Dialect {
 	return d
 }
 
-func pg_valueToString(v reflect.Value) (r string) {
-	_type := v.Kind().String()
-	switch _type {
+func pg_valueToString(v *queryRootField) (r string) {
+	value := v.value
+	switch v.DocField.Type {
 	case "string":
-		r = "'" + v.String() + "'"
+		r = "'" + value.String() + "'"
 	case "int":
-		r = strconv.FormatInt(v.Int(), 10)
-	// case "time":
-	// 	if v
+		r = strconv.FormatInt(value.Int(), 10)
+	case "time":
+		if _v, ok := value.Interface().(time.Time); ok {
+			r = "'" + _v.Format(pg_timeFormat) + "'"
+		}
 	default:
-		r = v.String()
+		r = value.String()
 	}
 	return r
 }
@@ -114,11 +120,11 @@ func (d *dialectpostgre) Session() *Session {
 }
 func (d *dialectpostgre) Insert(doc *ODM) (err error) {
 	var nameLst, valueLst []string
-	rootFields := doc.Result.getRootFields()
+	rootFields := doc.Query.getRootFields()
 	rootFields = doc.selectValidFields(rootFields)
 	for _, v := range rootFields {
 		nameLst = append(nameLst, v.DocField.Name)
-		valueLst = append(valueLst, pg_valueToString(v.value))
+		valueLst = append(valueLst, pg_valueToString(v))
 	}
 	nameLstStr := strings.Join(nameLst, ",")
 	valueLstStr := strings.Join(valueLst, ",")
@@ -129,7 +135,6 @@ func (d *dialectpostgre) Insert(doc *ODM) (err error) {
 		"$valueLst", valueLstStr,
 	})
 	err = d.OpenWithODM(rawsql, doc)
-	log.Print(*doc.R)
 	return
 }
 func (d *dialectpostgre) Update(doc *ODM) (r interface{}, err error) {
@@ -160,7 +165,9 @@ func (d *dialectpostgre) Open(sql string, results interface{}) (err error) {
 	d.LogSql(sql)
 	rows, err := pgConn.Query(sql)
 	defer pgConn.Close()
-
+	if results == nil {
+		return err
+	}
 	resultV := reflect.ValueOf(results)
 	resultVElem := reflect.Indirect(resultV)
 	resultT := resultVElem.Type()
@@ -187,7 +194,7 @@ func (d *dialectpostgre) Open(sql string, results interface{}) (err error) {
 		return err
 	}
 }
-func (d *dialectpostgre) OpenWithODM(sql string, result *ODM) (err error) {
+func (d *dialectpostgre) OpenWithODM(sql string, odm *ODM) (err error) {
 	_conn, err := d.newConn()
 	if err != nil {
 		return err
@@ -197,14 +204,14 @@ func (d *dialectpostgre) OpenWithODM(sql string, result *ODM) (err error) {
 	rows, err := pgConn.Query(sql)
 	defer pgConn.Close()
 
-	resultV := *result.R
+	resultV := *odm.R
 	resultT := resultV.Type()
 	if resultT.Kind() == reflect.Slice {
 		for rows.Next() {
-			resultItemV := result.Col.Doc.newItemValue()
+			resultItemV := odm.Result.newResultItem()
 			var resultSlicePtr []interface{}
-			for _, v := range result.Col.Doc.getNewItemRootValue(resultItemV) {
-				resultSlicePtr = append(resultSlicePtr, (*v).Interface())
+			for _, v := range odm.Result.getResultRootItemFieldAddr(resultItemV) {
+				resultSlicePtr = append(resultSlicePtr, (v).Interface())
 			}
 			err = rows.Scan(resultSlicePtr...)
 			resultV.Set(reflect.Append(resultV, *resultItemV))
@@ -214,29 +221,7 @@ func (d *dialectpostgre) OpenWithODM(sql string, result *ODM) (err error) {
 		}
 		return err
 	} else {
-		for rows.Next() {
-			_resultItemV := result.Col.Doc.newItemValue()
-			resultItemV := reflect.Indirect(*_resultItemV)
-
-			returnValues, err := rows.Values()
-			if err != nil {
-				return err
-			}
-			for _, v := range returnValues {
-				fmt.Print(v)
-			}
-			itemRootvalues := result.Col.Doc.getNewItemRootValue(&resultItemV)
-			if len(itemRootvalues) != len(returnValues) {
-				return errors.New("len values not same")
-			}
-			for i := 0; i < len(itemRootvalues); i++ {
-				//byteMap(returnValues[i], itemRootvalues[i])
-			}
-
-			resultV.Set(resultItemV)
-			break
-		}
-		return err
+		return nil
 	}
 
 }

@@ -26,7 +26,7 @@ func (n *NormalCol) Delete() {
 	n.DeleteTime = time.Now()
 }
 
-type NormalMode interface {
+type Mode interface {
 	Create()
 	Update()
 	Delete()
@@ -38,4 +38,12 @@ func isDocMode(s string) bool {
 		check = true
 	}
 	return check
+}
+
+func modeInsert(d *ODM) {
+	if d.Col.hasDocModel {
+		modeVInterface := d.Query.modeV.Addr().Interface()
+		v := modeVInterface.(Mode)
+		v.Create()
+	}
 }

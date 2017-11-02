@@ -1,6 +1,7 @@
 package odm
 
 import (
+	"log"
 	"reflect"
 	"testing"
 )
@@ -38,7 +39,7 @@ func Test_connection(t *testing.T) {
 	testInsert.Name = "haha,I get"
 	testInsert.Id = 1
 	_, err := col.Insert(testInsert)
-	t.Log(testInsert)
+	log.Print(testInsert)
 	t.Log(err)
 }
 

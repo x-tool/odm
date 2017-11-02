@@ -12,9 +12,9 @@ type queryRootField struct {
 	value    reflect.Value
 }
 
-func (r *result) getRootFields() []*queryRootField {
+func (r *query) getRootFields() []*queryRootField {
 	var rootField []*queryRootField
-	ivalue := *r.resultV
+	ivalue := *r.queryV
 	if ivalue.Kind() == reflect.Ptr || ivalue.Kind() == reflect.Interface {
 		ivalue = ivalue.Elem()
 	}
