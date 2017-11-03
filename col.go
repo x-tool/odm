@@ -55,5 +55,5 @@ func (c *Col) Query() {
 
 }
 func (c *Col) Key(s string) (o *ODM) {
-	return c.DB.Key(s)
+	return c.DB.Key(s, c)
 }

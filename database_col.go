@@ -54,6 +54,6 @@ func (d *Database) All(c *Col) (r interface{}, err error) {
 
 func (d *Database) Key(s string, c *Col) *ODM {
 	o := newODM(c.DB, c)
-	o.Query.Key(s)
+	o.Query.key(s)
 	return o
 }

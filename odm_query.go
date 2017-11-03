@@ -11,17 +11,35 @@ import (
 type query struct {
 	Col       *Col
 	dependLst []*DocField
-	queryKind int
+	queryKind string
 	queryV    *reflect.Value
 	modeV     *reflect.Value
-	Key       string
+	queryFormat
+	querySet []querySetItem
 }
 
-func newQuery(rV *reflect.Value, c *Col) *query {
+type querySetItem struct {
+	v         reflect.Value
+	dependDoc *DocField
+}
 
+type queryFormat struct {
+	queryLst  []queryItem
+	limitNum  int
+	limitDesc bool
+}
+
+type queryItem struct {
+	dependDoc  *DocField
+	whereCheck string
+	whereV     interface{}
+}
+
+func newQuery(rV *reflect.Value, c *Col, t string) *query {
 	r := &query{
-		Col:    c,
-		queryV: rV,
+		Col:       c,
+		queryV:    rV,
+		queryKind: t,
 	}
 	r.setDependToDoc()
 	return r
@@ -55,22 +73,28 @@ func (r *query) setDependToDoc() {
 		if isDocMode(fieldT.Name) {
 			r.modeV = &field
 		}
-		newqueryItem := r.DependToDoc(fieldT.Tag.Get(tagName), fieldT.Name)
+		newqueryItem := r.DependToDoc(strings.Split(fieldT.Tag.Get(tagName), "."), fieldT.Name)
 		r.dependLst = append(r.dependLst, newqueryItem)
 	}
 
 }
-
-func (r *query) DependToDoc(tag string, name string) (d *DocField) {
-	if tag == "" {
+func (r *query) dependtoDocOneStr(s string) (d *DocField) {
+	_s := strings.Split(s, ".")
+	if len(_s) > 1 {
+		return r.DependToDoc(_s[:len(_s)-2], _s[len(_s)-1])
+	} else {
+		return r.DependToDoc([]string{}, _s[0])
+	}
+}
+func (r *query) DependToDoc(dependLst []string, name string) (d *DocField) {
+	if len(dependLst) == 0 {
 		field := r.Col.Doc.getFieldByName(name)
 		if len(field) != 1 {
-			tool.Panic("ODM", errors.New("name not be single, you should add tag to find doc field"))
+			tool.Panic("ODM", errors.New("name not be single, you should add dependLst to find doc field"))
 		} else {
 			return field[0]
 		}
 	} else {
-		dependLst := strings.Split(tag, ".")
 		docFieldLst := r.Col.Doc.getFieldByName(name)
 		for _, val := range docFieldLst {
 			if len(dependLst) != len(val.dependLst) {

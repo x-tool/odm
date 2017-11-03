@@ -5,7 +5,6 @@ import "reflect"
 type ODM struct {
 	Col    *Col
 	DB     *Database // col has db,but it can't use col when handle needless col. Ex: getColLst()
-	Handle *handle
 	Query  *query
 	Result *result
 	R      *reflect.Value
@@ -37,9 +36,8 @@ func (d *ODM) insert(i interface{}) (err error) {
 	r := reflect.Indirect(reflect.ValueOf(i))
 	d.R = &r
 
-	d.Query = newQuery(&r, d.Col)
+	d.Query = newQuery(&r, d.Col, "insert")
 	d.Result = newResult(&r, d.Col)
-	d.Handle = newHandle(HandleInsert)
 	modeInsert(d)
 	err = d.DB.Dialect.Insert(d)
 	return
@@ -48,8 +46,9 @@ func (d *ODM) insert(i interface{}) (err error) {
 func (d *ODM) update(i interface{}) {
 
 }
+
 func (d *ODM) delete(err error) {
-	if d.getDeleteFieldName() != "" {
+	if d.Col.Doc.getDeleteFieldName() != "" {
 		err = d.DB.Dialect.Update(d)
 	} else {
 		err = d.DB.Dialect.Delete(d)
