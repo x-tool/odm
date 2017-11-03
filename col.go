@@ -9,12 +9,13 @@ type ColInterface interface {
 }
 
 type Col struct {
-	DB          *Database
-	name        string
-	hasDocModel bool
-	DocModel    string
-	deleteField string
-	Doc         *Doc
+	DB             *Database
+	name           string
+	hasDocModel    bool
+	DocModel       string
+	hasDeleteField bool
+	deleteField    string
+	Doc            *Doc
 }
 
 func NewCol(d *Database, i interface{}) *Col {
@@ -24,6 +25,9 @@ func NewCol(d *Database, i interface{}) *Col {
 	c.Doc = NewDoc(c, i)
 	c.hasDocModel, c.DocModel = c.Doc.DocModel()
 	c.deleteField = c.Doc.getDeleteFieldName()
+	if c.deleteField != "" {
+		c.hasDeleteField = true
+	}
 	return c
 }
 

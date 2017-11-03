@@ -14,8 +14,10 @@ type query struct {
 	queryKind string
 	queryV    *reflect.Value
 	modeV     *reflect.Value
-	queryFormat
-	querySet []querySetItem
+	queryLst  []queryItem
+	limitNum  int
+	limitDesc bool
+	querySet  []querySetItem
 }
 
 type querySetItem struct {
@@ -23,16 +25,11 @@ type querySetItem struct {
 	dependDoc *DocField
 }
 
-type queryFormat struct {
-	queryLst  []queryItem
-	limitNum  int
-	limitDesc bool
-}
-
 type queryItem struct {
 	dependDoc  *DocField
 	whereCheck string
 	whereV     interface{}
+	whereAnd   bool
 }
 
 func newQuery(rV *reflect.Value, c *Col, t string) *query {

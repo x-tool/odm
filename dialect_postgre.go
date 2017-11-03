@@ -156,6 +156,14 @@ func (d *dialectpostgre) newConn() (*postgreConn, error) {
 func (d *dialectpostgre) LogSql(sql string) {
 	tool.Console.LogWithLabel("XODM", sql)
 }
+
+func pg_formatQuery(q *query) (s string) {
+	var queryStr string
+	for _, v := range q.queryLst {
+		var queryItemStr string
+
+	}
+}
 func (d *dialectpostgre) Open(sql string, results interface{}) (err error) {
 	_conn, err := d.newConn()
 	if err != nil {
