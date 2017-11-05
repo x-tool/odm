@@ -1,5 +1,7 @@
 package odm
 
+import "reflect"
+
 func (q *query) key(s string) {
 	q.addWhere("key", "=", s)
 }
@@ -18,10 +20,13 @@ func (q *query) addWhere(wL ...interface{}) {
 	}
 
 	qItem := queryItem{
-		dependDoc:  q.dependtoDocOneStr(w),
+		queryRootField: queryRootField{
+			DocField: q.dependtoDocOneStr(w),
+			zero:     false,
+			value:    reflect.ValueOf(i),
+		},
 		whereCheck: contrast,
-		whereV:     i,
 		whereAnd:   b,
 	}
-	q.queryFormat.queryLst = append(q.queryFormat.queryLst, qItem)
+	q.querySet = append(q.querySet, qItem)
 }

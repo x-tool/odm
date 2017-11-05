@@ -17,18 +17,12 @@ type query struct {
 	queryLst  []queryItem
 	limitNum  int
 	limitDesc bool
-	querySet  []querySetItem
-}
-
-type querySetItem struct {
-	v         reflect.Value
-	dependDoc *DocField
+	querySet  []queryItem
 }
 
 type queryItem struct {
-	dependDoc  *DocField
+	queryRootField
 	whereCheck string
-	whereV     interface{}
 	whereAnd   bool
 }
 
