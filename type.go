@@ -12,7 +12,6 @@ var mapType = map[string]string{
 	"float64": "float64",
 	"struct":  "struct",
 	"slice":   "slice",
-	"array":   "array",
 	"map":     "map",
 }
 

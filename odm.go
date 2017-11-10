@@ -36,7 +36,7 @@ func (d *ODM) insert(i interface{}) (err error) {
 	r := reflect.Indirect(reflect.ValueOf(i))
 	d.R = &r
 
-	d.Query = newQuery(&r, d.Col, "insert")
+	d.Query = newQuery(&r, d, "insert")
 	d.Result = newResult(&r, d.Col)
 	modeInsert(d)
 	err = d.DB.Dialect.Insert(d)

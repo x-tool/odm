@@ -152,6 +152,11 @@ func (d *Doc) getChildFields(i *DocField) (r DocFields) {
 	}
 	return
 }
+
+func (d *Doc) getRootField(l []*DocField) (r *DocField) {
+
+}
+
 func (d *Doc) getFieldById(id int) (o *DocField) {
 	for _, v := range d.fields {
 		if v.Id == id {

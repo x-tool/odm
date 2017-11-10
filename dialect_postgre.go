@@ -157,11 +157,15 @@ func (d *dialectpostgre) LogSql(sql string) {
 	tool.Console.LogWithLabel("XODM", sql)
 }
 
-func pg_formatQuery(q *query) (s string) {
+func pg_formatQuery(o *ODM) (s string) {
 	var queryStr string
-	for _, v := range q.queryLst {
+	for _,v:=range o.Result.resultFieldLst{
+		
+	}
+	for _, v := range o.query.queryLst {
 		var queryItemStr string
-
+		val:= pg_valueToString(v.queryRootField)
+		queryItemStr := 
 	}
 }
 func (d *dialectpostgre) Open(sql string, results interface{}) (err error) {

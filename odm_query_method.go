@@ -21,7 +21,7 @@ func (q *query) addWhere(wL ...interface{}) {
 
 	qItem := queryItem{
 		queryRootField: queryRootField{
-			DocField: q.dependtoDocOneStr(w),
+			DocField: q.odm.dependtoDocOneStr(w),
 			zero:     false,
 			value:    reflect.ValueOf(i),
 		},
