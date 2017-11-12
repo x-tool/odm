@@ -7,14 +7,12 @@ import (
 
 type query struct {
 	odm       *ODM
-	dependLst []*DocField
 	queryKind string
 	queryV    *reflect.Value
 	modeV     *reflect.Value
 	queryLst  []queryItem
 	limitNum  int
 	limitDesc bool
-	querySet  []queryItem
 }
 
 type queryItem struct {

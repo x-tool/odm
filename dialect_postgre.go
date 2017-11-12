@@ -157,16 +157,36 @@ func (d *dialectpostgre) LogSql(sql string) {
 	tool.Console.LogWithLabel("XODM", sql)
 }
 
-func pg_formatQuery(o *ODM) (s string) {
+func pg_formatQL(o *ODM) (s string) {
 	var queryStr string
-	for _,v:=range o.Result.resultFieldLst{
-		
+	var resultStr string
+	for i,v:=range o.Result.resultFieldLst{
+		vRootField:= v.getRootFieldDB()
+		if i == 0 && vRootField.Type == "struct"{
+			 
+			resultStr = pg_formatJsonStruct(v)
+		}else{
+			resultStr = vRootField.Name
+		}
 	}
-	for _, v := range o.query.queryLst {
+	for _, v := range o.Query.queryLst {
 		var queryItemStr string
 		val:= pg_valueToString(v.queryRootField)
-		queryItemStr := 
+		queryItemStr := v.
 	}
+}
+func pg_formatJsonStruct(d *DocField)(s string){
+	vRootField:= v.getRootFieldDB()
+	s = vRootField.Name
+	for i,_v:=range v.getDependLstDB{
+		if i == 0{
+			continue
+		}else{
+			jsonStr = jsonStr+"->'"+_v.Name+"'"
+		}
+
+	}
+	return s
 }
 func (d *dialectpostgre) Open(sql string, results interface{}) (err error) {
 	_conn, err := d.newConn()

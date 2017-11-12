@@ -18,9 +18,9 @@ type DocField struct {
 	Type      string
 	DBType    string
 	Id        int
-	Pid       int // field golang parent real ID
+	Pid       int // field golang parent real ID; default:-1
 	isExtend  bool
-	extendPid int // field odm parent ID
+	extendPid int // field odm parent ID; default:-1
 	dependLst
 	Tag     string
 	funcLst map[string]string
@@ -28,6 +28,26 @@ type DocField struct {
 
 type dependLst []*DocField
 
+func (o *DocField) getRootFieldDB() (r *DocField) {
+	switch len(o.dependLst) {
+	case 0:
+		return 0
+	default:
+		if o.dependLst[0].isExtend {
+			return o.dependLst[1]
+		} else {
+			return o.dependLst[0]
+		}
+	}
+}
+func (o *DocField) getDependLstDB() (r []*DocField) {
+	for _, v := range o.dependLst {
+		if v.isExtend {
+			r = append(r, v)
+		}
+	}
+	return
+}
 func NewDoc(c *Col, i interface{}) *Doc {
 
 	// append doc.fields
@@ -151,10 +171,6 @@ func (d *Doc) getChildFields(i *DocField) (r DocFields) {
 		}
 	}
 	return
-}
-
-func (d *Doc) getRootField(l []*DocField) (r *DocField) {
-
 }
 
 func (d *Doc) getFieldById(id int) (o *DocField) {

@@ -3,10 +3,10 @@ package odm
 import "reflect"
 
 func (q *query) key(s string) {
-	q.addWhere("key", "=", s)
+	q.newQueryItem("key", "=", s)
 }
 
-func (q *query) addWhere(wL ...interface{}) {
+func (q *query) newQueryItem(wL ...interface{}) {
 	var wLL = len(wL)
 	if wLL != 3 && wLL != 4 {
 		return
@@ -28,5 +28,5 @@ func (q *query) addWhere(wL ...interface{}) {
 		whereCheck: contrast,
 		whereAnd:   b,
 	}
-	q.querySet = append(q.querySet, qItem)
+	q.queryLst = append(q.queryLst, qItem)
 }
