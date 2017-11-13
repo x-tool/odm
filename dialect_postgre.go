@@ -160,34 +160,59 @@ func (d *dialectpostgre) LogSql(sql string) {
 func pg_formatQL(o *ODM) (s string) {
 	var queryStr string
 	var resultStr string
-	for i,v:=range o.Result.resultFieldLst{
-		vRootField:= v.getRootFieldDB()
-		if i == 0 && vRootField.Type == "struct"{
-			 
-			resultStr = pg_formatJsonStruct(v)
-		}else{
-			resultStr = vRootField.Name
-		}
-	}
-	for _, v := range o.Query.queryLst {
-		var queryItemStr string
-		val:= pg_valueToString(v.queryRootField)
-		queryItemStr := v.
-	}
-}
-func pg_formatJsonStruct(d *DocField)(s string){
-	vRootField:= v.getRootFieldDB()
-	s = vRootField.Name
-	for i,_v:=range v.getDependLstDB{
-		if i == 0{
-			continue
-		}else{
-			jsonStr = jsonStr+"->'"+_v.Name+"'"
+	for _, v := range o.Result.resultFieldLst {
+		var _resultStr string
+		vRootField := v.getRootFieldDB()
+		if vRootField.Type == "struct" {
+			jsonStr := vRootField.Name
+			for i, _v := range v.getDependLstDB() {
+				if i == 0 {
+					continue
+				} else {
+					jsonStr = jsonStr + "->'" + _v.Name + "'"
+				}
+
+			}
+			_resultStr = jsonStr
+		} else {
+			_resultStr = vRootField.Name
 		}
 
+		if i == 0 {
+			resultStr = _resultStr
+		} else {
+			resultStr = resultStr + "," + _resultStr
+		}
 	}
-	return s
+
+	for _, v := range o.Query.queryLst {
+		var _queryStr string
+		vRootField := v.getRootFieldDB()
+		if i == 0 && vRootField.Type == "struct" {
+			jsonStr := vRootField.Name
+			for i, _v := range v.getDependLstDB() {
+				if i == 0 {
+					continue
+				} else {
+					jsonStr = jsonStr + "->'" + _v.Name + "'"
+				}
+
+			}
+			_queryStr = jsonStr
+		} else {
+			_queryStr = vRootField.Name
+		}
+
+		if i == 0 {
+			queryStr = _queryStr
+		} else {
+			queryStr = queryStr + "," + _queryStr
+		}
+	}
+	s = "SELECT " + queryStr + " FROM " + o.colName() + "WHERE " + resultStr
+	return
 }
+
 func (d *dialectpostgre) Open(sql string, results interface{}) (err error) {
 	_conn, err := d.newConn()
 	if err != nil {
