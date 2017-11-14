@@ -160,10 +160,10 @@ func (d *dialectpostgre) LogSql(sql string) {
 func pg_formatQL(o *ODM) (s string) {
 	var queryStr string
 	var resultStr string
-	for _, v := range o.Result.resultFieldLst {
+	for i, v := range o.Result.resultFieldLst {
 		var _resultStr string
 		vRootField := v.getRootFieldDB()
-		if vRootField.Type == "struct" {
+		if i == 0 && vRootField.Type == "struct" {
 			jsonStr := vRootField.Name
 			for i, _v := range v.getDependLstDB() {
 				if i == 0 {
@@ -186,7 +186,7 @@ func pg_formatQL(o *ODM) (s string) {
 	}
 
 	for _, v := range o.Query.queryLst {
-		var _queryStr string
+		var _resultStr string
 		vRootField := v.getRootFieldDB()
 		if i == 0 && vRootField.Type == "struct" {
 			jsonStr := vRootField.Name
@@ -198,15 +198,15 @@ func pg_formatQL(o *ODM) (s string) {
 				}
 
 			}
-			_queryStr = jsonStr
+			_resultStr = jsonStr
 		} else {
-			_queryStr = vRootField.Name
+			_resultStr = vRootField.Name
 		}
 
 		if i == 0 {
-			queryStr = _queryStr
+			resultStr = _resultStr
 		} else {
-			queryStr = queryStr + "," + _queryStr
+			resultStr = resultStr + "," + _resultStr
 		}
 	}
 	s = "SELECT " + queryStr + " FROM " + o.colName() + "WHERE " + resultStr

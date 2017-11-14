@@ -59,8 +59,8 @@ func (r *query) setDependToDoc() {
 		if isDocMode(fieldT.Name) {
 			r.modeV = &field
 		}
-		newqueryItem := r.DependToDoc(strings.Split(fieldT.Tag.Get(tagName), "."), fieldT.Name)
-		r.dependLst = append(r.dependLst, newqueryItem)
+		newqueryItem := r.odm.DependToDoc(strings.Split(fieldT.Tag.Get(tagName), "."), fieldT.Name)
+		r.queryLst = append(r.queryLst, newqueryItem)
 	}
 
 }
