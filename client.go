@@ -1,19 +1,22 @@
 package odm
 
-type Client struct {
-	dbName string
+// config Struct
+type ConnectionConfig struct {
+	Host         string
+	Port         int64
+	User         string
+	Passwd       string
+	DatabaseName string
+	Database     string
+	TLs          bool
+}
+
+type client struct {
 	config ConnectionConfig
 }
 
-func NewClient(dbName string, conf ConnectionConfig) *Client {
-	var c Client
-	c.dbName = dbName
-	c.config = conf
-	return &c
-}
-
-func (c *Client) Database(name string) Database {
-	var d Database
+func (c *client) Database(name string) Database {
+	var d core.Database
 	var config ConnectionConfig
 	config = c.config
 	config.DatabaseName = name

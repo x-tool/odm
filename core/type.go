@@ -4,22 +4,36 @@ import (
 	"reflect"
 )
 
-var mapType = map[string]string{
-	"bool":    "bool",
-	"Time":    "time",
-	"string":  "string",
-	"int":     "int",
-	"float64": "float64",
-	"struct":  "struct",
-	"slice":   "slice",
-	"map":     "map",
-}
-
-func formatTypeToString(t *reflect.Type) (s string) {
-	b := *t
-	s = mapType[b.Name()]
-	return
-}
+type Kind uint
+const (
+    Invalid Kind = iota
+    Bool
+    Int
+    Int8
+    Int16
+    Int32
+    Int64
+    Uint
+    Uint8
+    Uint16
+    Uint32
+    Uint64
+    Uintptr
+    Float32
+    Float64
+    Complex64
+    Complex128
+    Array
+    Chan
+    Func
+    Interface
+    Map
+    Ptr
+    Slice
+    String
+    Struct
+    UnsafePointer
+)
 
 func mapTypeToValue(b interface{}, v *reflect.Value) {
 	// realV := reflect.Indirect(*v)
