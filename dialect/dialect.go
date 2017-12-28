@@ -1,13 +1,11 @@
-package odm
+package dialect
 
-import "reflect"
-
-
+import "github.com/x-tool/odm"
 
 type Index string
 
 type Dialect interface {
-	Init(ConnectionConfig) Dialect
+	Init(odm.ConnectionConfig) Dialect
 	// Conn() (Conn, error)
 	GetColNames(db *Database) ([]string, error)
 	SwitchType(string) string

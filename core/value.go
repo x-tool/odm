@@ -1,4 +1,4 @@
-package odm
+package core
 
 type ODMValue struct {
 	v    interface{}

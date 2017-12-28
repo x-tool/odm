@@ -1,5 +1,7 @@
 package odm
 
+import "github.com/x-tool/odm/core"
+
 // config Struct
 type ConnectionConfig struct {
 	Host         string
@@ -15,7 +17,7 @@ type client struct {
 	config ConnectionConfig
 }
 
-func (c *client) Database(name string) Database {
+func (c *client) Database(name string) core.Database {
 	var d core.Database
 	var config ConnectionConfig
 	config = c.config
