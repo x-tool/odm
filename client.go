@@ -17,11 +17,6 @@ type client struct {
 	config ConnectionConfig
 }
 
-func (c *client) Database(name string) core.Database {
-	var d core.Database
-	var config ConnectionConfig
-	config = c.config
-	config.DatabaseName = name
-	d.Dialect = initDialect(config)
-	return d
+func (c *client) Database(name string) *core.Database {
+	return core.NewDatabase(name)
 }

@@ -33,27 +33,3 @@ func (d *Database) GetCol(i interface{}) (c *Col) {
 	}
 	return
 }
-
-func (d *Database) Insert(c *Col, i interface{}) (r interface{}, err error) {
-	odm := newODM(c.DB, c)
-	err = odm.insert(i)
-	return r, err
-}
-func (d *Database) Get(c *Col) (r interface{}, err error) {
-	return
-}
-func (d *Database) Delete(c *Col) (r interface{}, err error) {
-	return
-}
-func (d *Database) Query(c *Col) (r interface{}, err error) {
-	return
-}
-func (d *Database) All(c *Col) (r interface{}, err error) {
-	return
-}
-
-func (d *Database) Key(s string, c *Col) *ODM {
-	o := newODM(c.DB, c)
-	o.Query.key(s)
-	return o
-}

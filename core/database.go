@@ -8,12 +8,21 @@ const (
 	tagName = "odm"
 )
 
+type pluginInterface interface {
+	handelInterface(*ODM)
+}
 type Database struct {
-	Client           *Client
 	name             string
 	activeColNameLst []string
 	ColLst           []*Col
-	Dialect
+	pluginInterface
+}
+
+func NewDatabase(name string, p pluginInterface) *Database {
+	_d := new(Database)
+	_d.name = name
+	_d.pluginInterface = p
+	return _d
 }
 
 // func (d *Database) NewConn() (c Conn, err error) {
