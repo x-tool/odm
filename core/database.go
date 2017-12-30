@@ -8,9 +8,6 @@ const (
 	tagName = "odm"
 )
 
-type pluginInterface interface {
-	handelInterface(*ODM)
-}
 type Database struct {
 	name             string
 	activeColNameLst []string

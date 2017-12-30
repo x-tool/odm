@@ -4,34 +4,27 @@ import "reflect"
 
 type ODM struct {
 	Col    *Col
-	DB     *Database // col has db,but it can't use col when handle needless col. Ex: getColLst()
 	Query  *query
 	Result *result
 	R      *reflect.Value
 	Err    error
 }
 
-func newODM(db *Database, c *Col) *ODM {
+func newODM(c *Col) *ODM {
 	d := &ODM{
 		Col: c,
-		DB:  db,
-	}
-	return d
-}
-
-func newODMwithoutCol(db *Database) *ODM {
-	d := &ODM{
-		DB: db,
 	}
 	return d
 }
 
 func (d *ODM) dbName() string {
-	return d.DB.name
+	return d.Col.DB.name
 }
+
 func (d *ODM) colName() string {
 	return d.Col.name
 }
+
 func (d *ODM) insert(i interface{}) (err error) {
 	r := reflect.Indirect(reflect.ValueOf(i))
 	d.R = &r
@@ -39,7 +32,7 @@ func (d *ODM) insert(i interface{}) (err error) {
 	d.Query = newQuery(&r, d, "insert")
 	d.Result = newResult(&r, d.Col)
 	modeInsert(d)
-	err = d.DB.Dialect.Insert(d)
+	err = d.Col.DB.pluginInterface.handle(d)
 	return
 }
 

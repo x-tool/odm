@@ -46,8 +46,10 @@ func GetColName(i interface{}) (name string) {
 	return
 }
 
-func (c *Col) Insert(i interface{}) (interface{}, error) {
-	return c.DB.Insert(c, i)
+func (c *Col) Insert(i interface{}) error {
+	odm := newODM(c)
+	err = odm.insert(i)
+	return err
 }
 func (c *Col) Update() {
 
