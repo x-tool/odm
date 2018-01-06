@@ -1,4 +1,4 @@
-package core
+package odm
 
 import "regexp"
 import "reflect"

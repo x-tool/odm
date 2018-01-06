@@ -1,6 +1,6 @@
 package odm
 
-import "github.com/x-tool/odm/core"
+import "github.com/x-tool/odm/odm"
 
 // config Struct
 type ConnectionConfig struct {
@@ -17,6 +17,6 @@ type client struct {
 	config ConnectionConfig
 }
 
-func (c *client) Database(name string) *core.Database {
-	return core.NewDatabase(name)
+func (c *client) Database(name string) *odm.Database {
+	return odm.NewDatabase(name)
 }
