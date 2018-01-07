@@ -1,4 +1,4 @@
-package odm
+package core
 
 import "github.com/x-tool/odm/odm"
 
@@ -13,10 +13,10 @@ type ConnectionConfig struct {
 	TLs          bool
 }
 
-type client struct {
+type Client struct {
 	config ConnectionConfig
 }
 
-func (c *client) Database(name string) *odm.Database {
+func (c *Client) Database(name string) *odm.Database {
 	return odm.NewDatabase(name)
 }
