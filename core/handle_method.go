@@ -7,7 +7,7 @@ import (
 	"github.com/x-tool/tool"
 )
 
-func (r *ODM) dependtoDocOneStr(s string) (d *DocField) {
+func (r *Handle) dependtoDocOneStr(s string) (d *DocField) {
 	_s := strings.Split(s, ".")
 	if len(_s) > 1 {
 		return r.DependToDoc(_s[:len(_s)-2], _s[len(_s)-1])
@@ -15,11 +15,11 @@ func (r *ODM) dependtoDocOneStr(s string) (d *DocField) {
 		return r.DependToDoc([]string{}, _s[0])
 	}
 }
-func (r *ODM) DependToDoc(dependLst []string, name string) (d *DocField) {
+func (r *Handle) DependToDoc(dependLst []string, name string) (d *DocField) {
 	if len(dependLst) == 0 {
 		field := r.Col.Doc.getFieldByName(name)
 		if len(field) != 1 {
-			tool.Panic("ODM", errors.New("name not be single, you should add dependLst to find doc field"))
+			tool.Panic("Handle", errors.New("name not be single, you should add dependLst to find doc field"))
 		} else {
 			return field[0]
 		}

@@ -47,8 +47,8 @@ func GetColName(i interface{}) (name string) {
 }
 
 func (c *Col) Insert(i interface{}) error {
-	odm := newODM(c)
-	err = odm.insert(i)
+	Handle := newHandle(c)
+	err = Handle.insert(i)
 	return err
 }
 func (c *Col) Update() {
@@ -60,6 +60,6 @@ func (c *Col) Delete() {
 func (c *Col) Query() {
 
 }
-func (c *Col) Key(s string) (o *ODM) {
+func (c *Col) Key(s string) (o *Handle) {
 	return c.DB.Key(s, c)
 }

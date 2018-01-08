@@ -2,7 +2,7 @@ package core
 
 import "reflect"
 
-type ODM struct {
+type Handle struct {
 	Col    *Col
 	Query  *query
 	Result *result
@@ -10,22 +10,22 @@ type ODM struct {
 	Err    error
 }
 
-func newODM(c *Col) *ODM {
-	d := &ODM{
+func newHandle(c *Col) *Handle {
+	d := &Handle{
 		Col: c,
 	}
 	return d
 }
 
-func (d *ODM) dbName() string {
+func (d *Handle) dbName() string {
 	return d.Col.DB.name
 }
 
-func (d *ODM) colName() string {
+func (d *Handle) colName() string {
 	return d.Col.name
 }
 
-func (d *ODM) insert(i interface{}) (err error) {
+func (d *Handle) insert(i interface{}) (err error) {
 	r := reflect.Indirect(reflect.ValueOf(i))
 	d.R = &r
 
@@ -36,11 +36,11 @@ func (d *ODM) insert(i interface{}) (err error) {
 	return
 }
 
-func (d *ODM) update(i interface{}) {
+func (d *Handle) update(i interface{}) {
 
 }
 
-func (d *ODM) delete(err error) {
+func (d *Handle) delete(err error) {
 	if d.Col.Doc.getDeleteFieldName() != "" {
 		err = d.DB.Dialect.Update(d)
 	} else {
@@ -50,21 +50,21 @@ func (d *ODM) delete(err error) {
 	return
 }
 
-func (d *ODM) get(i interface{}) {
+func (d *Handle) get(i interface{}) {
 
 }
 
-func (d *ODM) Where(s string) *ODM {
+func (d *Handle) Where(s string) *Handle {
 	// d.Handle.where = s
 	return d
 }
 
-func (d *ODM) Limit(s string) *ODM {
+func (d *Handle) Limit(s string) *Handle {
 	// d.Handle.limit = s
 	return d
 }
 
-func (d *ODM) selectValidFields(dLst []*queryRootField) (vLst []*queryRootField) {
+func (d *Handle) selectValidFields(dLst []*queryRootField) (vLst []*queryRootField) {
 	for _, v := range dLst {
 		if !v.zero {
 			vLst = append(vLst, v)

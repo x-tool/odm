@@ -5,7 +5,7 @@ import (
 )
 
 const (
-	tagName = "odm"
+	tagName = "Handle"
 )
 
 type Database struct {

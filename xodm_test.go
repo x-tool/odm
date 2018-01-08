@@ -1,4 +1,4 @@
-package odm
+package Handle
 
 import (
 	"log"
@@ -16,7 +16,7 @@ type myDoc struct {
 	NormalCol
 	Name       string
 	Id         int
-	myDocLabel `odm:"extend"`
+	myDocLabel `Handle:"extend"`
 }
 
 func (m *myDoc) ColName() string {

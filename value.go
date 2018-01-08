@@ -1,13 +1,13 @@
-package odm
+package Handle
 
-type ODMValue struct {
+type HandleValue struct {
 	v    interface{}
 	zero bool
 	doc  *Doc
 }
 
-func newValue(v interface{}, doc *Doc) (o *ODMValue) {
-	_v := &ODMValue{
+func newValue(v interface{}, doc *Doc) (o *HandleValue) {
+	_v := &HandleValue{
 		v:   v,
 		doc: doc,
 	}

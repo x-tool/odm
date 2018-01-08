@@ -21,7 +21,7 @@ func (q *query) newQueryItem(wL ...interface{}) {
 
 	qItem := queryItem{
 		queryRootField: queryRootField{
-			DocField: q.odm.dependtoDocOneStr(w),
+			DocField: q.Handle.dependtoDocOneStr(w),
 			zero:     false,
 			value:    reflect.ValueOf(i),
 		},

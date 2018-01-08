@@ -1,4 +1,4 @@
-package odm
+package Handle
 
 import (
 	"errors"
@@ -118,7 +118,7 @@ func (d *dialectpostgre) syncCol(col *Col) {
 func (d *dialectpostgre) Session() *Session {
 	return new(Session)
 }
-func (d *dialectpostgre) Insert(doc *ODM) (err error) {
+func (d *dialectpostgre) Insert(doc *Handle) (err error) {
 	var nameLst, valueLst []string
 	rootFields := doc.Query.getRootFields()
 	rootFields = doc.selectValidFields(rootFields)
@@ -134,16 +134,16 @@ func (d *dialectpostgre) Insert(doc *ODM) (err error) {
 		"$typeLst", nameLstStr,
 		"$valueLst", valueLstStr,
 	})
-	err = d.OpenWithODM(rawsql, doc)
+	err = d.OpenWithHandle(rawsql, doc)
 	return
 }
-func (d *dialectpostgre) Update(doc *ODM) (err error) {
+func (d *dialectpostgre) Update(doc *Handle) (err error) {
 	return
 }
-func (d *dialectpostgre) Delete(doc *ODM) (err error) {
+func (d *dialectpostgre) Delete(doc *Handle) (err error) {
 	return
 }
-func (d *dialectpostgre) Query(doc *ODM) (r interface{}, err error) {
+func (d *dialectpostgre) Query(doc *Handle) (r interface{}, err error) {
 	return
 }
 
@@ -154,10 +154,10 @@ func (d *dialectpostgre) newConn() (*postgreConn, error) {
 	return &c, err
 }
 func (d *dialectpostgre) LogSql(sql string) {
-	tool.Console.LogWithLabel("XODM", sql)
+	tool.Console.LogWithLabel("XHandle", sql)
 }
 
-func pg_formatQL(o *ODM) (s string) {
+func pg_formatQL(o *Handle) (s string) {
 	var queryStr string
 	var resultStr string
 	for i, v := range o.Result.resultFieldLst {
@@ -251,7 +251,7 @@ func (d *dialectpostgre) Open(sql string, results interface{}) (err error) {
 		return err
 	}
 }
-func (d *dialectpostgre) OpenWithODM(sql string, odm *ODM) (err error) {
+func (d *dialectpostgre) OpenWithHandle(sql string, Handle *Handle) (err error) {
 	_conn, err := d.newConn()
 	if err != nil {
 		return err
@@ -261,13 +261,13 @@ func (d *dialectpostgre) OpenWithODM(sql string, odm *ODM) (err error) {
 	rows, err := pgConn.Query(sql)
 	defer pgConn.Close()
 
-	resultV := *odm.R
+	resultV := *Handle.R
 	resultT := resultV.Type()
 	if resultT.Kind() == reflect.Slice {
 		for rows.Next() {
-			resultItemV := odm.Result.newResultItem()
+			resultItemV := Handle.Result.newResultItem()
 			var resultSlicePtr []interface{}
-			for _, v := range odm.Result.getResultRootItemFieldAddr(resultItemV) {
+			for _, v := range Handle.Result.getResultRootItemFieldAddr(resultItemV) {
 				resultSlicePtr = append(resultSlicePtr, (v).Interface())
 			}
 			err = rows.Scan(resultSlicePtr...)

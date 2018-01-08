@@ -20,7 +20,7 @@ type DocField struct {
 	Id        int
 	Pid       int // field golang parent real ID; default:-1
 	isExtend  bool
-	extendPid int // field odm parent ID; default:-1
+	extendPid int // field Handle parent ID; default:-1
 	dependLst
 	Tag     string
 	funcLst map[string]string

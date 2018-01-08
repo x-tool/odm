@@ -1,20 +1,18 @@
 package dialect
 
-import "github.com/x-tool/odm"
-
 type Index string
 
 type Dialect interface {
-	Init(odm.ConnectionConfig) Dialect
+	Init(Handle.ConnectionConfig) Dialect
 	// Conn() (Conn, error)
 	GetColNames(db *Database) ([]string, error)
 	SwitchType(string) string
 	syncCol(*Col)
 	// base handel
-	Insert(*ODM) error
-	Update(*ODM) error
-	Delete(*ODM) error
-	Query(*ODM) (interface{}, error)
+	Insert(*Handle) error
+	Update(*Handle) error
+	Delete(*Handle) error
+	Query(*Handle) (interface{}, error)
 	LogSql(string)
 	Session() *Session
 }

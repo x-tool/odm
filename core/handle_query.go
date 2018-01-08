@@ -6,7 +6,7 @@ import (
 )
 
 type query struct {
-	odm       *ODM
+	Handle    *Handle
 	queryKind string
 	queryV    *reflect.Value
 	modeV     *reflect.Value
@@ -21,9 +21,9 @@ type queryItem struct {
 	whereAnd   bool
 }
 
-func newQuery(rV *reflect.Value, o *ODM, t string) *query {
+func newQuery(rV *reflect.Value, o *Handle, t string) *query {
 	r := &query{
-		odm:       o,
+		Handle:    o,
 		queryV:    rV,
 		queryKind: t,
 	}
@@ -59,7 +59,7 @@ func (r *query) setDependToDoc() {
 		if isDocMode(fieldT.Name) {
 			r.modeV = &field
 		}
-		newqueryItem := r.odm.DependToDoc(strings.Split(fieldT.Tag.Get(tagName), "."), fieldT.Name)
+		newqueryItem := r.Handle.DependToDoc(strings.Split(fieldT.Tag.Get(tagName), "."), fieldT.Name)
 		r.queryLst = append(r.queryLst, newqueryItem)
 	}
 

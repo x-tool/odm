@@ -10,7 +10,7 @@ type NormalCol struct {
 	Key         string
 	CreatedTime time.Time
 	UpdateTime  time.Time
-	DeleteTime  time.Time `xodm:"delete"`
+	DeleteTime  time.Time `xHandle:"delete"`
 	State       int
 }
 
@@ -50,7 +50,7 @@ func isDelete(s string) bool {
 	}
 	return check
 }
-func modeInsert(d *ODM) {
+func modeInsert(d *Handle) {
 	if d.Col.hasDocModel {
 		modeVInterface := d.Query.modeV.Addr().Interface()
 		v := modeVInterface.(Mode)

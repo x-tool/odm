@@ -1,23 +1,18 @@
 package core
 
-import (
-	"reflect"
-	"strings"
-)
-
-type odmSet struct {
-	setLst []odmSetItem
+type HandleSet struct {
+	setLst []HandleSetItem
 }
 
-type odmSetItem struct {
+type HandleSetItem struct {
 	dependDoc *Doc
-	value interface{}
+	value     interface{}
 }
 
-func (odmSet *odmSet)addODMSet(o *ODM, str string, value interface{}){
-	_odmSet := odmSetItem{
+func (HandleSet *HandleSet) addHandleSet(o *Handle, str string, value interface{}) {
+	_HandleSet := HandleSetItem{
 		dependDoc: o.dependtoDocOneStr(str),
-		value: value,
+		value:     value,
 	}
-	odmSet.setLst = append(odmSet.setLst, _odmSet)
+	HandleSet.setLst = append(HandleSet.setLst, _HandleSet)
 }
