@@ -1,7 +1,5 @@
 package core
 
-import "github.com/x-tool/odm/odm"
-
 // config Struct
 type ConnectionConfig struct {
 	Host         string
