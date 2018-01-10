@@ -1,30 +1,25 @@
-package core
+package odm
 
 import (
 	"github.com/x-tool/tool"
 )
 
 const (
-	tagName = "Handle"
+	tagName = "xorm"
 )
 
 type Database struct {
 	name             string
 	activeColNameLst []string
 	ColLst           []*Col
-	pluginInterface
 }
 
-func NewDatabase(name string, p pluginInterface) *Database {
+func NewDatabase(name string) *Database {
 	_d := new(Database)
 	_d.name = name
-	_d.pluginInterface = p
 	return _d
 }
 
-// func (d *Database) NewConn() (c Conn, err error) {
-// 	return d.Conn()
-// }
 func (d *Database) SyncCols(cols ...interface{}) {
 	activeCols, err := d.GetColNames(d)
 	if err != nil {

@@ -1,4 +1,4 @@
-package core
+package odm
 
 // config Struct
 type ConnectionConfig struct {
@@ -12,9 +12,9 @@ type ConnectionConfig struct {
 }
 
 type Client struct {
-	config ConnectionConfig
+	Config ConnectionConfig
 }
 
-func (c *Client) Database(name string) *odm.Database {
-	return odm.NewDatabase(name)
+func (c *Client) Database(name string) *Database {
+	return NewDatabase(name)
 }
