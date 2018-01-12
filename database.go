@@ -4,10 +4,6 @@ import (
 	"github.com/x-tool/tool"
 )
 
-const (
-	tagName = "xorm"
-)
-
 type Database struct {
 	name             string
 	activeColNameLst []string

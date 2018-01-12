@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/jackc/pgx"
+	"github.com/x-tool/odm/exporti"
 	"github.com/x-tool/tool"
 )
 
@@ -30,10 +31,10 @@ var typeMap = map[string]string{
 }
 
 type dialectpostgre struct {
-	config    ConnectionConfig
+	config    exporti.ConnectionConfig
 	pgxConfig pgx.ConnConfig
 }
-type postgreSimpleResult [][][]byte
+
 type postgreConn struct {
 	conn *pgx.Conn
 }

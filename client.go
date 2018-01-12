@@ -1,20 +1,24 @@
 package odm
 
-// config Struct
-type ConnectionConfig struct {
-	Host         string
-	Port         int64
-	User         string
-	Passwd       string
-	DatabaseName string
-	Database     string
-	TLs          bool
+import (
+	"github.com/x-tool/odm/module"
+	"github.com/x-tool/odm/module/dialect"
+)
+
+type ConnectConfig = module.ConnectionConfig
+
+type client struct {
+	config  ConnectConfig
+	connect dialect.Dialect
 }
 
-type Client struct {
-	Config ConnectionConfig
-}
-
-func (c *Client) Database(name string) *Database {
+func (c *client) Database(name string) *Database {
 	return NewDatabase(name)
+}
+
+func NewClient(c ConnectConfig) *client {
+	_o := new(client)
+	_o.config = c
+	_o.connect = dialect.NewDialect(c)
+	return _o
 }

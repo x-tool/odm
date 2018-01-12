@@ -23,7 +23,7 @@ func (m *myDoc) ColName() string {
 	return "doc"
 }
 func Test_connection(t *testing.T) {
-	connectionConf := ConnectionConfig{
+	connectionConf := ConnectConfig{
 		Host:     "127.0.0.1",
 		Port:     5432,
 		User:     "postgres",
