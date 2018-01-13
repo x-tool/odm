@@ -1,10 +1,13 @@
 package dialect
 
-import "github.com/x-tool/odm/module"
-import "github.com/x-tool/odm/module/dialect/model"
+import (
+	"github.com/x-tool/odm/module"
+	"github.com/x-tool/odm/module/dialect/model"
+)
+
 type Dialect = model.Dialect
 
-func initDialect(c module.ConnectConfig) (d Dialect) {
+func NewDialect(c module.ConnectConfig) (d Dialect) {
 	switch c.Database {
 	case "postgresql":
 		fallthrough
@@ -24,11 +27,3 @@ func initDialect(c module.ConnectConfig) (d Dialect) {
 type Session struct{}
 type Exec interface{}
 type Result interface{}
-
-func NewDialect(c module.ConnectConfig) Dialect {
-	switch c.Database{
-	case "postgre":
-			postgresql.
-	}
-	return 
-}
