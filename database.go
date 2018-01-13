@@ -1,14 +1,11 @@
 package odm
 
 import (
+	"github.com/x-tool/odm/model"
 	"github.com/x-tool/tool"
 )
 
-type Database struct {
-	name             string
-	activeColNameLst []string
-	ColLst           []*Col
-}
+type Database = model.Database
 
 func NewDatabase(name string) *Database {
 	_d := new(Database)

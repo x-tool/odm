@@ -1,22 +1,15 @@
-package core
+package odm
 
 import (
 	"reflect"
+
+	"github.com/x-tool/odm/model"
 )
 
 type ColInterface interface {
 	ColName() string
 }
-
-type Col struct {
-	DB             *Database
-	name           string
-	hasDocModel    bool
-	DocModel       string
-	hasDeleteField bool
-	deleteField    string
-	Doc            *Doc
-}
+type Col = model.Col
 
 func NewCol(d *Database, i interface{}) *Col {
 	c := new(Col)

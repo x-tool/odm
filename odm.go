@@ -2,18 +2,18 @@ package odm
 
 import (
 	"github.com/x-tool/odm/module"
-	"github.com/x-tool/odm/module/dialect"
+	"github.com/x-tool/odm/module/model"
 )
 
 const (
 	tagName = "xodm"
 )
 
-type ConnectConfig = module.ConnectionConfig
+type ConnectConfig = model.ConnectionConfig
 
 type client struct {
 	config  ConnectConfig
-	connect dialect.Dialect
+	connect module.Dialect
 }
 
 func (c *client) Database(name string) *Database {
@@ -23,6 +23,6 @@ func (c *client) Database(name string) *Database {
 func NewClient(c ConnectConfig) *client {
 	_o := new(client)
 	_o.config = c
-	_o.connect = dialect.NewDialect(c)
+	_o.connect = module.NewDialect(c)
 	return _o
 }

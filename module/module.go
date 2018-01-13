@@ -1,12 +1,9 @@
 package module
 
-// config Struct
-type ConnectConfig struct {
-	Host         string
-	Port         int64
-	User         string
-	Passwd       string
-	DatabaseName string
-	Database     string
-	TLs          bool
+import "github.com/x-tool/odm/module/dialect/model"
+
+var Dialect = model.Dialect
+
+func NewDialect() {
+
 }
