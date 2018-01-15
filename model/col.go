@@ -1,9 +1,7 @@
-package odm
+package model
 
 import (
 	"reflect"
-
-	"github.com/x-tool/odm/model"
 )
 
 type ColInterface interface {

@@ -1,4 +1,4 @@
-package odm
+package model
 
 import "reflect"
 

@@ -2,11 +2,13 @@ package model
 
 import "reflect"
 
+// Database use
 type Database struct {
-	name             string
-	activeColNameLst []string
-	ColLst           []*Col
+	Name string
+	ColLst
 }
+
+type ColLst []*Col
 
 type Col struct {
 	DB             *Database

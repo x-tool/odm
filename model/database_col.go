@@ -1,6 +1,6 @@
-package odm
+package model
 
-func (d *Database) syncCol(colI interface{}) {
+func (d *database) syncCol(colI interface{}) {
 	col := d.NewCol(colI)
 	d.ColLst = append(d.ColLst, col)
 	if !d.checkNativeCol(col.name) {
@@ -10,7 +10,7 @@ func (d *Database) syncCol(colI interface{}) {
 }
 
 // check col sync to database
-func (d *Database) checkNativeCol(s string) bool {
+func (d *database) checkNativeCol(s string) bool {
 	for _, v := range d.activeColNameLst {
 		if v == s {
 			return true
@@ -19,11 +19,11 @@ func (d *Database) checkNativeCol(s string) bool {
 	return false
 }
 
-func (d *Database) NewCol(i interface{}) *Col {
+func (d *database) NewCol(i interface{}) *Col {
 	return NewCol(d, i)
 }
 
-func (d *Database) GetCol(i interface{}) (c *Col) {
+func (d *database) GetCol(i interface{}) (c *Col) {
 	colName := GetColName(i)
 	for _, v := range d.ColLst {
 		if v.name == colName {

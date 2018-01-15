@@ -1,19 +1,18 @@
-package odm
+package model
 
 import (
-	"github.com/x-tool/odm/model"
 	"github.com/x-tool/tool"
 )
 
-type Database = model.Database
+type database = model.Database
 
-func NewDatabase(name string) *Database {
-	_d := new(Database)
-	_d.name = name
+func newDatabase(name string) *database {
+	_d := new(database)
+	_d.Name = name
 	return _d
 }
 
-func (d *Database) SyncCols(cols ...interface{}) {
+func (d *database) SyncCols(cols ...interface{}) {
 	activeCols, err := d.GetColNames(d)
 	if err != nil {
 		tool.Panic("DB", err)
@@ -30,7 +29,7 @@ func (d *Database) SyncCols(cols ...interface{}) {
 	}
 }
 
-func (d *Database) getCol(name string) *Col {
+func (d *database) GetCol(name string) *Col {
 	var col *Col
 	for _, v := range d.ColLst {
 		if v.name == name {

@@ -1,10 +1,9 @@
-package odm
+package model
 
 import (
 	"errors"
 	"reflect"
 
-	"github.com/x-tool/odm/model"
 	"github.com/x-tool/tool"
 )
 
