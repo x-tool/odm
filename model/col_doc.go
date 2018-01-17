@@ -7,8 +7,26 @@ import (
 	"github.com/x-tool/tool"
 )
 
-type Doc = model.Doc
-type DocField = model.DocField
+type Doc struct {
+	col    *Col
+	t      *reflect.Type
+	fields DocFields
+}
+type DocFields []*DocField
+type DocField struct {
+	Name      string
+	Type      string
+	DBType    string
+	Id        int
+	Pid       int // field golang parent real ID; default:-1
+	isExtend  bool
+	extendPid int // field Handle parent ID; default:-1
+	dependLst
+	Tag     string
+	funcLst map[string]string
+}
+
+type dependLst []*DocField
 
 func (o *DocField) getRootFieldDB() (r *DocField) {
 	switch len(o.dependLst) {

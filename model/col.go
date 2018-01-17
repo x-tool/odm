@@ -1,13 +1,20 @@
 package model
 
-import (
-	"reflect"
-)
+import "reflect"
 
 type ColInterface interface {
 	ColName() string
 }
-type Col = model.Col
+
+type Col struct {
+	DB             *Database
+	name           string
+	hasDocModel    bool
+	DocModel       string
+	hasDeleteField bool
+	deleteField    string
+	Doc            *Doc
+}
 
 func NewCol(d *Database, i interface{}) *Col {
 	c := new(Col)
@@ -20,6 +27,10 @@ func NewCol(d *Database, i interface{}) *Col {
 		c.hasDeleteField = true
 	}
 	return c
+}
+
+func (c *Col) GetDatabase() *database {
+	return c.DB
 }
 
 func GetColName(i interface{}) (name string) {
@@ -35,22 +46,4 @@ func GetColName(i interface{}) (name string) {
 
 	}
 	return
-}
-
-func (c *Col) Insert(i interface{}) error {
-	Handle := newHandle(c)
-	err = Handle.insert(i)
-	return err
-}
-func (c *Col) Update() {
-
-}
-func (c *Col) Delete() {
-
-}
-func (c *Col) Query() {
-
-}
-func (c *Col) Key(s string) (o *Handle) {
-	return c.DB.Key(s, c)
 }
