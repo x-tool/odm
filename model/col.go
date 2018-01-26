@@ -7,7 +7,6 @@ type ColInterface interface {
 }
 
 type Col struct {
-	DB             *Database
 	name           string
 	hasDocModel    bool
 	DocModel       string
@@ -16,7 +15,7 @@ type Col struct {
 	Doc            *Doc
 }
 
-func NewCol(d *Database, i interface{}) *Col {
+func NewCol(i interface{}) *Col {
 	c := new(Col)
 	c.name = GetColName(i)
 	c.DB = d
@@ -27,10 +26,6 @@ func NewCol(d *Database, i interface{}) *Col {
 		c.hasDeleteField = true
 	}
 	return c
-}
-
-func (c *Col) GetDatabase() *database {
-	return c.DB
 }
 
 func GetColName(i interface{}) (name string) {

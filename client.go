@@ -6,17 +6,17 @@ import (
 )
 
 type client struct {
-	config  ConnectConfig
-	connect model.Dialect
+	config         ConnectConfig
+	dialectConnect model.Dialect
 }
 
 func (c *client) Database(name string) *database {
 	return newDatabase(name)
 }
 
-func newClient(c ConnectConfig) *client {
+func NewClient(c ConnectConfig) *client {
 	_o := new(client)
 	_o.config = c
-	_o.connect = dialect.NewDialect(c)
+	_o.dialectConnect = dialect.NewDialect(c)
 	return _o
 }
