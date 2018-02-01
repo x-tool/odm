@@ -10,6 +10,10 @@ type database struct {
 
 type colLst []*model.Col
 
+type databaseRelation interface {
+	GetColByName(string) *Col
+}
+
 func NewDatabase(name string) *database {
 	_d := new(database)
 	_d.Name = name
