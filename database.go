@@ -1,7 +1,5 @@
 package odm
 
-import "github.com/x-tool/odm/module/model"
-
 // database use
 type database struct {
 	name string
@@ -14,7 +12,7 @@ type databaseRelation interface {
 	GetColByName(string) *Col
 }
 
-func NewDatabase(name string) *database {
+func newDatabase(name string) *database {
 	_d := new(database)
 	_d.Name = name
 	return _d

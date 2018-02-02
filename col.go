@@ -1,6 +1,10 @@
 package odm
 
-import "reflect"
+import (
+	"reflect"
+
+	"github.com/x-tool/odm/module/colmod/model"
+)
 
 type ColInterface interface {
 	ColName() string
@@ -8,11 +12,10 @@ type ColInterface interface {
 
 type Col struct {
 	name           string
-	hasDocModel    bool
-	DocModel       string
 	hasDeleteField bool
 	deleteField    string
-	Doc            *Doc
+	Doc
+	colModeJ model.ColModer
 }
 
 func NewCol(i interface{}) *Col {
@@ -20,7 +23,6 @@ func NewCol(i interface{}) *Col {
 	c.name = GetColName(i)
 	c.DB = d
 	c.Doc = NewDoc(c, i)
-	c.hasDocModel, c.DocModel = c.Doc.DocModel()
 	c.deleteField = c.Doc.getDeleteFieldName()
 	if c.deleteField != "" {
 		c.hasDeleteField = true
