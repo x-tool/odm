@@ -9,19 +9,17 @@ type ColInterface interface {
 }
 
 type Col struct {
-	name           string
-	hasDeleteField bool
-	deleteField    string
+	database *database
+	name     string
 	Doc
 	colModeJ model.ColModer
 }
 
-func newCol(i interface{}) *Col {
+func newCol(db *database, i interface{}) *Col {
 	c := new(Col)
 	c.name = GetColName(i)
-	c.DB = d
+	c.db = db
 	c.Doc = NewDoc(c, i)
-	c.deleteField = c.Doc.getDeleteFieldName()
 	if c.deleteField != "" {
 		c.hasDeleteField = true
 	}

@@ -38,7 +38,7 @@ func (d *database) RegisterCols(c ...interface{}) {
 func (d *database) GetColByName(name string) *Col {
 	var col *Col
 	for _, v := range d.colLst {
-		if v.name == name {
+		if v.GetName() == name {
 			col = v
 			break
 		}
