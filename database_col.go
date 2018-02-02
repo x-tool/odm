@@ -1,4 +1,4 @@
-package model
+package odm
 
 func (d *database) syncCol(colI interface{}) {
 	col := d.NewCol(colI)

@@ -1,29 +1,51 @@
 package odm
 
-import "github.com/x-tool/odm/model"
+import "github.com/x-tool/odm/module/model"
 
+// database use
 type database struct {
-	baseDB model.Database
+	name string
 	colLst
 }
 
-func newDatabase(s string) *database {
+type colLst []*model.Col
+
+type databaseRelation interface {
+	GetColByName(string) *Col
+}
+
+func NewDatabase(name string) *database {
 	_d := new(database)
-	_d.baseDB = model.NewDatabase(s)
+	_d.Name = name
 	return _d
 }
 
-func (d *database) RegisterCol(i interface{}) {
-	col := newCol(d, i)
-	d.colLst = append(d.colLst, col)
+func (d *database) GetName() string {
+	return d.name
 }
 
-func (d *database) RegisterCols(i ...Interface{}) {
-	for _,v:=range i{
-		go d.RegisterCol(v)
+func (d *database) RegisterCol(c interface{}) {
+	_col := NewCol(d, c)
+	d.colLst = append(d.colLst, _col)
+}
+
+func (d *database) RegisterCols(c ...interface{}) {
+	for i := range c {
+		go d.RegisterCol(i)
 	}
 }
 
-func (d *database) GetDBName()string{
-	return d.baseDB.getName()
+func (d *database) GetColByName(name string) *Col {
+	var col *Col
+	for _, v := range d.colLst {
+		if v.name == name {
+			col = v
+			break
+		}
+	}
+	return col
+}
+
+func (d *database) GetName() string {
+	return d.name
 }
