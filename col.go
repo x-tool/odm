@@ -2,8 +2,6 @@ package odm
 
 import (
 	"reflect"
-
-	"github.com/x-tool/odm/module/colmod/model"
 )
 
 type ColInterface interface {
@@ -18,7 +16,7 @@ type Col struct {
 	colModeJ model.ColModer
 }
 
-func NewCol(i interface{}) *Col {
+func newCol(i interface{}) *Col {
 	c := new(Col)
 	c.name = GetColName(i)
 	c.DB = d

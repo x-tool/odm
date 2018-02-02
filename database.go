@@ -2,7 +2,8 @@ package odm
 
 // database use
 type database struct {
-	name string
+	client *client
+	name   string
 	colLst
 }
 
@@ -12,9 +13,10 @@ type databaseRelation interface {
 	GetColByName(string) *Col
 }
 
-func newDatabase(name string) *database {
+func newDatabase(name string, c *client) *database {
 	_d := new(database)
 	_d.Name = name
+	_d.client = c
 	return _d
 }
 
@@ -23,7 +25,7 @@ func (d *database) GetName() string {
 }
 
 func (d *database) RegisterCol(c interface{}) {
-	_col := NewCol(d, c)
+	_col := newCol(d, c)
 	d.colLst = append(d.colLst, _col)
 }
 
