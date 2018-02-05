@@ -39,3 +39,7 @@ func (d *database) RegisterCols(c ...interface{}) {
 func (d *database) GetName() string {
 	return d.name
 }
+
+func (d *database) SyncCol() {
+	d.Dialect.syncCol(d.colLst)
+}

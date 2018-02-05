@@ -7,18 +7,21 @@ import (
 	"github.com/x-tool/tool"
 )
 
-type Doc struct {
-	col    *Col
+type doc struct {
+	col    *col
 	t      *reflect.Type
 	fields DocFields
 }
-type DocFields []*DocField
+
+type docLst []doc
+type DocFields []DocField
+
 type DocField struct {
-	Name      string
-	Type      string
-	DBType    string
-	Id        int
-	Pid       int // field golang parent real ID; default:-1
+	name      string
+	selfType  string
+	dbType    string
+	id        int
+	pid       int // field golang parent real ID; default:-1
 	isExtend  bool
 	extendPid int // field Handle parent ID; default:-1
 	dependLst
