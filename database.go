@@ -1,13 +1,14 @@
 package odm
 
+import "github.com/x-tool/odm/module/dialect"
+
 // database use
 type database struct {
-	client *client
-	name   string
+	client         *client
+	name           string
+	dialectConnect dialect.Dialect
 	colLst
 }
-
-type colLst []*model.Col
 
 type databaseRelation interface {
 	GetColByName(string) *Col
@@ -33,17 +34,6 @@ func (d *database) RegisterCols(c ...interface{}) {
 	for i := range c {
 		go d.RegisterCol(i)
 	}
-}
-
-func (d *database) GetColByName(name string) *Col {
-	var col *Col
-	for _, v := range d.colLst {
-		if v.GetName() == name {
-			col = v
-			break
-		}
-	}
-	return col
 }
 
 func (d *database) GetName() string {

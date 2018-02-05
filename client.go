@@ -5,8 +5,7 @@ import (
 )
 
 type client struct {
-	config         ConnectConfig
-	dialectConnect dialect.Dialect
+	config ConnectConfig
 }
 
 func (c *client) Database(name string) *database {
