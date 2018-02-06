@@ -9,7 +9,7 @@ type Col_export = col
 type col struct {
 	database *database
 	name     string
-	docLst
+	doc
 	colModeJ model.ColModer
 }
 
@@ -21,7 +21,7 @@ func newCol(db *database, i interface{}) *col {
 	c := new(col)
 	c.name = GetColName(i)
 	c.db = db
-	c.Doc = NewDoc(c, i)
+	c.doc = NewDoc(c, i)
 	return c
 }
 
