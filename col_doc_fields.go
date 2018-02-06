@@ -1,8 +1,8 @@
 package odm
 
-type DocFieldLst []*DocField
+type docFieldLst []*DocField
 
-func (d *DocFieldLst) getFieldByName(name string) (o *DocFields) {
+func (d *DocFieldLst) getFieldsByName(name string) (o *docFields) {
 	for _, v := range d {
 		if v.Name == name {
 			o = append(o, v)
@@ -11,7 +11,7 @@ func (d *DocFieldLst) getFieldByName(name string) (o *DocFields) {
 	return
 }
 
-func (d *DocFieldLst) getRootFieldLst() (rd *DocFieldLst){
+func (d *docFieldLst) getRootFieldLst() (rd *docFieldLst){
 	for _,v := range d {
 		if v.pid = rootPid {
 			rd = append(rd, v)
@@ -20,7 +20,7 @@ func (d *DocFieldLst) getRootFieldLst() (rd *DocFieldLst){
 	return 
 }
 
-func (d *DocFieldLst) getExtendFieldLst() (rd *DocFieldLst){
+func (d *docFieldLst) getExtendFieldLst() (rd *docFieldLst){
 	for _,v := range d {
 		if v.isExtend() {
 			rd = append(rd, v)

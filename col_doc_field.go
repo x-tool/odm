@@ -2,7 +2,7 @@ package odm
 
 import "reflect"
 
-type DocField struct {
+type docField struct {
 	name      string
 	selfType  string
 	dbType    string
@@ -15,11 +15,11 @@ type DocField struct {
 	funcLst map[string]string
 }
 
-func (d *DocField) IsExtend() bool {
+func (d *docField) IsExtend() bool {
 	return d.isExtend
 }
 
-func (o *DocField) getRootFieldDB() (r *DocField) {
+func (o *docField) getRootFieldDB() (r *docField) {
 	switch len(o.dependLst) {
 	case 0:
 		return 0
@@ -32,7 +32,7 @@ func (o *DocField) getRootFieldDB() (r *DocField) {
 	}
 }
 
-func (o *DocField) getDependLstDB() (r DocFieldLst) {
+func (o *docField) getDependLstDB() (r docFieldLst) {
 	for _, v := range o.dependLst {
 		if v.isExtend {
 			r = append(r, v)
@@ -41,12 +41,12 @@ func (o *DocField) getDependLstDB() (r DocFieldLst) {
 	return
 }
 
-func newDocField(d *Doc, t *reflect.StructField, Pid int, extendPid int) {
+func newdocField(d *doc, t *reflect.StructField, Pid int, extendPid int) {
 	fieldType := *t
 	fieldTypeStr := formatTypeToString(&fieldType.Type)
 	id := len(d.fields)
 	tag := fieldType.Tag.Get(tagName)
-	isExtend := checkDocFieldisExtend(fieldType.Name, tag)
+	isExtend := checkdocFieldisExtend(tag)
 	extendField := d.getFieldById(extendPid)
 	var dependLst dependLst
 	if extendField == nil {
@@ -54,7 +54,7 @@ func newDocField(d *Doc, t *reflect.StructField, Pid int, extendPid int) {
 		dependLst = append(extendField.dependLst, extendField)
 	}
 
-	field := &DocField{
+	field := &docField{
 		Name:      fieldType.Name,
 		Type:      fieldTypeStr,
 		DBType:    d.col.DB.SwitchType(fieldTypeStr),
@@ -83,7 +83,7 @@ func newDocField(d *Doc, t *reflect.StructField, Pid int, extendPid int) {
 				extendPid = id
 			}
 			field := _fieldType.Field(i)
-			newDocField(d, &field, id, extendPid)
+			newdocField(d, &field, id, extendPid)
 		}
 	case reflect.Struct:
 		// if time package not range time struct
@@ -98,7 +98,7 @@ func newDocField(d *Doc, t *reflect.StructField, Pid int, extendPid int) {
 				extendPid = id
 			}
 			field := fieldType.Type.Field(i)
-			newDocField(d, &field, id, extendPid)
+			newdocField(d, &field, id, extendPid)
 		}
 
 	}

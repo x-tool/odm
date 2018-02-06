@@ -6,8 +6,8 @@ const (
 	rootPid = -1
 )
 
-func (doc *Doc) getRootExtendFields() (d DocFieldLst) {
-	for _, v := range doc.fields {
+func (d *doc) getRootExtendFields() (d docFieldLst) {
+	for _, v := range d.fields {
 		if v.Pid == -1 && v.extendPid != -1 && v.isExtend {
 			d = append(d, v)
 		}
@@ -15,25 +15,25 @@ func (doc *Doc) getRootExtendFields() (d DocFieldLst) {
 	return
 }
 
-func (doc *Doc) getRootSinpleFields() (d DocFieldLst) {
-	for _, v := range doc.fields {
-		if v.extendPid == -1 && !v.isExtend && !doc.checkComplexField(v) {
+func (d *doc) getRootSinpleFields() (d docFieldLst) {
+	for _, v := range d.fields {
+		if v.extendPid == -1 && !v.isExtend && !d.checkComplexField(v) {
 			d = append(d, v)
 		}
 	}
 	return
 }
 
-func (doc *Doc) getRootComplexFields() (d DocFieldLst) {
-	for _, v := range doc.fields {
-		if v.extendPid == -1 && !v.isExtend && doc.checkComplexField(v) {
+func (d *doc) getRootComplexFields() (d docFieldLst) {
+	for _, v := range d.fields {
+		if v.extendPid == -1 && !v.isExtend && d.checkComplexField(v) {
 			d = append(d, v)
 		}
 	}
 	return
 }
 
-func (d *Doc) getRootDetails() (doc dependLst) {
+func (d *doc) getRootDetails() (doc dependLst) {
 	for _, v := range d.fields {
 		if v.extendPid == -1 && !v.isExtend {
 			doc = append(doc, v)
@@ -41,7 +41,7 @@ func (d *Doc) getRootDetails() (doc dependLst) {
 	}
 	return
 }
-func (d *Doc) getRootDetailsWithExtend() (doc dependLst) {
+func (d *doc) getRootDetailsWithExtend() (doc dependLst) {
 	for _, v := range d.fields {
 		if v.extendPid == -1 {
 			doc = append(doc, v)
@@ -50,7 +50,7 @@ func (d *Doc) getRootDetailsWithExtend() (doc dependLst) {
 	return
 }
 
-func (d *Doc) getRootDetailValue(rootValue *reflect.Value, doc *DocField) (v *reflect.Value) {
+func (d *doc) getRootDetailValue(rootValue *reflect.Value, doc *docField) (v *reflect.Value) {
 	rV := *rootValue
 	if rV.Kind() == reflect.Ptr {
 		rV = reflect.Indirect(rV)
@@ -63,8 +63,8 @@ func (d *Doc) getRootDetailValue(rootValue *reflect.Value, doc *DocField) (v *re
 		value := rV.FieldByName(doc.Name)
 		return &value
 	} else {
-		pDoc := d.getFieldById(doc.Pid)
-		_value := rV.FieldByName(pDoc.Name)
+		pdoc := d.getFieldById(doc.Pid)
+		_value := rV.FieldByName(pdoc.Name)
 		if _value.Kind() == reflect.Ptr {
 			_value = reflect.Indirect(_value)
 		}

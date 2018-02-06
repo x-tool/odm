@@ -10,15 +10,15 @@ import (
 type doc struct {
 	col *col
 	docItemType
-	fields   DocFields
-	colModeJ model.DocModer
+	fields   docFields
+	colModeJ model.docModer
 }
 
 type docLst []*doc
 
 type docItemType reflect.Type
 
-func (d *Doc) getChildFields(i *DocField) (r DocFields) {
+func (d *doc) getChildFields(i *docField) (r docFields) {
 	id := i.Id
 	for _, v := range d.fields {
 		if v.Pid == id {
@@ -28,7 +28,7 @@ func (d *Doc) getChildFields(i *DocField) (r DocFields) {
 	return
 }
 
-func (d *Doc) getFieldById(id int) (o *DocField) {
+func (d *doc) getFieldById(id int) (o *docField) {
 	for _, v := range d.fields {
 		if v.Id == id {
 			o = v
@@ -38,13 +38,13 @@ func (d *Doc) getFieldById(id int) (o *DocField) {
 	return
 }
 
-func NewDoc(c *Col, i interface{}) *Doc {
+func Newdoc(c *Col, i interface{}) *doc {
 
 	// append doc.fields
 	docSource := reflect.ValueOf(i)
 	docSourceV := docSource.Elem()
 	docSourceT := docSourceV.Type()
-	doc := &Doc{
+	doc := &doc{
 		col:         c,
 		docItemType: docSourceT,
 	}
@@ -52,25 +52,25 @@ func NewDoc(c *Col, i interface{}) *Doc {
 		cont := docSourceT.NumField()
 		for i := 0; i < cont; i++ {
 			field := docSourceT.Field(i)
-			newDocField(doc, &field, -1, -1)
+			newdocField(doc, &field, rootPid, rootPid)
 		}
 		// check Fields Name, Can't both same name in one Col
 		// doc.checkFieldsName()
 	} else {
-		tool.Panic("DB", errors.New("Doc type is "+docSourceT.Kind().String()+"!,Type should be Struct"))
+		tool.Panic("DB", errors.New("doc type is "+docSourceT.Kind().String()+"!,Type should be Struct"))
 	}
 
 	return doc
 }
 
-// func (doc *Doc) isComplexField(d *DocField) bool {
+// func (doc *doc) isComplexField(d *docField) bool {
 // 	if d.Type == "struct" || d.Type == "map" || d.Type == "slice" {
 // 		return true
 // 	}
 // 	return false
 // }
 
-// func (d *Doc) checkFieldsName() {
+// func (d *doc) checkFieldsName() {
 // 	FieldsLen := len(d.fields)
 // 	for i := 0; i < FieldsLen; i++ {
 // 		for j := i + 1; j < FieldsLen; j++ {
@@ -81,11 +81,15 @@ func NewDoc(c *Col, i interface{}) *Doc {
 // 	}
 // }
 
-// func (d *Doc) DocModel() (hasDocModel bool, docModel string) {
+// func (d *doc) docModel() (hasdocModel bool, docModel string) {
 // 	for _, v := range d.fields {
-// 		if isDocMode(v.Name) {
+// 		if isdocMode(v.Name) {
 // 			return true, v.Name
 // 		}
 // 	}
 // 	return
 // }
+
+func checkdocFieldisExtend(tag string) bool {
+	return tagIsExtend(tag)
+}
