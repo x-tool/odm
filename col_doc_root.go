@@ -6,7 +6,7 @@ const (
 	rootPid = -1
 )
 
-func (doc *Doc) getRootExtendFields() (d DocFields) {
+func (doc *Doc) getRootExtendFields() (d DocFieldLst) {
 	for _, v := range doc.fields {
 		if v.Pid == -1 && v.extendPid != -1 && v.isExtend {
 			d = append(d, v)
@@ -15,7 +15,7 @@ func (doc *Doc) getRootExtendFields() (d DocFields) {
 	return
 }
 
-func (doc *Doc) getRootSinpleFields() (d DocFields) {
+func (doc *Doc) getRootSinpleFields() (d DocFieldLst) {
 	for _, v := range doc.fields {
 		if v.extendPid == -1 && !v.isExtend && !doc.checkComplexField(v) {
 			d = append(d, v)
@@ -24,7 +24,7 @@ func (doc *Doc) getRootSinpleFields() (d DocFields) {
 	return
 }
 
-func (doc *Doc) getRootComplexFields() (d DocFields) {
+func (doc *Doc) getRootComplexFields() (d DocFieldLst) {
 	for _, v := range doc.fields {
 		if v.extendPid == -1 && !v.isExtend && doc.checkComplexField(v) {
 			d = append(d, v)
