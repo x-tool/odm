@@ -35,7 +35,7 @@ func NewDoc(c *Col, i interface{}) *Doc {
 			newDocField(doc, &field, -1, -1)
 		}
 		// check Fields Name, Can't both same name in one Col
-		doc.checkFieldsName()
+		// doc.checkFieldsName()
 	} else {
 		tool.Panic("DB", errors.New("Doc type is "+docSourceT.Kind().String()+"!,Type should be Struct"))
 	}
@@ -90,17 +90,8 @@ func (d *Doc) getFieldById(id int) (o *DocField) {
 	return
 }
 
-// func (d *Doc) getDeleteFieldName() (name string) {
-// 	for _, v := range d.fields {
-// 		if tagIsDelete(v.Tag) {
-// 			return v.Name
-// 		}
-// 	}
-// 	return
-// }
-
-// func checkDocFieldisExtend(name, tag string) bool {
-// 	isMode := isDocMode(name)
-// 	isExtend := tagIsExtend(tag)
-// 	return isMode || isExtend
-// }
+func checkDocFieldisExtend(name, tag string) bool {
+	isMode := isDocMode(name)
+	isExtend := tagIsExtend(tag)
+	return isMode || isExtend
+}

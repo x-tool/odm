@@ -2,6 +2,10 @@ package odm
 
 import "reflect"
 
+const (
+	rootPid = -1
+)
+
 func (doc *Doc) getRootExtendFields() (d DocFields) {
 	for _, v := range doc.fields {
 		if v.Pid == -1 && v.extendPid != -1 && v.isExtend {
@@ -55,7 +59,7 @@ func (d *Doc) getRootDetailValue(rootValue *reflect.Value, doc *DocField) (v *re
 		}
 	}
 
-	if doc.Pid == -1 {
+	if doc.Pid == rootPid {
 		value := rV.FieldByName(doc.Name)
 		return &value
 	} else {

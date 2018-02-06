@@ -2,8 +2,6 @@ package odm
 
 import "reflect"
 
-type DocFields []DocField
-
 type DocField struct {
 	name      string
 	selfType  string
@@ -94,7 +92,8 @@ func (o *DocField) getRootFieldDB() (r *DocField) {
 		}
 	}
 }
-func (o *DocField) getDependLstDB() (r []*DocField) {
+
+func (o *DocField) getDependLstDB() (r dependLst) {
 	for _, v := range o.dependLst {
 		if v.isExtend {
 			r = append(r, v)
@@ -103,7 +102,9 @@ func (o *DocField) getDependLstDB() (r []*DocField) {
 	return
 }
 
-func (d *DocFields) getFieldByName(name string) (o *DocFields) {
+type DocFieldLst []*DocField
+
+func (d *DocFieldLst) getFieldByName(name string) (o *DocFields) {
 	for _, v := range d {
 		if v.Name == name {
 			o = append(o, v)
