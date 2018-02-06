@@ -10,7 +10,6 @@ type col struct {
 	database *database
 	name     string
 	doc
-	colModeJ model.ColModer
 }
 
 type ColInterface interface {

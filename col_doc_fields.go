@@ -102,3 +102,12 @@ func (o *DocField) getDependLstDB() (r []*DocField) {
 	}
 	return
 }
+
+func (d *DocFields) getFieldByName(name string) (o *DocFields) {
+	for _, v := range d {
+		if v.Name == name {
+			o = append(o, v)
+		}
+	}
+	return
+}

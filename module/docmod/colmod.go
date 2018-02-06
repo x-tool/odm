@@ -1,5 +1,5 @@
 package colmod
 
-type ColModer interface {
+type DocModer interface {
 	config()
 }

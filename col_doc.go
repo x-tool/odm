@@ -8,12 +8,15 @@ import (
 )
 
 type doc struct {
-	col    *col
-	t      *reflect.Type
-	fields DocFields
+	col *col
+	docItemType
+	fields   DocFields
+	colModeJ model.DocModer
 }
 
-type docLst []doc
+type docLst []*doc
+
+type docItemType reflect.Type
 
 func NewDoc(c *Col, i interface{}) *Doc {
 
@@ -22,8 +25,8 @@ func NewDoc(c *Col, i interface{}) *Doc {
 	docSourceV := docSource.Elem()
 	docSourceT := docSourceV.Type()
 	doc := &Doc{
-		col: c,
-		t:   &docSourceT,
+		col:         c,
+		docItemType: docSourceT,
 	}
 	if docSourceT.Kind() == reflect.Struct {
 		cont := docSourceT.NumField()
@@ -40,24 +43,24 @@ func NewDoc(c *Col, i interface{}) *Doc {
 	return doc
 }
 
-func (doc *Doc) checkComplexField(d *DocField) bool {
-	if d.Type == "struct" || d.Type == "map" || d.Type == "slice" {
-		return true
-	}
-	return false
+// func (doc *Doc) isComplexField(d *DocField) bool {
+// 	if d.Type == "struct" || d.Type == "map" || d.Type == "slice" {
+// 		return true
+// 	}
+// 	return false
+// }
 
-}
+// func (d *Doc) checkFieldsName() {
+// 	FieldsLen := len(d.fields)
+// 	for i := 0; i < FieldsLen; i++ {
+// 		for j := i + 1; j < FieldsLen; j++ {
+// 			if d.fields[i].Name == d.fields[j].Name && d.fields[i].extendPid == d.fields[j].extendPid {
+// 				tool.Panic("DB", errors.New("FieldsName Should special, Col Name is "+d.col.name))
+// 			}
+// 		}
+// 	}
+// }
 
-func (d *Doc) checkFieldsName() {
-	FieldsLen := len(d.fields)
-	for i := 0; i < FieldsLen; i++ {
-		for j := i + 1; j < FieldsLen; j++ {
-			if d.fields[i].Name == d.fields[j].Name && d.fields[i].extendPid == d.fields[j].extendPid {
-				tool.Panic("DB", errors.New("FieldsName Should special, Col Name is "+d.col.name))
-			}
-		}
-	}
-}
 func (d *Doc) DocModel() (hasDocModel bool, docModel string) {
 	for _, v := range d.fields {
 		if isDocMode(v.Name) {
@@ -86,23 +89,15 @@ func (d *Doc) getFieldById(id int) (o *DocField) {
 	}
 	return
 }
-func (d *Doc) getFieldByName(name string) (o DocFields) {
-	for _, v := range d.fields {
-		if v.Name == name {
-			o = append(o, v)
-		}
-	}
-	return
-}
 
-func (d *Doc) getDeleteFieldName() (name string) {
-	for _, v := range d.fields {
-		if tagIsDelete(v.Tag) {
-			return v.Name
-		}
-	}
-	return
-}
+// func (d *Doc) getDeleteFieldName() (name string) {
+// 	for _, v := range d.fields {
+// 		if tagIsDelete(v.Tag) {
+// 			return v.Name
+// 		}
+// 	}
+// 	return
+// }
 
 // func checkDocFieldisExtend(name, tag string) bool {
 // 	isMode := isDocMode(name)
