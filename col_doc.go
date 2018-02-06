@@ -18,6 +18,26 @@ type docLst []*doc
 
 type docItemType reflect.Type
 
+func (d *Doc) getChildFields(i *DocField) (r DocFields) {
+	id := i.Id
+	for _, v := range d.fields {
+		if v.Pid == id {
+			r = append(r, v)
+		}
+	}
+	return
+}
+
+func (d *Doc) getFieldById(id int) (o *DocField) {
+	for _, v := range d.fields {
+		if v.Id == id {
+			o = v
+			return o
+		}
+	}
+	return
+}
+
 func NewDoc(c *Col, i interface{}) *Doc {
 
 	// append doc.fields
@@ -61,37 +81,11 @@ func NewDoc(c *Col, i interface{}) *Doc {
 // 	}
 // }
 
-func (d *Doc) DocModel() (hasDocModel bool, docModel string) {
-	for _, v := range d.fields {
-		if isDocMode(v.Name) {
-			return true, v.Name
-		}
-	}
-	return
-}
-
-func (d *Doc) getChildFields(i *DocField) (r DocFields) {
-	id := i.Id
-	for _, v := range d.fields {
-		if v.Pid == id {
-			r = append(r, v)
-		}
-	}
-	return
-}
-
-func (d *Doc) getFieldById(id int) (o *DocField) {
-	for _, v := range d.fields {
-		if v.Id == id {
-			o = v
-			return o
-		}
-	}
-	return
-}
-
-func checkDocFieldisExtend(name, tag string) bool {
-	isMode := isDocMode(name)
-	isExtend := tagIsExtend(tag)
-	return isMode || isExtend
-}
+// func (d *Doc) DocModel() (hasDocModel bool, docModel string) {
+// 	for _, v := range d.fields {
+// 		if isDocMode(v.Name) {
+// 			return true, v.Name
+// 		}
+// 	}
+// 	return
+// }
