@@ -5,14 +5,15 @@ import "reflect"
 type docField struct {
 	name      string
 	selfType  string
-	dbType    string
+	dbType    int
 	id        int
 	pid       int // field golang parent real ID; default:-1
 	isExtend  bool
 	extendPid int // field Handle parent ID; default:-1
-	dependLst
-	Tag     string
-	funcLst map[string]string
+	childLst  docFieldLst
+	dependLst docFieldLst
+	Tag       string
+	funcLst   map[string]string
 }
 
 func (d *docField) IsExtend() bool {
@@ -41,6 +42,20 @@ func (o *docField) getDependLstDB() (r docFieldLst) {
 	return
 }
 
+func (o *docField) isSingleType() (b bool) {
+	if o.selfType != Struct && o.selfType != Array && o.selfType != Map && o.selfType != Slice {
+		b = true
+	}
+	return b
+}
+
+func (o *docField) isGroupType() (b bool) {
+	if o.selfType == Struct || o.selfType == Array || o.selfType == Map || o.selfType == Slice {
+		b = true
+	}
+	return b
+}
+
 func newdocField(d *doc, t *reflect.StructField, Pid int, extendPid int) {
 	fieldType := *t
 	fieldTypeStr := formatTypeToString(&fieldType.Type)
@@ -48,7 +63,7 @@ func newdocField(d *doc, t *reflect.StructField, Pid int, extendPid int) {
 	tag := fieldType.Tag.Get(tagName)
 	isExtend := checkdocFieldisExtend(tag)
 	extendField := d.getFieldById(extendPid)
-	var dependLst dependLst
+	var dependLst docFieldLst
 	if extendField == nil {
 	} else {
 		dependLst = append(extendField.dependLst, extendField)

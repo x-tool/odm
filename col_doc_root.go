@@ -6,32 +6,32 @@ const (
 	rootPid = -1
 )
 
-func (d *doc) getRootExtendFields() (d docFieldLst) {
-	for _, v := range d.fields {
-		if v.Pid == -1 && v.extendPid != -1 && v.isExtend {
-			d = append(d, v)
-		}
-	}
-	return
-}
+// func (d *doc) getRootExtendFields() (d docFieldLst) {
+// 	for _, v := range d.fields {
+// 		if v.Pid == -1 && v.extendPid != -1 && v.isExtend {
+// 			d = append(d, v)
+// 		}
+// 	}
+// 	return
+// }
 
-func (d *doc) getRootSinpleFields() (d docFieldLst) {
-	for _, v := range d.fields {
-		if v.extendPid == -1 && !v.isExtend && !d.checkComplexField(v) {
-			d = append(d, v)
-		}
-	}
-	return
-}
+// func (d *doc) getRootSinpleFields() (d docFieldLst) {
+// 	for _, v := range d.fields {
+// 		if v.extendPid == -1 && !v.isExtend && !d.checkComplexField(v) {
+// 			d = append(d, v)
+// 		}
+// 	}
+// 	return
+// }
 
-func (d *doc) getRootComplexFields() (d docFieldLst) {
-	for _, v := range d.fields {
-		if v.extendPid == -1 && !v.isExtend && d.checkComplexField(v) {
-			d = append(d, v)
-		}
-	}
-	return
-}
+// func (d *doc) getRootComplexFields() (d docFieldLst) {
+// 	for _, v := range d.fields {
+// 		if v.extendPid == -1 && !v.isExtend && d.checkComplexField(v) {
+// 			d = append(d, v)
+// 		}
+// 	}
+// 	return
+// }
 
 func (d *doc) getRootDetails() (doc dependLst) {
 	for _, v := range d.fields {
