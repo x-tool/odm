@@ -9,7 +9,6 @@ import (
 	"time"
 
 	"github.com/jackc/pgx"
-	"github.com/x-tool/odm/exporti"
 	"github.com/x-tool/tool"
 )
 
