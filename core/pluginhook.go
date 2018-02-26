@@ -1,4 +1,4 @@
-package odm
+package core
 
 // config Struct
 type ConnectConfig struct {
