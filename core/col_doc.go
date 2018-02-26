@@ -10,15 +10,15 @@ import (
 type doc struct {
 	col *col
 	docItemType
-	fields   docFields
-	colModeJ model.docModer
+	fields  docFieldLst
+	colMode colModeHook
 }
 
 type docLst []*doc
 
 type docItemType reflect.Type
 
-func (d *doc) getChildFields(i *docField) (r docFields) {
+func (d *doc) getChildFields(i *docField) (r docFieldLst) {
 	id := i.Id
 	for _, v := range d.fields {
 		if v.Pid == id {
@@ -38,7 +38,7 @@ func (d *doc) getFieldById(id int) (o *docField) {
 	return
 }
 
-func Newdoc(c *Col, i interface{}) *doc {
+func Newdoc(c *col, i interface{}) *doc {
 
 	// append doc.fields
 	docSource := reflect.ValueOf(i)

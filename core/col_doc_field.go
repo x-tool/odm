@@ -11,7 +11,7 @@ type docField struct {
 	isExtend  bool
 	extendPid int // field Handle parent ID; default:-1
 	childLst  docFieldLst
-	dependLst docFieldLst
+	dependLst dependLst
 	Tag       string
 	funcLst   map[string]string
 }

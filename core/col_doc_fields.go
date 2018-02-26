@@ -1,8 +1,9 @@
 package core
 
-type docFieldLst []*DocField
+type docFieldLst []*docField
+type dependLst docFieldLst
 
-func (d *DocFieldLst) getFieldsByName(name string) (o *docFields) {
+func (d *docFieldLst) getFieldsByName(name string) (o *docFieldLst) {
 	for _, v := range d {
 		if v.Name == name {
 			o = append(o, v)

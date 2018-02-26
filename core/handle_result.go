@@ -5,14 +5,14 @@ import (
 )
 
 type result struct {
-	Col            *Col
-	resultFieldLst []*DocField
+	Col            *col
+	resultFieldLst []*docField
 	resultV        *reflect.Value
 	resultKind     int
 	resultElem     *reflect.Value
 }
 
-func newResult(rV *reflect.Value, c *Col) (r *result) {
+func newResult(rV *reflect.Value, c *col) (r *result) {
 	var vK int
 	var vE reflect.Value
 	if rV.Kind() == reflect.Slice {

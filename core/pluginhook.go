@@ -1,5 +1,8 @@
 package core
 
+type colModeHook interface {
+}
+
 // config Struct
 type ConnectConfig struct {
 	Host         string

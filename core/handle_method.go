@@ -7,7 +7,7 @@ import (
 	"github.com/x-tool/tool"
 )
 
-func (r *Handle) dependtoDocOneStr(s string) (d *DocField) {
+func (r *Handle) dependtoDocOneStr(s string) (d *docField) {
 	_s := strings.Split(s, ".")
 	if len(_s) > 1 {
 		return r.DependToDoc(_s[:len(_s)-2], _s[len(_s)-1])
@@ -15,7 +15,7 @@ func (r *Handle) dependtoDocOneStr(s string) (d *DocField) {
 		return r.DependToDoc([]string{}, _s[0])
 	}
 }
-func (r *Handle) DependToDoc(dependLst []string, name string) (d *DocField) {
+func (r *Handle) DependToDoc(dependLst []string, name string) (d *docField) {
 	if len(dependLst) == 0 {
 		field := r.Col.Doc.getFieldByName(name)
 		if len(field) != 1 {

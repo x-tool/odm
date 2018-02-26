@@ -1,17 +1,14 @@
 package core
 
-import "github.com/x-tool/odm/module/dialect"
-
 // database use
 type database struct {
-	client         *client
-	name           string
-	dialectConnect dialect.Dialect
+	client *client
+	name   string
 	colLst
 }
 
 type databaseRelation interface {
-	GetColByName(string) *Col
+	GetColByName(string) *col
 }
 
 func newDatabase(name string, c *client) *database {
@@ -34,10 +31,6 @@ func (d *database) RegisterCols(c ...interface{}) {
 	for i := range c {
 		go d.RegisterCol(i)
 	}
-}
-
-func (d *database) GetName() string {
-	return d.name
 }
 
 func (d *database) SyncCol() {
