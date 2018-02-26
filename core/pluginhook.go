@@ -19,12 +19,12 @@ type Dialect interface {
 	// Conn() (Conn, error)
 	GetColNames() ([]string, error)
 	SwitchType(string) string
-	syncCol(*odm.Col)
+	syncCol(*col)
 	// base handel
-	Insert(*odm.Handle) error
-	Update(*odm.Handle) error
-	Delete(*odm.Handle) error
-	Query(*odm.Handle) (interface{}, error)
+	Insert(*Handle) error
+	Update(*Handle) error
+	Delete(*Handle) error
+	Query(*Handle) (interface{}, error)
 	LogSql(string)
 	Session() *Session
 }
