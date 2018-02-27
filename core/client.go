@@ -1,20 +1,16 @@
 package core
 
-import (
-	"github.com/x-tool/odm/module/dialect"
-)
-
-type client struct {
+type Client struct {
 	config ConnectConfig
 }
 
-func (c *client) Database(name string) *database {
-	return newDatabase(name)
+func (c *Client) Database(name string) *database {
+	return newDatabase(name, c)
 }
 
-func NewClient(c ConnectConfig) *client {
-	_o := new(client)
+func NewClient(c ConnectConfig) *Client {
+	_o := new(Client)
 	_o.config = c
-	_o.dialectConnect = dialect.NewDialect(c)
+	//_o.dialectConnect = dialect.NewDialect(c)
 	return _o
 }

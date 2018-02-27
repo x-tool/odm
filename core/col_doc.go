@@ -38,7 +38,7 @@ func (d *doc) getFieldById(id int) (o *docField) {
 	return
 }
 
-func Newdoc(c *col, i interface{}) *doc {
+func NewDoc(c *col, i interface{}) *doc {
 
 	// append doc.fields
 	docSource := reflect.ValueOf(i)

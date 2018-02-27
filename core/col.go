@@ -9,7 +9,7 @@ type Col_export = col
 type col struct {
 	database *database
 	name     string
-	doc
+	doc      *doc
 }
 
 type ColInterface interface {
@@ -19,7 +19,7 @@ type ColInterface interface {
 func newCol(db *database, i interface{}) *col {
 	c := new(col)
 	c.name = GetColName(i)
-	c.db = db
+	c.database = db
 	c.doc = NewDoc(c, i)
 	return c
 }

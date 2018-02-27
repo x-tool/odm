@@ -2,7 +2,7 @@ package core
 
 // database use
 type database struct {
-	client *client
+	client *Client
 	name   string
 	colLst
 }
@@ -11,7 +11,7 @@ type databaseRelation interface {
 	GetColByName(string) *col
 }
 
-func newDatabase(name string, c *client) *database {
+func newDatabase(name string, c *Client) *database {
 	_d := new(database)
 	_d.Name = name
 	_d.client = c
