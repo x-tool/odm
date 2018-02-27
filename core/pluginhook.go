@@ -3,17 +3,6 @@ package core
 type colModeHook interface {
 }
 
-// config Struct
-type ConnectConfig struct {
-	Host         string
-	Port         int64
-	User         string
-	Passwd       string
-	DatabaseName string
-	Database     string
-	TLs          bool
-}
-
 type Dialect interface {
 	Init(ConnectConfig) Dialect
 	// Conn() (Conn, error)

@@ -1,8 +1,9 @@
-package core
+package remark2C
 
 import (
 	"time"
 
+	"github.com/x-tool/odm/core"
 	"github.com/x-tool/tool"
 )
 
@@ -50,7 +51,7 @@ func isDelete(s string) bool {
 	}
 	return check
 }
-func modeInsert(d *Handle) {
+func modeInsert(d *core.Handle) {
 	if d.Col.hasDocModel {
 		modeVInterface := d.Query.modeV.Addr().Interface()
 		v := modeVInterface.(Mode)

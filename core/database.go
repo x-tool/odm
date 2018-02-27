@@ -2,7 +2,7 @@ package core
 
 // database use
 type database struct {
-	client *Client
+	client *client.Client
 	name   string
 	colLst
 }
