@@ -5,6 +5,8 @@ import (
 	"github.com/x-tool/odm/core"
 )
 
+type connect = client.ConnectConfig
+
 type ODM struct {
 }
 
@@ -20,12 +22,12 @@ type ODMClient struct {
 	sourceClient *client.Client
 }
 
-type connect = client.ConnectConfig
-
-func newClient(connect) ODMClient {
-	return core.NewClient(connect)
+func newClient(connect) *ODMClient {
+	_c := new(ODMClient)
+	_c.sourceClient = core.NewClient(connect)
+	return _c
 }
 
-func (c *client) Database(name string) *core.Database {
-	return newDatabase(name, c)
+func (c *ODMClient) Database(name string) *core.Database {
+	return core.NewDatabase(name, c)
 }

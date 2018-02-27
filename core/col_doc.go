@@ -19,9 +19,9 @@ type docLst []*doc
 type docItemType reflect.Type
 
 func (d *doc) getChildFields(i *docField) (r docFieldLst) {
-	id := i.Id
+	id := i.GetId()
 	for _, v := range d.fields {
-		if v.Pid == id {
+		if v.pid == id {
 			r = append(r, v)
 		}
 	}
@@ -30,7 +30,7 @@ func (d *doc) getChildFields(i *docField) (r docFieldLst) {
 
 func (d *doc) getFieldById(id int) (o *docField) {
 	for _, v := range d.fields {
-		if v.Id == id {
+		if v.GetId() == id {
 			o = v
 			return o
 		}
@@ -90,6 +90,6 @@ func NewDoc(c *col, i interface{}) *doc {
 // 	return
 // }
 
-func checkdocFieldisExtend(tag string) bool {
-	return tagIsExtend(tag)
-}
+// func checkdocFieldisExtend(tag string) bool {
+// 	return tagIsExtend(tag)
+// }

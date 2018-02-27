@@ -13,7 +13,7 @@ type databaseRelation interface {
 	GetColByName(string) *col
 }
 
-func newDatabase(name string, c *client.Client) *database {
+func NewDatabase(name string, c *client.Client) *database {
 	_d := new(database)
 	_d.Name = name
 	_d.client = c

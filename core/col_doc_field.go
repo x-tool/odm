@@ -4,7 +4,7 @@ import "reflect"
 
 type docField struct {
 	name      string
-	selfType  string
+	selfType  Kind
 	dbType    int
 	id        int
 	pid       int // field golang parent real ID; default:-1
@@ -16,6 +16,14 @@ type docField struct {
 	funcLst   map[string]string
 }
 
+func (d *docField) GetName() string {
+	return d.name
+}
+
+func (d *docField) GetId() int {
+	return d.id
+}
+
 func (d *docField) IsExtend() bool {
 	return d.isExtend
 }
@@ -23,7 +31,7 @@ func (d *docField) IsExtend() bool {
 func (o *docField) getRootFieldDB() (r *docField) {
 	switch len(o.dependLst) {
 	case 0:
-		return 0
+		return nil
 	default:
 		if o.dependLst[0].isExtend {
 			return o.dependLst[1]
