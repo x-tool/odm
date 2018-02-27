@@ -1,5 +1,7 @@
 package core
 
+import "github.com/x-tool/odm/client"
+
 // database use
 type database struct {
 	client *client.Client
@@ -11,7 +13,7 @@ type databaseRelation interface {
 	GetColByName(string) *col
 }
 
-func newDatabase(name string, c *Client) *database {
+func newDatabase(name string, c *client.Client) *database {
 	_d := new(database)
 	_d.Name = name
 	_d.client = c

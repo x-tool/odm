@@ -1,10 +1,12 @@
 package core
 
+import "github.com/x-tool/odm/client"
+
 type colModeHook interface {
 }
 
 type Dialect interface {
-	Init(ConnectConfig) Dialect
+	Init(client.ConnectConfig) Dialect
 	// Conn() (Conn, error)
 	GetColNames() ([]string, error)
 	SwitchType(string) string
@@ -18,7 +20,7 @@ type Dialect interface {
 	Session() *Session
 }
 
-func NewDialect(c ConnectConfig) (d Dialect) {
+func NewDialect(c client.ConnectConfig) (d Dialect) {
 	switch c.Database {
 	case "postgresql":
 		fallthrough

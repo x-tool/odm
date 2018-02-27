@@ -12,6 +12,10 @@ type col struct {
 	doc      *doc
 }
 
+func (c *col) GetName() string {
+	return c.name
+}
+
 type ColInterface interface {
 	ColName() string
 }
@@ -43,7 +47,7 @@ type colLst []*col
 
 func (cL *colLst) GetCol(i interface{}) (c *col) {
 	colName := GetColName(i)
-	for _, v := range d.ColLst {
+	for _, v := range *cL {
 		if v.name == colName {
 			c = v
 			break
@@ -54,7 +58,7 @@ func (cL *colLst) GetCol(i interface{}) (c *col) {
 
 func (cL *colLst) GetColByName(name string) *col {
 	var col *col
-	for _, v := range cL {
+	for _, v := range *cL {
 		if v.GetName() == name {
 			col = v
 			break
