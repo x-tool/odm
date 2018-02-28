@@ -32,16 +32,16 @@ func (d *doc) getRootDetailValue(rootValue *reflect.Value, doc *docField) (v *re
 		}
 	}
 
-	if doc.Pid == rootPid {
-		value := rV.FieldByName(doc.Name)
+	if doc.pid == rootPid {
+		value := rV.FieldByName(doc.GetName())
 		return &value
 	} else {
-		pdoc := d.getFieldById(doc.Pid)
-		_value := rV.FieldByName(pdoc.Name)
+		pdoc := d.getFieldById(doc.pid)
+		_value := rV.FieldByName(pdoc.GetName())
 		if _value.Kind() == reflect.Ptr {
 			_value = reflect.Indirect(_value)
 		}
-		value := _value.FieldByName(doc.Name)
+		value := _value.FieldByName(doc.GetName())
 		return &value
 	}
 }

@@ -10,12 +10,12 @@ type connect = client.ConnectConfig
 type ODM struct {
 }
 
-func New() *ODM {
-	return new(ODM)
-}
-
 func (o *ODM) Client(c ConnectConfig) *ODMClient {
 	return newClient(c)
+}
+
+func New() *ODM {
+	return new(ODM)
 }
 
 type ODMClient struct {
@@ -28,6 +28,6 @@ func newClient(connect) *ODMClient {
 	return _c
 }
 
-func (c *ODMClient) Database(name string) *core.Database {
-	return core.NewDatabase(name, c)
+func (c *ODMClient) Database(name string, d core.Dialect) *core.Database {
+	return core.NewDatabase(name, c, d)
 }

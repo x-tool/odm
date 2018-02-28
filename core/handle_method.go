@@ -17,7 +17,7 @@ func (r *Handle) dependtoDocOneStr(s string) (d *docField) {
 }
 func (r *Handle) DependToDoc(dependLst []string, name string) (d *docField) {
 	if len(dependLst) == 0 {
-		field := r.Col.Doc.getFieldByName(name)
+		field := r.Col.doc.getFieldByName(name)
 		if len(field) != 1 {
 			tool.Panic("Handle", errors.New("name not be single, you should add dependLst to find doc field"))
 		} else {

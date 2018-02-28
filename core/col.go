@@ -7,9 +7,11 @@ import (
 type Col_export = col
 
 type col struct {
-	database *database
+	database *Database
 	name     string
 	doc      *doc
+	mode     colMode
+	hasMode  bool
 }
 
 func (c *col) GetName() string {
@@ -20,7 +22,7 @@ type ColInterface interface {
 	ColName() string
 }
 
-func newCol(db *database, i interface{}) *col {
+func newCol(db *Database, i interface{}) *col {
 	c := new(col)
 	c.name = GetColName(i)
 	c.database = db
@@ -43,6 +45,7 @@ func GetColName(i interface{}) (name string) {
 	return
 }
 
+// colLst //////////////////
 type colLst []*col
 
 func (cL *colLst) GetCol(i interface{}) (c *col) {

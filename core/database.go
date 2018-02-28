@@ -3,38 +3,36 @@ package core
 import "github.com/x-tool/odm/client"
 
 // database use
-type database struct {
-	client *client.Client
-	name   string
+type Database struct {
+	client  *client.Client
+	name    string
+	dialect Dialect
 	colLst
 }
 
-type databaseRelation interface {
-	GetColByName(string) *col
-}
-
-func NewDatabase(name string, c *client.Client) *database {
-	_d := new(database)
-	_d.Name = name
+func NewDatabase(name string, c *client.Client, d Dialect) *Database {
+	_d := new(Database)
+	_d.name = name
 	_d.client = c
+	_d.dialect = d
 	return _d
 }
 
-func (d *database) GetName() string {
+func (d *Database) GetName() string {
 	return d.name
 }
 
-func (d *database) RegisterCol(c interface{}) {
+func (d *Database) RegisterCol(c interface{}) {
 	_col := newCol(d, c)
 	d.colLst = append(d.colLst, _col)
 }
 
-func (d *database) RegisterCols(c ...interface{}) {
+func (d *Database) RegisterCols(c ...interface{}) {
 	for i := range c {
 		go d.RegisterCol(i)
 	}
 }
 
-func (d *database) SyncCol() {
-	d.Dialect.syncCol(d.colLst)
+func (d *Database) SyncCol() {
+	d.dialect.SyncCol(d.colLst)
 }

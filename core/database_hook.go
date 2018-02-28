@@ -10,7 +10,7 @@ type Dialect interface {
 	// Conn() (Conn, error)
 	GetColNames() ([]string, error)
 	SwitchType(string) string
-	syncCol(*col)
+	SyncCol(colLst)
 	// base handel
 	Insert(*Handle) error
 	Update(*Handle) error
@@ -20,16 +20,16 @@ type Dialect interface {
 	Session() *Session
 }
 
-func NewDialect(c client.ConnectConfig) (d Dialect) {
-	switch c.Database {
-	case "postgresql":
-		fallthrough
-	default:
-		_d := new(dialectpostgre)
-		d = _d.Init(c)
-		return d
-	}
-}
+// func NewDialect(c *client.ConnectConfig) (d Dialect) {
+// 	switch c.Database {
+// 	case "postgresql":
+// 		fallthrough
+// 	default:
+// 		_d := new(dialectpostgre)
+// 		d = _d.Init(c)
+// 		return d
+// 	}
+// }
 
 // type Conn interface {
 // 	Open(sql string) error

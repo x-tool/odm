@@ -8,15 +8,9 @@ import (
 )
 
 type doc struct {
-	col *col
-	docItemType
-	fields  docFieldLst
-	colMode colModeHook
+	col    *col
+	fields docFieldLst
 }
-
-type docLst []*doc
-
-type docItemType reflect.Type
 
 func (d *doc) getChildFields(i *docField) (r docFieldLst) {
 	id := i.GetId()
@@ -45,8 +39,8 @@ func NewDoc(c *col, i interface{}) *doc {
 	docSourceV := docSource.Elem()
 	docSourceT := docSourceV.Type()
 	doc := &doc{
-		col:         c,
-		docItemType: docSourceT,
+		col: c,
+		// docItemType: docSourceT,
 	}
 	if docSourceT.Kind() == reflect.Struct {
 		cont := docSourceT.NumField()
@@ -93,3 +87,5 @@ func NewDoc(c *col, i interface{}) *doc {
 // func checkdocFieldisExtend(tag string) bool {
 // 	return tagIsExtend(tag)
 // }
+
+type docLst []*doc
