@@ -8,8 +8,10 @@ import (
 )
 
 type doc struct {
-	col    *col
-	fields docFieldLst
+	col        *col
+	fields     docFieldLst
+	sourceType *reflect.Type
+	mode       colMode
 }
 
 func (d *doc) getChildFields(i *docField) (r docFieldLst) {
@@ -35,12 +37,12 @@ func (d *doc) getFieldById(id int) (o *docField) {
 func NewDoc(c *col, i interface{}) *doc {
 
 	// append doc.fields
-	docSource := reflect.ValueOf(i)
-	docSourceV := docSource.Elem()
-	docSourceT := docSourceV.Type()
+	docSourceT := reflect.TypeOf(i)
 	doc := &doc{
-		col: c,
-		// docItemType: docSourceT,
+		col:        c,
+		sourceType: &docSourceT,
+		fields:     newDocFields(&docSourceT),
+		mode:       checkDocMode(&docSourceT),
 	}
 	if docSourceT.Kind() == reflect.Struct {
 		cont := docSourceT.NumField()
@@ -57,35 +59,12 @@ func NewDoc(c *col, i interface{}) *doc {
 	return doc
 }
 
-// func (doc *doc) isComplexField(d *docField) bool {
-// 	if d.Type == "struct" || d.Type == "map" || d.Type == "slice" {
-// 		return true
-// 	}
-// 	return false
-// }
+func newDocFields(docSourceT *reflect.Type) (lst docFieldLst) {
 
-// func (d *doc) checkFieldsName() {
-// 	FieldsLen := len(d.fields)
-// 	for i := 0; i < FieldsLen; i++ {
-// 		for j := i + 1; j < FieldsLen; j++ {
-// 			if d.fields[i].Name == d.fields[j].Name && d.fields[i].extendPid == d.fields[j].extendPid {
-// 				tool.Panic("DB", errors.New("FieldsName Should special, Col Name is "+d.col.name))
-// 			}
-// 		}
-// 	}
-// }
+}
 
-// func (d *doc) docModel() (hasdocModel bool, docModel string) {
-// 	for _, v := range d.fields {
-// 		if isdocMode(v.Name) {
-// 			return true, v.Name
-// 		}
-// 	}
-// 	return
-// }
+func checkDocMode(docSourceT *reflect.Type) (m colMode) {
 
-// func checkdocFieldisExtend(tag string) bool {
-// 	return tagIsExtend(tag)
-// }
+}
 
 type docLst []*doc

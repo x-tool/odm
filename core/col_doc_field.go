@@ -4,8 +4,8 @@ import "reflect"
 
 type docField struct {
 	name      string
-	selfType  Kind
-	dbType    int
+	selfType  *reflect.Type
+	dbType    Kind
 	id        int
 	pid       int // field golang parent real ID; default:-1
 	isExtend  bool
@@ -51,17 +51,11 @@ func (o *docField) getDependLstDB() (r docFieldLst) {
 }
 
 func (o *docField) isSingleType() (b bool) {
-	if o.selfType != Struct && o.selfType != Array && o.selfType != Map && o.selfType != Slice {
-		b = true
-	}
-	return b
+	return !isGroupType(o.dbType)
 }
 
 func (o *docField) isGroupType() (b bool) {
-	if o.selfType == Struct || o.selfType == Array || o.selfType == Map || o.selfType == Slice {
-		b = true
-	}
-	return b
+	return isGroupType(o.dbType)
 }
 
 func newdocField(d *doc, t *reflect.StructField, Pid int, extendPid int) {

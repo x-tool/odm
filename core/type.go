@@ -84,3 +84,17 @@ func formatTypeToString(k Kind) string {
 	// }
 	return ""
 }
+
+func isGroupType(k Kind) (b bool) {
+	switch k {
+	case Array:
+		fallthrough
+	case Slice:
+		fallthrough
+	case Map:
+		fallthrough
+	case Struct:
+		b = true
+	}
+	return
+}

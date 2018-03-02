@@ -22,6 +22,10 @@ func (d *Database) GetName() string {
 	return d.name
 }
 
+func (d *Database) GetClient() *client.Client {
+	return d.client
+}
+
 func (d *Database) RegisterCol(c interface{}) {
 	_col := newCol(d, c)
 	d.colLst = append(d.colLst, _col)

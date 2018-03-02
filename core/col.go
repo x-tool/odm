@@ -10,8 +10,6 @@ type col struct {
 	database *Database
 	name     string
 	doc      *doc
-	mode     colMode
-	hasMode  bool
 }
 
 func (c *col) GetName() string {
@@ -50,13 +48,7 @@ type colLst []*col
 
 func (cL *colLst) GetCol(i interface{}) (c *col) {
 	colName := GetColName(i)
-	for _, v := range *cL {
-		if v.name == colName {
-			c = v
-			break
-		}
-	}
-	return
+	return cL.GetColByName(colName)
 }
 
 func (cL *colLst) GetColByName(name string) *col {
