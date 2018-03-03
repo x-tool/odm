@@ -16,13 +16,7 @@ type doc struct {
 }
 
 func (d *doc) getChildFields(i *docField) (r docFieldLst) {
-	id := i.GetId()
-	for _, v := range d.fields {
-		if v.pid == id {
-			r = append(r, v)
-		}
-	}
-	return
+	return i.childLst
 }
 
 func (d *doc) getFieldById(id int) (o *docField) {
@@ -35,19 +29,19 @@ func (d *doc) getFieldById(id int) (o *docField) {
 	return
 }
 
-func NewDoc(c *col, i interface{}) *doc {
+func NewDoc(c *col, i interface{}) (_doc *doc) {
 
 	// append doc.fields
 	docSourceT := reflect.TypeOf(i)
-	_doc := &doc{
+	_doc = &doc{
 		name:       docSourceT.Name(),
 		col:        c,
 		sourceType: &docSourceT,
-		fields:     newDocFields(&docSourceT),
+		fields:     newDocFields(_doc, &docSourceT),
 		mode:       checkDocMode(&docSourceT),
 	}
 
-	return _doc
+	return
 }
 
 func newDocFields(d *doc, docSourceTPtr *reflect.Type) (lst docFieldLst) {
@@ -56,7 +50,7 @@ func newDocFields(d *doc, docSourceTPtr *reflect.Type) (lst docFieldLst) {
 		cont := docSourceT.NumField()
 		for i := 0; i < cont; i++ {
 			field := docSourceT.Field(i)
-			newDocField(lst, &field, nil, nil)
+			go newDocField(lst, &field, nil)
 		}
 		// check Fields Name, Can't both same name in one Col
 		// doc.checkFieldsName()

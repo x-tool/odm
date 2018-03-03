@@ -6,17 +6,18 @@ import (
 )
 
 type docField struct {
-	name         string
-	selfType     *reflect.Type
-	kind         Kind
-	id           int
-	parent       *docField // field golang parent real ID; default:-1
-	isExtend     bool
-	extendParent *docField // field Handle parent ID; default:-1
-	childLst     docFieldLst
-	dependLst    dependLst
-	Tag          string
-	funcLst      map[string]string
+	name            string
+	selfType        *reflect.Type
+	kind            Kind
+	id              int
+	isExtend        bool
+	parent          *docField // field golang parent real ID; default:-1
+	extendParent    *docField // field Handle parent ID; default:-1
+	childLst        docFieldLst
+	dependLst       dependLst
+	extendDependLst dependLst
+	Tag             string
+	funcLst         map[string]string
 }
 
 func (d *docField) GetName() string {
@@ -61,32 +62,32 @@ func (o *docField) isGroupType() (b bool) {
 	return isGroupType(o.kind)
 }
 
-func newDocField(d *docFieldLst, t *reflect.StructField, parant *docField, extendParent *docField) {
+func newDocField(d docFieldLst, t *reflect.StructField, parent *docField) {
 	fieldType := *t
 	reflectType := fieldType.Type
 	tag := fieldType.Tag.Get(tagName)
 	kind := reflectToType(&reflectType)
 	isExtend := checkdocFieldisExtend(t)
-	var _dependLst dependLst
-	if extendField == nil {
+	_dependLst := append(parent.dependLst, parent)
+	var _extendDependLst dependLst
+	if isExtend {
+		_extendDependLst = parent.extendDependLst
 	} else {
-		_dependLst = append(extendField.dependLst, extendField)
+		_extendDependLst = append(parent.extendDependLst, parent)
 	}
 
 	field := &docField{
-		name:     reflectType.Name(),
-		selfType: &reflectType,
-		kind:     kind,
-		// kind:    d.col.DB.SwitchType(fieldTypeStr),
-		// Id:        id,
-		parent:       parant,
-		isExtend:     isExtend,
-		dependLst:    _dependLst,
-		extendParent: extendParent,
-		Tag:          tag,
+		name:            reflectType.Name(),
+		selfType:        &reflectType,
+		kind:            kind,
+		parent:          parent,
+		isExtend:        isExtend,
+		dependLst:       _dependLst,
+		extendDependLst: _extendDependLst,
+		Tag:             tag,
 	}
 	// add item to doc fieldlst, and set field id
-	d.fields.addItem(field)
+	d.addItem(field)
 	switch field.kind {
 	case Array:
 		fallthrough
@@ -94,28 +95,14 @@ func newDocField(d *docFieldLst, t *reflect.StructField, parant *docField, exten
 		_fieldType := fieldType.Type.Elem()
 		count := _fieldType.NumField()
 		for i := 0; i < count; i++ {
-			if isExtend {
-				extendPid = pid
-			} else {
-				extendPid = id
-			}
-			field := _fieldType.Field(i)
-			newDocField(d, &field, id, extendPid)
+			_f := _fieldType.Field(i)
+			go newDocField(d, &_f, field)
 		}
 	case Struct:
-		// if time package not range time struct
-		if t.Type.PkgPath() == "time" {
-			return
-		}
 		count := fieldType.Type.NumField()
 		for i := 0; i < count; i++ {
-			if isExtend {
-				extendPid = pid
-			} else {
-				extendPid = id
-			}
-			field := fieldType.Type.Field(i)
-			newDocField(d, &field, id, extendPid)
+			_f := fieldType.Type.Field(i)
+			go newDocField(d, &_f, field)
 		}
 
 	}
@@ -151,7 +138,7 @@ func (d *docFieldLst) getFieldsByName(name string) (o docFieldLst) {
 
 func (d *docFieldLst) getRootFieldLst() (rd docFieldLst) {
 	for _, v := range *d {
-		if v.pid == rootPid {
+		if v.parent == nil {
 			rd = append(rd, v)
 		}
 	}

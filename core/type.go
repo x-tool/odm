@@ -91,8 +91,6 @@ func isGroupType(k Kind) (b bool) {
 	switch k {
 	case Array:
 		fallthrough
-	case Slice:
-		fallthrough
 	case Map:
 		fallthrough
 	case Struct:
