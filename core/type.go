@@ -19,21 +19,16 @@ const (
 	Uint16
 	Uint32
 	Uint64
-	Uintptr
 	Float32
 	Float64
 	Complex64
 	Complex128
 	Array
-	Chan
-	Func
-	Interface
 	Map
-	Ptr
 	Slice
 	String
+	Time
 	Struct
-	UnsafePointer
 )
 
 func mapTypeToValue(b interface{}, v *reflect.Value) {
@@ -53,36 +48,43 @@ func mapTypeToValue(b interface{}, v *reflect.Value) {
 
 }
 
-func formatTypeToString(k Kind) string {
-	// switch k {
-
-	// case Bool:
-
-	// Int
-	// Int8
-	// Int16
-	// Int32
-	// Int64
-	// Uint
-	// Uint8
-	// Uint16
-	// Uint32
-	// Uint64
-	// Uintptr
-	// Float32
-	// Float64
-	// Complex64
-	// Complex128
-	// Array
-	// Chan
-	// Func
-	// Interface
-	// Map
-	// Ptr
-	// Slice
-	// String
-	// }
-	return ""
+func reflectToType(r *reflect.Type) (k Kind) {
+	_r := *r
+	rKind := _r.Kind()
+	switch r {
+	case reflect.Bool:
+		k = Bool
+	case reflect.Int:
+		k = Int
+	case reflect.Int8:
+		k = Int8
+	case reflect.Int16:
+		k = Int16
+	case reflect.Uint:
+		k = Uint
+	case reflect.Float32:
+		k = Float32
+	case reflect.Float64:
+		k = Float64
+	case reflect.Complex64:
+		k = Complex64
+	case reflect.Complex128:
+		k = Complex128
+	case reflect.Array:
+		fallthrough
+	case reflect.Slice:
+		k = Array
+	case reflect.String:
+		k = String
+	case reflect.Struct:
+		pkgPath := _r.PkgPath()
+		if pkgPath == "time" {
+			k = Time
+		} else {
+			k = Struct
+		}
+	}
+	return
 }
 
 func isGroupType(k Kind) (b bool) {

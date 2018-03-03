@@ -8,6 +8,7 @@ import (
 )
 
 type doc struct {
+	name       string
 	col        *col
 	fields     docFieldLst
 	sourceType *reflect.Type
@@ -38,33 +39,35 @@ func NewDoc(c *col, i interface{}) *doc {
 
 	// append doc.fields
 	docSourceT := reflect.TypeOf(i)
-	doc := &doc{
+	_doc := &doc{
+		name:       docSourceT.Name(),
 		col:        c,
 		sourceType: &docSourceT,
 		fields:     newDocFields(&docSourceT),
 		mode:       checkDocMode(&docSourceT),
 	}
+
+	return _doc
+}
+
+func newDocFields(d *doc, docSourceTPtr *reflect.Type) (lst docFieldLst) {
+	docSourceT := *docSourceTPtr
 	if docSourceT.Kind() == reflect.Struct {
 		cont := docSourceT.NumField()
 		for i := 0; i < cont; i++ {
 			field := docSourceT.Field(i)
-			newdocField(doc, &field, rootPid, rootPid)
+			newDocField(lst, &field, nil, nil)
 		}
 		// check Fields Name, Can't both same name in one Col
 		// doc.checkFieldsName()
 	} else {
 		tool.Panic("DB", errors.New("doc type is "+docSourceT.Kind().String()+"!,Type should be Struct"))
 	}
-
-	return doc
-}
-
-func newDocFields(docSourceT *reflect.Type) (lst docFieldLst) {
-
+	return
 }
 
 func checkDocMode(docSourceT *reflect.Type) (m colMode) {
-
+	return
 }
 
 type docLst []*doc
