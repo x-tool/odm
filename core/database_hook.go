@@ -1,12 +1,15 @@
 package core
 
-import "github.com/x-tool/odm/client"
+import (
+	"github.com/x-tool/odm/client"
+)
 
 type colModeHook interface {
 }
 
 type Dialect interface {
-	Init(client.ConnectConfig) Dialect
+	// Init(client.ConnectConfig) Dialect
+	SetConnectConfig(client.ConnectConfig)
 	// Conn() (Conn, error)
 	GetColNames() ([]string, error)
 	SwitchType(string) string

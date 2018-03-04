@@ -1,4 +1,4 @@
-package Handle
+package postgresql
 
 import (
 	"errors"
@@ -9,6 +9,8 @@ import (
 	"time"
 
 	"github.com/jackc/pgx"
+	"github.com/x-tool/odm/client"
+	"github.com/x-tool/odm/core"
 	"github.com/x-tool/tool"
 )
 
@@ -29,16 +31,20 @@ var typeMap = map[string]string{
 	"Others": "text",
 }
 
-type dialectpostgre struct {
-	config    exporti.ConnectionConfig
-	pgxConfig pgx.ConnConfig
-}
-
 type postgreConn struct {
 	conn *pgx.Conn
 }
 
-func (d *dialectpostgre) Init(c ConnectionConfig) Dialect {
+func New() core.Dialect {
+	return new(dialectpostgre)
+}
+
+type dialectpostgre struct {
+	config    client.ConnectConfig
+	pgxConfig pgx.ConnConfig
+}
+
+func (d *dialectpostgre) SetConnectConfig(c *client.ConnectConfig) {
 	d.config = c
 	d.pgxConfig = pgx.ConnConfig{
 		Host:     d.config.Host,
@@ -47,7 +53,7 @@ func (d *dialectpostgre) Init(c ConnectionConfig) Dialect {
 		User:     d.config.User,
 		Password: d.config.Passwd,
 	}
-	return d
+	// return d
 }
 
 func pg_valueToString(v *queryRootField) (r string) {

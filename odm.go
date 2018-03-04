@@ -5,29 +5,24 @@ import (
 	"github.com/x-tool/odm/core"
 )
 
-type connect = client.ConnectConfig
+type Connect = client.ConnectConfig
 
-type ODM struct {
-}
-
-func (o *ODM) Client(c ConnectConfig) *ODMClient {
-	return newClient(c)
-}
-
-func New() *ODM {
-	return new(ODM)
+func New(c Connect) *ODMClient {
+	_c := new(ODMClient)
+	_c.sourceClient = core.NewClient(connect)
+	return _c
 }
 
 type ODMClient struct {
 	sourceClient *client.Client
 }
 
-func newClient(connect) *ODMClient {
-	_c := new(ODMClient)
-	_c.sourceClient = core.NewClient(connect)
-	return _c
-}
-
-func (c *ODMClient) Database(name string, d core.Dialect) *core.Database {
+// if d == nil use default dialect
+func (c *ODMClient) Database(d core.Dialect) *core.Database {
+	// check default database
+	if c.sourceClient.GetConnectConfig().Database == "postgre" && d == nil {
+		d = defaultPostgre
+	}
+	d.SetConnectConfig(c.sourceClient.GetConnectConfig())
 	return core.NewDatabase(name, c, d)
 }
