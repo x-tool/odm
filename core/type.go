@@ -51,7 +51,7 @@ func mapTypeToValue(b interface{}, v *reflect.Value) {
 func reflectToType(r *reflect.Type) (k Kind) {
 	_r := *r
 	rKind := _r.Kind()
-	switch r {
+	switch rKind {
 	case reflect.Bool:
 		k = Bool
 	case reflect.Int:

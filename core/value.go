@@ -7,9 +7,9 @@ type HandleValue struct {
 }
 
 func newValue(v interface{}, doc *doc) (o *HandleValue) {
-	_v := &HandleValue{
+	o = &HandleValue{
 		v:   v,
 		doc: doc,
 	}
-	return _V
+	return o
 }

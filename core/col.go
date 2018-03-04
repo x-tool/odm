@@ -4,8 +4,6 @@ import (
 	"reflect"
 )
 
-type Col_export = col
-
 type col struct {
 	database *Database
 	name     string
@@ -16,6 +14,7 @@ func (c *col) GetName() string {
 	return c.name
 }
 
+// ColInterface to get name quick from interface
 type ColInterface interface {
 	ColName() string
 }
@@ -28,7 +27,9 @@ func newCol(db *Database, i interface{}) *col {
 	return c
 }
 
+// GetColName get interface name
 func GetColName(i interface{}) (name string) {
+	// if i = ColInterface use method to get name
 	if colI, ok := i.(ColInterface); ok {
 		name = colI.ColName()
 	} else {

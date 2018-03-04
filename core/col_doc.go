@@ -21,7 +21,7 @@ func (d *doc) getChildFields(i *docField) (r docFieldLst) {
 
 func (d *doc) getFieldById(id int) (o *docField) {
 	for _, v := range d.fields {
-		if v.GetId() == id {
+		if v.GetID() == id {
 			o = v
 			return o
 		}

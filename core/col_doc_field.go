@@ -24,7 +24,7 @@ func (d *docField) GetName() string {
 	return d.name
 }
 
-func (d *docField) GetId() int {
+func (d *docField) GetID() int {
 	return d.id
 }
 
@@ -32,21 +32,22 @@ func (d *docField) IsExtend() bool {
 	return d.isExtend
 }
 
-func (o *docField) getRootFieldDB() (r *docField) {
-	switch len(o.dependLst) {
+func (d *docField) getRootFieldDB() (r *docField) {
+	switch len(d.dependLst) {
 	case 0:
-		return nil
+		r = nil
 	default:
-		if o.dependLst[0].isExtend {
-			return o.dependLst[1]
+		if d.dependLst[0].isExtend {
+			r = d.dependLst[1]
 		} else {
-			return o.dependLst[0]
+			r = d.dependLst[0]
 		}
 	}
+	return r
 }
 
-func (o *docField) getDependLstDB() (r docFieldLst) {
-	for _, v := range o.dependLst {
+func (d *docField) getDependLstDB() (r docFieldLst) {
+	for _, v := range d.dependLst {
 		if v.isExtend {
 			r = append(r, v)
 		}
@@ -54,12 +55,12 @@ func (o *docField) getDependLstDB() (r docFieldLst) {
 	return
 }
 
-func (o *docField) isSingleType() (b bool) {
-	return !isGroupType(o.kind)
+func (d *docField) isSingleType() (b bool) {
+	return !isGroupType(d.kind)
 }
 
-func (o *docField) isGroupType() (b bool) {
-	return isGroupType(o.kind)
+func (d *docField) isGroupType() (b bool) {
+	return isGroupType(d.kind)
 }
 
 func newDocField(d docFieldLst, t *reflect.StructField, parent *docField) {
@@ -86,8 +87,15 @@ func newDocField(d docFieldLst, t *reflect.StructField, parent *docField) {
 		extendDependLst: _extendDependLst,
 		Tag:             tag,
 	}
+
+	// add parent childs
+	if parent.isGroupType() {
+		parent.childLst = append(parent.childLst, field)
+	}
+
 	// add item to doc fieldlst, and set field id
 	d.addItem(field)
+
 	switch field.kind {
 	case Array:
 		fallthrough

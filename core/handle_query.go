@@ -2,7 +2,6 @@ package core
 
 import (
 	"reflect"
-	"strings"
 )
 
 type query struct {
@@ -38,29 +37,29 @@ func newqueryWithoutCol(rV *reflect.Value) *query {
 }
 
 func (r *query) setDependToDoc() {
-	T := r.queryV.Type()
-	var value reflect.Type
-	if T.Kind() == reflect.Slice {
-		value = T.Elem()
-	} else {
-		value = T
-	}
-	var valueItem reflect.Value
-	var valueItemT reflect.Type
-	if value.Kind() == reflect.Slice {
-		valueItem = r.queryV.Elem()
-	} else {
-		valueItem = *r.queryV
-	}
-	valueItemT = valueItem.Type()
-	for i := 0; i < valueItem.NumField(); i++ {
-		field := valueItem.Field(i)
-		fieldT := valueItemT.Field(i)
-		if isDocMode(fieldT.Name) {
-			r.modeV = &field
-		}
-		newqueryItem := r.Handle.DependToDoc(strings.Split(fieldT.Tag.Get(tagName), "."), fieldT.Name)
-		r.queryLst = append(r.queryLst, newqueryItem)
-	}
+	// T := r.queryV.Type()
+	// var value reflect.Type
+	// if T.Kind() == reflect.Slice {
+	// 	value = T.Elem()
+	// } else {
+	// 	value = T
+	// }
+	// var valueItem reflect.Value
+	// var valueItemT reflect.Type
+	// if value.Kind() == reflect.Slice {
+	// 	valueItem = r.queryV.Elem()
+	// } else {
+	// 	valueItem = *r.queryV
+	// }
+	// valueItemT = valueItem.Type()
+	// for i := 0; i < valueItem.NumField(); i++ {
+	// 	field := valueItem.Field(i)
+	// 	fieldT := valueItemT.Field(i)
+	// 	if isDocMode(fieldT.Name) {
+	// 		r.modeV = &field
+	// 	}
+	// 	newqueryItem := r.Handle.DependToDoc(strings.Split(fieldT.Tag.Get(tagName), "."), fieldT.Name)
+	// 	r.queryLst = append(r.queryLst, newqueryItem)
+	// }
 
 }
