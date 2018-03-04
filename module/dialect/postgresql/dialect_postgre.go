@@ -4,9 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"reflect"
-	"strconv"
 	"strings"
-	"time"
 
 	"github.com/jackc/pgx"
 	"github.com/x-tool/odm/client"
@@ -40,7 +38,7 @@ func New() core.Dialect {
 }
 
 type dialectpostgre struct {
-	config    client.ConnectConfig
+	config    *client.ConnectConfig
 	pgxConfig pgx.ConnConfig
 }
 
@@ -56,27 +54,27 @@ func (d *dialectpostgre) SetConnectConfig(c *client.ConnectConfig) {
 	// return d
 }
 
-func pg_valueToString(v *queryRootField) (r string) {
-	value := v.value
-	switch v.DocField.Type {
-	case "string":
-		r = "'" + value.String() + "'"
-	case "int":
-		r = strconv.FormatInt(value.Int(), 10)
-	case "time":
-		if _v, ok := value.Interface().(time.Time); ok {
-			r = "'" + _v.Format(pg_timeFormat) + "'"
-		}
-	default:
-		r = value.String()
-	}
-	return r
-}
+// func pg_valueToString(v *queryRootField) (r string) {
+// 	value := v.value
+// 	switch v.DocField.Type {
+// 	case "string":
+// 		r = "'" + value.String() + "'"
+// 	case "int":
+// 		r = strconv.FormatInt(value.Int(), 10)
+// 	case "time":
+// 		if _v, ok := value.Interface().(time.Time); ok {
+// 			r = "'" + _v.Format(pg_timeFormat) + "'"
+// 		}
+// 	default:
+// 		r = value.String()
+// 	}
+// 	return r
+// }
 
 func (d *dialectpostgre) SwitchType(s string) string {
 	return typeMap[s]
 }
-func (d *dialectpostgre) GetColNames(db *Database) (ColNames []string, err error) {
+func (d *dialectpostgre) GetColNames(db *core.Database) (ColNames []string, err error) {
 	type _result struct {
 		Tablename  string
 		Tableowner string
@@ -89,42 +87,46 @@ func (d *dialectpostgre) GetColNames(db *Database) (ColNames []string, err error
 	return ColNames, err
 }
 
-func (d *dialectpostgre) syncCol(col *Col) {
-	var sql string
-	var colFields string
-	colName := col.name
-	fieldLst := col.Doc.getRootDetails()
-	fieldsNum := len(fieldLst)
+func (d *dialectpostgre) SyncCols(colLst *core.ColLst) {
+	for _, v := range *colLst {
+		go func(v core.Col) {
+			var sql string
+			var colFields string
+			colName := v.GetName()
+			fieldLst := v.GetRootDetails()
+			fieldsNum := len(fieldLst)
 
-	//output field name and typestr in colFields
-	for i, v := range fieldLst {
-		var fieldPg string
-		// only one field abord ","
-		if fieldsNum == 1 {
-			fieldPg = v.Name + " " + v.DBType
-			colFields = colFields + fieldPg
-			break
-		}
-		if i == (fieldsNum - 1) {
-			fieldPg = v.Name + " " + v.DBType
-		} else {
-			fieldPg = v.Name + " " + v.DBType + ",\n"
-		}
+			//output field name and typestr in colFields
+			for i, v := range fieldLst {
+				var fieldPg string
+				// only one field abord ","
+				if fieldsNum == 1 {
+					fieldPg = v.Name + " " + v.DBType
+					colFields = colFields + fieldPg
+					break
+				}
+				if i == (fieldsNum - 1) {
+					fieldPg = v.Name + " " + v.DBType
+				} else {
+					fieldPg = v.Name + " " + v.DBType + ",\n"
+				}
 
-		colFields = colFields + fieldPg
-	}
-	// make sql
-	sql = fmt.Sprintf("CREATE TABLE %s ( %s ) ", colName, colFields)
-	err := d.Open(sql, nil)
-	if err != nil {
-		tool.Panic("DB", err)
+				colFields = colFields + fieldPg
+			}
+			// make sql
+			sql = fmt.Sprintf("CREATE TABLE %s ( %s ) ", colName, colFields)
+			err := d.Open(sql, nil)
+			if err != nil {
+				tool.Panic("DB", err)
+			}
+		}()
 	}
 }
 
-func (d *dialectpostgre) Session() *Session {
-	return new(Session)
+func (d *dialectpostgre) Session() *core.Session {
+	return new(core.Session)
 }
-func (d *dialectpostgre) Insert(doc *Handle) (err error) {
+func (d *dialectpostgre) Insert(doc *core.Handle) (err error) {
 	var nameLst, valueLst []string
 	rootFields := doc.Query.getRootFields()
 	rootFields = doc.selectValidFields(rootFields)
@@ -143,13 +145,13 @@ func (d *dialectpostgre) Insert(doc *Handle) (err error) {
 	err = d.OpenWithHandle(rawsql, doc)
 	return
 }
-func (d *dialectpostgre) Update(doc *Handle) (err error) {
+func (d *dialectpostgre) Update(doc *core.Handle) (err error) {
 	return
 }
-func (d *dialectpostgre) Delete(doc *Handle) (err error) {
+func (d *dialectpostgre) Delete(doc *core.Handle) (err error) {
 	return
 }
-func (d *dialectpostgre) Query(doc *Handle) (r interface{}, err error) {
+func (d *dialectpostgre) Query(doc *core.Handle) (r interface{}, err error) {
 	return
 }
 
@@ -163,7 +165,7 @@ func (d *dialectpostgre) LogSql(sql string) {
 	tool.Console.LogWithLabel("XHandle", sql)
 }
 
-func pg_formatQL(o *Handle) (s string) {
+func pg_formatQL(o *core.Handle) (s string) {
 	var queryStr string
 	var resultStr string
 	for i, v := range o.Result.resultFieldLst {
@@ -257,7 +259,7 @@ func (d *dialectpostgre) Open(sql string, results interface{}) (err error) {
 		return err
 	}
 }
-func (d *dialectpostgre) OpenWithHandle(sql string, Handle *Handle) (err error) {
+func (d *dialectpostgre) OpenWithHandle(sql string, Handle *core.Handle) (err error) {
 	_conn, err := d.newConn()
 	if err != nil {
 		return err

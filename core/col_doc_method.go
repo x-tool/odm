@@ -1,6 +1,6 @@
 package core
 
-func (d *doc) getRootDetails() (lst dependLst) {
+func (d *doc) GetRootDetails() (lst dependLst) {
 	for _, v := range d.fields {
 		if v.extendParent == nil {
 			lst = append(lst, v)

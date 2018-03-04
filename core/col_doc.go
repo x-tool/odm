@@ -9,7 +9,7 @@ import (
 
 type doc struct {
 	name       string
-	col        *col
+	col        *Col
 	fields     docFieldLst
 	sourceType *reflect.Type
 	mode       colMode
@@ -29,7 +29,7 @@ func (d *doc) getFieldById(id int) (o *docField) {
 	return
 }
 
-func NewDoc(c *col, i interface{}) (_doc *doc) {
+func NewDoc(c *Col, i interface{}) (_doc *doc) {
 
 	// append doc.fields
 	docSourceT := reflect.TypeOf(i)

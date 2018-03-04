@@ -3,14 +3,14 @@ package core
 import "reflect"
 
 type Handle struct {
-	Col    *col
+	Col    *Col
 	Query  *query
 	Result *result
 	R      *reflect.Value
 	Err    error
 }
 
-func newHandle(c *col) *Handle {
+func newHandle(c *Col) *Handle {
 	d := &Handle{
 		Col: c,
 	}

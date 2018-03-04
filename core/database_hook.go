@@ -13,7 +13,7 @@ type Dialect interface {
 	// Conn() (Conn, error)
 	GetColNames() ([]string, error)
 	SwitchType(string) string
-	SyncCol(colLst)
+	SyncCols(ColLst)
 	// base handel
 	Insert(*Handle) error
 	Update(*Handle) error

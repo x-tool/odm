@@ -7,7 +7,11 @@ type Database struct {
 	client  *client.Client
 	name    string
 	dialect Dialect
-	colLst
+	ColLst
+}
+
+type history struct {
+	colLst []string
 }
 
 func NewDatabase(name string, c *client.Client, d Dialect) *Database {
@@ -28,7 +32,7 @@ func (d *Database) GetClient() *client.Client {
 
 func (d *Database) RegisterCol(c interface{}) {
 	_col := newCol(d, c)
-	d.colLst = append(d.colLst, _col)
+	d.ColLst = append(d.ColLst, _col)
 }
 
 func (d *Database) RegisterCols(c ...interface{}) {
@@ -37,6 +41,6 @@ func (d *Database) RegisterCols(c ...interface{}) {
 	}
 }
 
-func (d *Database) SyncCol() {
-	d.dialect.SyncCol(d.colLst)
+func (d *Database) SyncCols() {
+	d.dialect.SyncCols(d.ColLst)
 }

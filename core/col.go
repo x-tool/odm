@@ -4,13 +4,13 @@ import (
 	"reflect"
 )
 
-type col struct {
+type Col struct {
 	database *Database
 	name     string
 	doc      *doc
 }
 
-func (c *col) GetName() string {
+func (c *Col) GetName() string {
 	return c.name
 }
 
@@ -19,8 +19,8 @@ type ColInterface interface {
 	ColName() string
 }
 
-func newCol(db *Database, i interface{}) *col {
-	c := new(col)
+func newCol(db *Database, i interface{}) *Col {
+	c := new(Col)
 	c.name = GetColName(i)
 	c.database = db
 	c.doc = NewDoc(c, i)
@@ -30,8 +30,8 @@ func newCol(db *Database, i interface{}) *col {
 // GetColName get interface name
 func GetColName(i interface{}) (name string) {
 	// if i = ColInterface use method to get name
-	if colI, ok := i.(ColInterface); ok {
-		name = colI.ColName()
+	if ColI, ok := i.(ColInterface); ok {
+		name = ColI.ColName()
 	} else {
 		v := reflect.TypeOf(i)
 		if v.Kind() == reflect.Ptr {
@@ -44,21 +44,21 @@ func GetColName(i interface{}) (name string) {
 	return
 }
 
-// colLst //////////////////
-type colLst []*col
+// ColLst //////////////////
+type ColLst []*Col
 
-func (cL *colLst) GetCol(i interface{}) (c *col) {
-	colName := GetColName(i)
-	return cL.GetColByName(colName)
+func (cL *ColLst) GetCol(i interface{}) (c *Col) {
+	ColName := GetColName(i)
+	return cL.GetColByName(ColName)
 }
 
-func (cL *colLst) GetColByName(name string) *col {
-	var col *col
+func (cL *ColLst) GetColByName(name string) *Col {
+	var Col *Col
 	for _, v := range *cL {
 		if v.GetName() == name {
-			col = v
+			Col = v
 			break
 		}
 	}
-	return col
+	return Col
 }
