@@ -9,7 +9,7 @@ type Connect = client.ConnectConfig
 
 func New(c Connect) *ODMClient {
 	_c := new(ODMClient)
-	_c.sourceClient = core.NewClient(connect)
+	_c.sourceClient = client.NewClient(c)
 	return _c
 }
 
@@ -20,9 +20,10 @@ type ODMClient struct {
 // if d == nil use default dialect
 func (c *ODMClient) Database(d core.Dialect) *core.Database {
 	// check default database
-	if c.sourceClient.GetConnectConfig().Database == "postgre" && d == nil {
+	config := c.sourceClient.GetConnectConfig()
+	if config.Database == "postgre" && d == nil {
 		d = defaultPostgre
 	}
-	d.SetConnectConfig(c.sourceClient.GetConnectConfig())
-	return core.NewDatabase(name, c, d)
+	d.Init(c.sourceClient)
+	return core.NewDatabase(config.DatabaseName, c.sourceClient, d)
 }

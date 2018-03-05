@@ -52,9 +52,9 @@ func isDelete(s string) bool {
 	return check
 }
 func modeInsert(d *core.Handle) {
-	if d.Col.hasDocModel {
-		modeVInterface := d.Query.modeV.Addr().Interface()
-		v := modeVInterface.(Mode)
-		v.Create()
-	}
+	// if d.Col.hasDocModel {
+	// 	modeVInterface := d.Query.modeV.Addr().Interface()
+	// 	v := modeVInterface.(Mode)
+	// 	v.Create()
+	// }
 }

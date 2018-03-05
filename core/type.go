@@ -4,32 +4,58 @@ import (
 	"reflect"
 )
 
-type Kind uint
-
 const (
 	Invalid Kind = iota
 	Bool
 	Int
-	Int8
-	Int16
-	Int32
-	Int64
 	Uint
-	Uint8
-	Uint16
-	Uint32
-	Uint64
-	Float32
-	Float64
-	Complex64
-	Complex128
+	Byte
+	Float
+	Complex
 	Array
 	Map
-	Slice
 	String
 	Time
+	Date
+	DateTime
+	TimeStamp
 	Struct
 )
+
+var typeStringMap = map[Kind]string{
+	Bool:      "bool",
+	Int:       "int",
+	Uint:      "unit",
+	Byte:      "byte",
+	Float:     "float",
+	Complex:   "complex",
+	Array:     "array",
+	Map:       "map",
+	String:    "string",
+	Time:      "time",
+	Date:      "date",
+	DateTime:  "datetime",
+	TimeStamp: "timestamp",
+	Struct:    "struct",
+}
+
+type Kind uint
+
+func (k Kind) String() (s string) {
+	return typeStringMap[k]
+}
+
+func (k Kind) isGroupType() (b bool) {
+	switch k {
+	case Array:
+		fallthrough
+	case Map:
+		fallthrough
+	case Struct:
+		b = true
+	}
+	return
+}
 
 func mapTypeToValue(b interface{}, v *reflect.Value) {
 	// realV := reflect.Indirect(*v)
@@ -45,7 +71,6 @@ func mapTypeToValue(b interface{}, v *reflect.Value) {
 	case bool:
 		v.SetBool(b.(bool))
 	}
-
 }
 
 func reflectToType(r *reflect.Type) (k Kind) {
@@ -55,21 +80,33 @@ func reflectToType(r *reflect.Type) (k Kind) {
 	case reflect.Bool:
 		k = Bool
 	case reflect.Int:
-		k = Int
+		fallthrough
 	case reflect.Int8:
-		k = Int8
+		fallthrough
 	case reflect.Int16:
-		k = Int16
+		fallthrough
+	case reflect.Int32:
+		fallthrough
+	case reflect.Int64:
+		k = Int
 	case reflect.Uint:
+		fallthrough
+	case reflect.Uint8:
+		fallthrough
+	case reflect.Uint16:
+		fallthrough
+	case reflect.Uint32:
+		fallthrough
+	case reflect.Uint64:
 		k = Uint
 	case reflect.Float32:
-		k = Float32
+		fallthrough
 	case reflect.Float64:
-		k = Float64
+		k = Float
 	case reflect.Complex64:
-		k = Complex64
+		fallthrough
 	case reflect.Complex128:
-		k = Complex128
+		k = Complex
 	case reflect.Array:
 		fallthrough
 	case reflect.Slice:
@@ -83,18 +120,6 @@ func reflectToType(r *reflect.Type) (k Kind) {
 		} else {
 			k = Struct
 		}
-	}
-	return
-}
-
-func isGroupType(k Kind) (b bool) {
-	switch k {
-	case Array:
-		fallthrough
-	case Map:
-		fallthrough
-	case Struct:
-		b = true
 	}
 	return
 }

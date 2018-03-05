@@ -4,7 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"reflect"
-	"strings"
+	"sync"
 
 	"github.com/jackc/pgx"
 	"github.com/x-tool/odm/client"
@@ -17,16 +17,15 @@ const (
 )
 
 var typeMap = map[string]string{
-	"int":     "int",
-	"float64": "float8",
+	"int":   "int",
+	"float": "float8",
 	// "text":   "text",
-	"[]byte": "bytea",
+	"Byte":   "bytea",
 	"time":   "timestamp",
 	"array":  "json",
 	"bool":   "json",
 	"string": "text",
 	"struct": "json",
-	"Others": "text",
 }
 
 type postgreConn struct {
@@ -42,8 +41,8 @@ type dialectpostgre struct {
 	pgxConfig pgx.ConnConfig
 }
 
-func (d *dialectpostgre) SetConnectConfig(c *client.ConnectConfig) {
-	d.config = c
+func (d *dialectpostgre) Init(c *client.Client) {
+	d.config = c.GetConnectConfig()
 	d.pgxConfig = pgx.ConnConfig{
 		Host:     d.config.Host,
 		Port:     uint16(d.config.Port),
@@ -74,7 +73,7 @@ func (d *dialectpostgre) SetConnectConfig(c *client.ConnectConfig) {
 func (d *dialectpostgre) SwitchType(s string) string {
 	return typeMap[s]
 }
-func (d *dialectpostgre) GetColNames(db *core.Database) (ColNames []string, err error) {
+func (d *dialectpostgre) GetColNames() (ColNames []string, err error) {
 	type _result struct {
 		Tablename  string
 		Tableowner string
@@ -87,9 +86,12 @@ func (d *dialectpostgre) GetColNames(db *core.Database) (ColNames []string, err 
 	return ColNames, err
 }
 
-func (d *dialectpostgre) SyncCols(colLst *core.ColLst) {
-	for _, v := range *colLst {
-		go func(v core.Col) {
+func (d *dialectpostgre) SyncCols(colLst core.ColLst) {
+	var syncLock sync.WaitGroup
+	for _, v := range colLst {
+		go func(*core.Col) {
+			syncLock.Add(1)
+			defer syncLock.Done()
 			var sql string
 			var colFields string
 			colName := v.GetName()
@@ -98,17 +100,18 @@ func (d *dialectpostgre) SyncCols(colLst *core.ColLst) {
 
 			//output field name and typestr in colFields
 			for i, v := range fieldLst {
+				var fieldKind = kindToString(v.GetKind())
 				var fieldPg string
 				// only one field abord ","
 				if fieldsNum == 1 {
-					fieldPg = v.Name + " " + v.DBType
+					fieldPg = colName + " " + fieldKind
 					colFields = colFields + fieldPg
 					break
 				}
 				if i == (fieldsNum - 1) {
-					fieldPg = v.Name + " " + v.DBType
+					fieldPg = colName + " " + fieldKind
 				} else {
-					fieldPg = v.Name + " " + v.DBType + ",\n"
+					fieldPg = colName + " " + fieldKind + ",\n"
 				}
 
 				colFields = colFields + fieldPg
@@ -119,30 +122,31 @@ func (d *dialectpostgre) SyncCols(colLst *core.ColLst) {
 			if err != nil {
 				tool.Panic("DB", err)
 			}
-		}()
+		}(v)
 	}
+	syncLock.Wait()
 }
 
 func (d *dialectpostgre) Session() *core.Session {
 	return new(core.Session)
 }
 func (d *dialectpostgre) Insert(doc *core.Handle) (err error) {
-	var nameLst, valueLst []string
-	rootFields := doc.Query.getRootFields()
-	rootFields = doc.selectValidFields(rootFields)
-	for _, v := range rootFields {
-		nameLst = append(nameLst, v.DocField.Name)
-		valueLst = append(valueLst, pg_valueToString(v))
-	}
-	nameLstStr := strings.Join(nameLst, ",")
-	valueLstStr := strings.Join(valueLst, ",")
-	sql := "INSERT INTO $colName ($typeLst) VALUES ($valueLst) RETURNING *"
-	rawsql := tool.ReplaceStrings(sql, []string{
-		"$colName", doc.Col.name,
-		"$typeLst", nameLstStr,
-		"$valueLst", valueLstStr,
-	})
-	err = d.OpenWithHandle(rawsql, doc)
+	// var nameLst, valueLst []string
+	// rootFields := doc.Query.getRootFields()
+	// rootFields = doc.selectValidFields(rootFields)
+	// for _, v := range rootFields {
+	// 	nameLst = append(nameLst, v.DocField.Name)
+	// 	valueLst = append(valueLst, pg_valueToString(v))
+	// }
+	// nameLstStr := strings.Join(nameLst, ",")
+	// valueLstStr := strings.Join(valueLst, ",")
+	// sql := "INSERT INTO $colName ($typeLst) VALUES ($valueLst) RETURNING *"
+	// rawsql := tool.ReplaceStrings(sql, []string{
+	// 	"$colName", doc.Col.name,
+	// 	"$typeLst", nameLstStr,
+	// 	"$valueLst", valueLstStr,
+	// })
+	// err = d.OpenWithHandle(rawsql, doc)
 	return
 }
 func (d *dialectpostgre) Update(doc *core.Handle) (err error) {
@@ -165,61 +169,61 @@ func (d *dialectpostgre) LogSql(sql string) {
 	tool.Console.LogWithLabel("XHandle", sql)
 }
 
-func pg_formatQL(o *core.Handle) (s string) {
-	var queryStr string
-	var resultStr string
-	for i, v := range o.Result.resultFieldLst {
-		var _resultStr string
-		vRootField := v.getRootFieldDB()
-		if i == 0 && vRootField.Type == "struct" {
-			jsonStr := vRootField.Name
-			for i, _v := range v.getDependLstDB() {
-				if i == 0 {
-					continue
-				} else {
-					jsonStr = jsonStr + "->'" + _v.Name + "'"
-				}
+// func pg_formatQL(o *core.Handle) (s string) {
+// 	var queryStr string
+// 	var resultStr string
+// 	for i, v := range o.Result.resultFieldLst {
+// 		var _resultStr string
+// 		vRootField := v.getRootFieldDB()
+// 		if i == 0 && vRootField.Type == "struct" {
+// 			jsonStr := vRootField.Name
+// 			for i, _v := range v.getDependLstDB() {
+// 				if i == 0 {
+// 					continue
+// 				} else {
+// 					jsonStr = jsonStr + "->'" + _v.Name + "'"
+// 				}
 
-			}
-			_resultStr = jsonStr
-		} else {
-			_resultStr = vRootField.Name
-		}
+// 			}
+// 			_resultStr = jsonStr
+// 		} else {
+// 			_resultStr = vRootField.Name
+// 		}
 
-		if i == 0 {
-			resultStr = _resultStr
-		} else {
-			resultStr = resultStr + "," + _resultStr
-		}
-	}
+// 		if i == 0 {
+// 			resultStr = _resultStr
+// 		} else {
+// 			resultStr = resultStr + "," + _resultStr
+// 		}
+// 	}
 
-	for _, v := range o.Query.queryLst {
-		var _resultStr string
-		vRootField := v.getRootFieldDB()
-		if i == 0 && vRootField.Type == "struct" {
-			jsonStr := vRootField.Name
-			for i, _v := range v.getDependLstDB() {
-				if i == 0 {
-					continue
-				} else {
-					jsonStr = jsonStr + "->'" + _v.Name + "'"
-				}
+// 	for _, v := range o.Query.queryLst {
+// 		var _resultStr string
+// 		vRootField := v.getRootFieldDB()
+// 		if i == 0 && vRootField.Type == "struct" {
+// 			jsonStr := vRootField.Name
+// 			for i, _v := range v.getDependLstDB() {
+// 				if i == 0 {
+// 					continue
+// 				} else {
+// 					jsonStr = jsonStr + "->'" + _v.Name + "'"
+// 				}
 
-			}
-			_resultStr = jsonStr
-		} else {
-			_resultStr = vRootField.Name
-		}
+// 			}
+// 			_resultStr = jsonStr
+// 		} else {
+// 			_resultStr = vRootField.Name
+// 		}
 
-		if i == 0 {
-			resultStr = _resultStr
-		} else {
-			resultStr = resultStr + "," + _resultStr
-		}
-	}
-	s = "SELECT " + queryStr + " FROM " + o.colName() + "WHERE " + resultStr
-	return
-}
+// 		if i == 0 {
+// 			resultStr = _resultStr
+// 		} else {
+// 			resultStr = resultStr + "," + _resultStr
+// 		}
+// 	}
+// 	s = "SELECT " + queryStr + " FROM " + o.colName() + "WHERE " + resultStr
+// 	return
+// }
 
 func (d *dialectpostgre) Open(sql string, results interface{}) (err error) {
 	_conn, err := d.newConn()
@@ -259,34 +263,39 @@ func (d *dialectpostgre) Open(sql string, results interface{}) (err error) {
 		return err
 	}
 }
-func (d *dialectpostgre) OpenWithHandle(sql string, Handle *core.Handle) (err error) {
-	_conn, err := d.newConn()
-	if err != nil {
-		return err
-	}
-	pgConn := _conn.conn
-	d.LogSql(sql)
-	rows, err := pgConn.Query(sql)
-	defer pgConn.Close()
 
-	resultV := *Handle.R
-	resultT := resultV.Type()
-	if resultT.Kind() == reflect.Slice {
-		for rows.Next() {
-			resultItemV := Handle.Result.newResultItem()
-			var resultSlicePtr []interface{}
-			for _, v := range Handle.Result.getResultRootItemFieldAddr(resultItemV) {
-				resultSlicePtr = append(resultSlicePtr, (v).Interface())
-			}
-			err = rows.Scan(resultSlicePtr...)
-			resultV.Set(reflect.Append(resultV, *resultItemV))
-			if err != nil {
-				break
-			}
-		}
-		return err
-	} else {
-		return nil
-	}
+// func (d *dialectpostgre) OpenWithHandle(sql string, Handle *core.Handle) (err error) {
+// 	_conn, err := d.newConn()
+// 	if err != nil {
+// 		return err
+// 	}
+// 	pgConn := _conn.conn
+// 	d.LogSql(sql)
+// 	rows, err := pgConn.Query(sql)
+// 	defer pgConn.Close()
 
+// 	resultV := *Handle.R
+// 	resultT := resultV.Type()
+// 	if resultT.Kind() == reflect.Slice {
+// 		for rows.Next() {
+// 			resultItemV := Handle.Result.newResultItem()
+// 			var resultSlicePtr []interface{}
+// 			for _, v := range Handle.Result.getResultRootItemFieldAddr(resultItemV) {
+// 				resultSlicePtr = append(resultSlicePtr, (v).Interface())
+// 			}
+// 			err = rows.Scan(resultSlicePtr...)
+// 			resultV.Set(reflect.Append(resultV, *resultItemV))
+// 			if err != nil {
+// 				break
+// 			}
+// 		}
+// 		return err
+// 	} else {
+// 		return nil
+// 	}
+
+// }
+
+func kindToString(k core.Kind) (s string) {
+	return typeMap[k.String()]
 }

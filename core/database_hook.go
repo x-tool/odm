@@ -9,7 +9,7 @@ type colModeHook interface {
 
 type Dialect interface {
 	// Init(client.ConnectConfig) Dialect
-	SetConnectConfig(client.ConnectConfig)
+	Init(*client.Client)
 	// Conn() (Conn, error)
 	GetColNames() ([]string, error)
 	SwitchType(string) string

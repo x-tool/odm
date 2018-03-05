@@ -7,6 +7,6 @@ import (
 
 type NormalCol = remark2C.NormalCol
 
-const (
+var (
 	defaultPostgre = postgresql.New()
 )

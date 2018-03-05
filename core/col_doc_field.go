@@ -28,6 +28,9 @@ func (d *docField) GetID() int {
 	return d.id
 }
 
+func (d *docField) GetKind() Kind {
+	return d.kind
+}
 func (d *docField) IsExtend() bool {
 	return d.isExtend
 }
@@ -56,11 +59,11 @@ func (d *docField) getDependLstDB() (r docFieldLst) {
 }
 
 func (d *docField) isSingleType() (b bool) {
-	return !isGroupType(d.kind)
+	return !d.kind.isGroupType()
 }
 
 func (d *docField) isGroupType() (b bool) {
-	return isGroupType(d.kind)
+	return d.kind.isGroupType()
 }
 
 func newDocField(d docFieldLst, t *reflect.StructField, parent *docField) {
