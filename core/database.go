@@ -1,6 +1,10 @@
 package core
 
-import "github.com/x-tool/odm/client"
+import (
+	"sync"
+
+	"github.com/x-tool/odm/client"
+)
 
 // database use
 type Database struct {
@@ -33,12 +37,17 @@ func (d *Database) GetClient() *client.Client {
 func (d *Database) RegisterCol(c interface{}) {
 	_col := newCol(d, c)
 	d.ColLst = append(d.ColLst, _col)
+	syncLock.Done()
 }
 
+var syncLock sync.WaitGroup
+
 func (d *Database) RegisterCols(c ...interface{}) {
-	for i := range c {
-		go d.RegisterCol(i)
+	for _, v := range c {
+		syncLock.Add(1)
+		go d.RegisterCol(v)
 	}
+	syncLock.Wait()
 }
 
 func (d *Database) SyncCols() {

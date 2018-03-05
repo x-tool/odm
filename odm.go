@@ -21,7 +21,7 @@ type ODMClient struct {
 func (c *ODMClient) Database(d core.Dialect) *core.Database {
 	// check default database
 	config := c.sourceClient.GetConnectConfig()
-	if config.Database == "postgre" && d == nil {
+	if config.Database == "postgresql" && d == nil {
 		d = defaultPostgre
 	}
 	d.Init(c.sourceClient)

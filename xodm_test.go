@@ -24,7 +24,7 @@ func Test_connection(t *testing.T) {
 	connectionConf := Connect{
 		Host:         "127.0.0.1",
 		Port:         5432,
-		User:         "postgre",
+		User:         "postgres",
 		Passwd:       "zxczxczxc",
 		Database:     "postgresql",
 		DatabaseName: "x",

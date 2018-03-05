@@ -89,8 +89,8 @@ func (d *dialectpostgre) GetColNames() (ColNames []string, err error) {
 func (d *dialectpostgre) SyncCols(colLst core.ColLst) {
 	var syncLock sync.WaitGroup
 	for _, v := range colLst {
+		syncLock.Add(1)
 		go func(*core.Col) {
-			syncLock.Add(1)
 			defer syncLock.Done()
 			var sql string
 			var colFields string
@@ -99,8 +99,8 @@ func (d *dialectpostgre) SyncCols(colLst core.ColLst) {
 			fieldsNum := len(fieldLst)
 
 			//output field name and typestr in colFields
-			for i, v := range fieldLst {
-				var fieldKind = kindToString(v.GetKind())
+			for i, _v := range fieldLst {
+				var fieldKind = kindToString(_v.GetKind())
 				var fieldPg string
 				// only one field abord ","
 				if fieldsNum == 1 {

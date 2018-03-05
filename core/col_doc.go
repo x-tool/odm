@@ -3,6 +3,7 @@ package core
 import (
 	"errors"
 	"reflect"
+	"sync"
 
 	"github.com/x-tool/tool"
 )
@@ -32,17 +33,20 @@ func (d *doc) getFieldById(id int) (o *docField) {
 func NewDoc(c *Col, i interface{}) (_doc *doc) {
 
 	// append doc.fields
-	docSourceT := reflect.TypeOf(i)
+	_docSourceT := reflect.TypeOf(i)
+	docSourceT := _docSourceT.Elem()
 	_doc = &doc{
 		name:       docSourceT.Name(),
 		col:        c,
 		sourceType: &docSourceT,
-		fields:     newDocFields(_doc, &docSourceT),
-		mode:       checkDocMode(&docSourceT),
 	}
+	_doc.fields = newDocFields(_doc, &docSourceT)
+	_doc.mode = checkDocMode(&docSourceT)
 
 	return
 }
+
+var addFieldsLock sync.WaitGroup
 
 func newDocFields(d *doc, docSourceTPtr *reflect.Type) (lst docFieldLst) {
 	docSourceT := *docSourceTPtr
@@ -50,6 +54,7 @@ func newDocFields(d *doc, docSourceTPtr *reflect.Type) (lst docFieldLst) {
 		cont := docSourceT.NumField()
 		for i := 0; i < cont; i++ {
 			field := docSourceT.Field(i)
+			addFieldsLock.Add(1)
 			go newDocField(lst, &field, nil)
 		}
 		// check Fields Name, Can't both same name in one Col
@@ -57,6 +62,7 @@ func newDocFields(d *doc, docSourceTPtr *reflect.Type) (lst docFieldLst) {
 	} else {
 		tool.Panic("DB", errors.New("doc type is "+docSourceT.Kind().String()+"!,Type should be Struct"))
 	}
+	addFieldsLock.Wait()
 	return
 }
 

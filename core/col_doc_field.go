@@ -72,16 +72,20 @@ func newDocField(d docFieldLst, t *reflect.StructField, parent *docField) {
 	tag := fieldType.Tag.Get(tagName)
 	kind := reflectToType(&reflectType)
 	isExtend := checkdocFieldisExtend(t)
-	_dependLst := append(parent.dependLst, parent)
+	var _dependLst dependLst
 	var _extendDependLst dependLst
-	if isExtend {
-		_extendDependLst = parent.extendDependLst
-	} else {
-		_extendDependLst = append(parent.extendDependLst, parent)
+	// if field is root field parent == nil, can't use parent method
+	if parent != nil {
+		_dependLst = append(parent.dependLst, parent)
+		if isExtend {
+			_extendDependLst = parent.extendDependLst
+		} else {
+			_extendDependLst = append(parent.extendDependLst, parent)
+		}
 	}
 
 	field := &docField{
-		name:            reflectType.Name(),
+		name:            fieldType.Name,
 		selfType:        &reflectType,
 		kind:            kind,
 		parent:          parent,
@@ -92,12 +96,15 @@ func newDocField(d docFieldLst, t *reflect.StructField, parent *docField) {
 	}
 
 	// add parent childs
-	if parent.isGroupType() {
-		parent.childLst = append(parent.childLst, field)
+	// if field is root field parent == nil, can't use parent method
+	if parent != nil {
+		if parent.isGroupType() {
+			parent.childLst = append(parent.childLst, field)
+		}
 	}
 
 	// add item to doc fieldlst, and set field id
-	d.addItem(field)
+	field = addItem(d, field)
 
 	switch field.kind {
 	case Array:
@@ -107,16 +114,19 @@ func newDocField(d docFieldLst, t *reflect.StructField, parent *docField) {
 		count := _fieldType.NumField()
 		for i := 0; i < count; i++ {
 			_f := _fieldType.Field(i)
+			addFieldsLock.Add(1)
 			go newDocField(d, &_f, field)
 		}
 	case Struct:
 		count := fieldType.Type.NumField()
 		for i := 0; i < count; i++ {
 			_f := fieldType.Type.Field(i)
+			addFieldsLock.Add(1)
 			go newDocField(d, &_f, field)
 		}
 
 	}
+	addFieldsLock.Done()
 }
 
 func checkdocFieldisExtend(r *reflect.StructField) (b bool) {
@@ -127,12 +137,12 @@ func checkdocFieldisExtend(r *reflect.StructField) (b bool) {
 type docFieldLst []*docField
 type dependLst docFieldLst
 
-var lock *sync.Mutex
+var addFieldLock sync.Mutex
 
-func (d docFieldLst) addItem(f *docField) *docField {
+func addItem(d docFieldLst, f *docField) *docField {
 	// add lock
-	lock.Lock()
-	defer lock.Unlock()
+	// addFieldLock.Lock()
+	// defer addFieldLock.Unlock()
 	f.id = len(d)
 	d = append(d, f)
 	return f
