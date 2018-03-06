@@ -1,15 +1,28 @@
 package core
 
+import (
+	"strings"
+)
+
 var (
 	tagName = "xodm"
-	tagPtr  = "p"
+	tag_Ptr = "p"
 )
 
 type odmTag struct {
-	name string
-	ptr  *docField
+	ptr string // find docfield quick by custom string
 }
 
-func formatTag(s string) (t *odmTag) {
-	return
+func newTag(s string) *odmTag {
+	_o := &odmTag{}
+	_s := strings.TrimSpace(s)
+	lst := strings.Split(_s, " ")
+	for _, v := range lst {
+		fieldLst := strings.Split(v, ":")
+		switch fieldLst[0] {
+		case tag_Ptr:
+			_o.ptr = fieldLst[1]
+		}
+	}
+	return _o
 }

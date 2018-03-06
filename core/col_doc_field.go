@@ -16,7 +16,7 @@ type docField struct {
 	childLst        docFieldLst
 	dependLst       dependLst
 	extendDependLst dependLst
-	Tag             string
+	tag             *odmTag
 	funcLst         map[string]string
 }
 
@@ -92,7 +92,7 @@ func newDocField(d *docFieldLst, t *reflect.StructField, parent *docField) {
 		isExtend:        isExtend,
 		dependLst:       _dependLst,
 		extendDependLst: _extendDependLst,
-		Tag:             tag,
+		tag:             newTag(tag),
 	}
 
 	// add parent childs
