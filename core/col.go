@@ -34,13 +34,17 @@ func GetColName(i interface{}) (name string) {
 		name = ColI.ColName()
 	} else {
 		v := reflect.TypeOf(i)
-		if v.Kind() == reflect.Ptr {
-			name = v.Elem().Name()
-		} else {
-			name = v.Name()
-		}
-
+		name = GetColNameByReflectType(v)
 	}
+	return
+}
+
+// GetColName get interface name
+func GetColNameByReflectType(t reflect.Type) (name string) {
+	if t.Kind() == reflect.Ptr {
+		t = t.Elem()
+	}
+	name = t.Name()
 	return
 }
 
