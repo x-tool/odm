@@ -1,7 +1,10 @@
 package core
 
 import (
+	"errors"
 	"sync"
+
+	"github.com/x-tool/tool"
 
 	"github.com/x-tool/odm/client"
 )
@@ -12,10 +15,11 @@ type Database struct {
 	name    string
 	dialect Dialect
 	ColLst
+	history *history
 }
 
 type history struct {
-	colLst []string
+	colNames []string
 }
 
 func NewDatabase(name string, c *client.Client, d Dialect) *Database {
@@ -23,6 +27,7 @@ func NewDatabase(name string, c *client.Client, d Dialect) *Database {
 	_d.name = name
 	_d.client = c
 	_d.dialect = d
+	_d.setHistory()
 	return _d
 }
 
@@ -52,4 +57,13 @@ func (d *Database) RegisterCols(c ...interface{}) {
 
 func (d *Database) SyncCols() {
 	d.dialect.SyncCols(d.ColLst)
+}
+
+func (d *Database) setHistory() {
+	var err error
+	d.history = new(history)
+	d.history.colNames, err = d.dialect.GetColNames()
+	if err != nil {
+		tool.Panic("DB", errors.New("Get colNames ERROR"))
+	}
 }

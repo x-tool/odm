@@ -40,7 +40,8 @@ func NewDoc(c *Col, i interface{}) (_doc *doc) {
 		col:        c,
 		sourceType: &docSourceT,
 	}
-	_doc.fields = newDocFields(_doc, &docSourceT)
+	fields := newDocFields(_doc, &docSourceT)
+	_doc.fields = *fields
 	_doc.mode = checkDocMode(&docSourceT)
 
 	return
@@ -48,14 +49,15 @@ func NewDoc(c *Col, i interface{}) (_doc *doc) {
 
 var addFieldsLock sync.WaitGroup
 
-func newDocFields(d *doc, docSourceTPtr *reflect.Type) (lst docFieldLst) {
+func newDocFields(d *doc, docSourceTPtr *reflect.Type) *docFieldLst {
+	var lst docFieldLst
 	docSourceT := *docSourceTPtr
 	if docSourceT.Kind() == reflect.Struct {
 		cont := docSourceT.NumField()
 		for i := 0; i < cont; i++ {
 			field := docSourceT.Field(i)
 			addFieldsLock.Add(1)
-			go newDocField(lst, &field, nil)
+			go newDocField(&lst, &field, nil)
 		}
 		// check Fields Name, Can't both same name in one Col
 		// doc.checkFieldsName()
@@ -63,7 +65,7 @@ func newDocFields(d *doc, docSourceTPtr *reflect.Type) (lst docFieldLst) {
 		tool.Panic("DB", errors.New("doc type is "+docSourceT.Kind().String()+"!,Type should be Struct"))
 	}
 	addFieldsLock.Wait()
-	return
+	return &lst
 }
 
 func checkDocMode(docSourceT *reflect.Type) (m colMode) {

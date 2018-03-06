@@ -37,8 +37,9 @@ func New() core.Dialect {
 }
 
 type dialectpostgre struct {
-	config    *client.ConnectConfig
-	pgxConfig pgx.ConnConfig
+	config          *client.ConnectConfig
+	pgxConfig       pgx.ConnConfig
+	historyColNames []string
 }
 
 func (d *dialectpostgre) Init(c *client.Client) {
@@ -81,9 +82,9 @@ func (d *dialectpostgre) GetColNames() (ColNames []string, err error) {
 	var results []_result
 	err = d.Open("SELECT tablename,tableowner FROM pg_tables WHERE schemaname='public'", &results)
 	for _, v := range results {
-		ColNames = append(ColNames, v.Tablename)
+		d.historyColNames = append(d.historyColNames, v.Tablename)
 	}
-	return ColNames, err
+	return d.historyColNames, err
 }
 
 func (d *dialectpostgre) SyncCols(colLst core.ColLst) {
@@ -96,26 +97,14 @@ func (d *dialectpostgre) SyncCols(colLst core.ColLst) {
 			var colFields string
 			colName := v.GetName()
 			fieldLst := v.GetRootDetails()
-			fieldsNum := len(fieldLst)
-
+			var fieldStringLst []string
 			//output field name and typestr in colFields
-			for i, _v := range fieldLst {
-				var fieldKind = kindToString(_v.GetKind())
-				var fieldPg string
-				// only one field abord ","
-				if fieldsNum == 1 {
-					fieldPg = colName + " " + fieldKind
-					colFields = colFields + fieldPg
-					break
-				}
-				if i == (fieldsNum - 1) {
-					fieldPg = colName + " " + fieldKind
-				} else {
-					fieldPg = colName + " " + fieldKind + ",\n"
-				}
-
-				colFields = colFields + fieldPg
+			for _, _v := range fieldLst {
+				fieldKind := kindToString(_v.GetKind())
+				name := _v.GetName()
+				fieldStringLst = append(fieldStringLst, name+" "+fieldKind)
 			}
+			colFields = tool.JoinStringWithComma(fieldStringLst)
 			// make sql
 			sql = fmt.Sprintf("CREATE TABLE %s ( %s ) ", colName, colFields)
 			err := d.Open(sql, nil)

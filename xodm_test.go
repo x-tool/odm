@@ -33,14 +33,15 @@ func Test_connection(t *testing.T) {
 	db := odm.Database(nil)
 	db.RegisterCols(new(myDoc))
 	db.SyncCols()
+
+	testdata := new(myDoc)
+	testdata.Name = "haha,I get"
+	testdata.Id = 1
 	// col := db.GetCol(new(myDoc))
-	// testInsert := new(myDoc)
-	// testInsert.Name = "haha,I get"
-	// testInsert.Id = 1
-	// _, err := col.Insert(testInsert)
-	// log.Print(testInsert)
-	// col.Key(testInsert.Key).Delete()
-	// t.Log(err)
+	// _, err := col.data(testdata)
+	// log.Print(testdata)
+	// col.Key(testdata.Key).Delete()
+	t.Log(testdata)
 }
 
 // func Test_formatType(t *testing.T) {

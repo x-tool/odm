@@ -66,7 +66,7 @@ func (d *docField) isGroupType() (b bool) {
 	return d.kind.isGroupType()
 }
 
-func newDocField(d docFieldLst, t *reflect.StructField, parent *docField) {
+func newDocField(d *docFieldLst, t *reflect.StructField, parent *docField) {
 	fieldType := *t
 	reflectType := fieldType.Type
 	tag := fieldType.Tag.Get(tagName)
@@ -102,9 +102,10 @@ func newDocField(d docFieldLst, t *reflect.StructField, parent *docField) {
 			parent.childLst = append(parent.childLst, field)
 		}
 	}
-
+	// set extendparent
+	field.extendParent = d.getExtendParent(field)
 	// add item to doc fieldlst, and set field id
-	field = addItem(d, field)
+	field = d.addItem(field)
 
 	switch field.kind {
 	case Array:
@@ -139,12 +140,12 @@ type dependLst docFieldLst
 
 var addFieldLock sync.Mutex
 
-func addItem(d docFieldLst, f *docField) *docField {
+func (d *docFieldLst) addItem(f *docField) *docField {
 	// add lock
 	// addFieldLock.Lock()
 	// defer addFieldLock.Unlock()
-	f.id = len(d)
-	d = append(d, f)
+	f.id = len(*d)
+	*d = append(*d, f)
 	return f
 }
 
@@ -187,6 +188,19 @@ func (d *docFieldLst) getGroupTypeFieldLst() (rd docFieldLst) {
 	for _, v := range *d {
 		if v.isGroupType() {
 			rd = append(rd, v)
+		}
+	}
+	return
+}
+
+func (d *docFieldLst) getExtendParent(field *docField) (f *docField) {
+	if field.parent == nil {
+		f = nil
+	} else {
+		if field.parent.isExtend {
+			f = d.getExtendParent(field.parent)
+		} else {
+			f = field.parent
 		}
 	}
 	return
