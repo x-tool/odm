@@ -6,6 +6,7 @@ import (
 )
 
 type docField struct {
+	doc             *doc
 	name            string
 	selfType        *reflect.Type
 	kind            Kind
@@ -66,7 +67,7 @@ func (d *docField) isGroupType() (b bool) {
 	return d.kind.isGroupType()
 }
 
-func newDocField(d *docFieldLst, t *reflect.StructField, parent *docField) {
+func newDocField(_doc *doc, d *docFieldLst, t *reflect.StructField, parent *docField) {
 	fieldType := *t
 	reflectType := fieldType.Type
 	tag := fieldType.Tag.Get(tagName)
@@ -85,6 +86,7 @@ func newDocField(d *docFieldLst, t *reflect.StructField, parent *docField) {
 	}
 
 	field := &docField{
+		doc:             _doc,
 		name:            fieldType.Name,
 		selfType:        &reflectType,
 		kind:            kind,
@@ -116,14 +118,14 @@ func newDocField(d *docFieldLst, t *reflect.StructField, parent *docField) {
 		for i := 0; i < count; i++ {
 			_f := _fieldType.Field(i)
 			addFieldsLock.Add(1)
-			go newDocField(d, &_f, field)
+			go newDocField(_doc, d, &_f, field)
 		}
 	case Struct:
 		count := fieldType.Type.NumField()
 		for i := 0; i < count; i++ {
 			_f := fieldType.Type.Field(i)
 			addFieldsLock.Add(1)
-			go newDocField(d, &_f, field)
+			go newDocField(_doc, d, &_f, field)
 		}
 
 	}

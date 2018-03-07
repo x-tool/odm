@@ -2,37 +2,49 @@ package core
 
 import "reflect"
 
+type HandleType int
+
+const (
+	InsertData HandleType = iota
+	addData
+	updateData
+	deleteData
+)
+
 type Handle struct {
-	Col    *Col
-	Query  *query
-	Result *result
-	R      *reflect.Value
-	Err    error
+	col         *Col
+	target      *docField
+	Query       *query
+	Result      *result
+	OriginValue *reflect.Value
+	OriginType  reflect.Type
+	Err         error
 }
 
 func newHandle(c *Col) *Handle {
 	d := &Handle{
-		Col: c,
+		col: c,
 	}
 	return d
+
 }
 
 func (d *Handle) dbName() string {
-	return d.Col.database.name
+	return d.target.doc.col.database.name
 }
 
 func (d *Handle) colName() string {
-	return d.Col.name
+	return d.target.doc.col.name
 }
 
 func (d *Handle) insert(i interface{}) (err error) {
 	r := reflect.Indirect(reflect.ValueOf(i))
-	d.R = &r
+	d.OriginValue = &r
 
 	d.Query = newQuery(&r, d, "insert")
-	d.Result = newResult(&r, d.Col)
+	d.Result = newResult(&r, d.col)
 	// modeInsert(d)
-	err = d.Col.database.dialect.Insert(d) //.handle(d)
+	err = d.col.database.dialect.Insert(d) //.handle(d)
 	return
 }
 

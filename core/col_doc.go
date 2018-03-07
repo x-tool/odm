@@ -65,7 +65,7 @@ func newDocFields(d *doc, docSourceTPtr *reflect.Type) *docFieldLst {
 		for i := 0; i < cont; i++ {
 			field := docSourceT.Field(i)
 			addFieldsLock.Add(1)
-			go newDocField(&lst, &field, nil)
+			go newDocField(d, &lst, &field, nil)
 		}
 		// check Fields Name, Can't both same name in one Col
 		// doc.checkFieldsName()
