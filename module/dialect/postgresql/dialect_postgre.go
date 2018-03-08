@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"reflect"
+	"strings"
 	"sync"
 
 	"github.com/jackc/pgx"
@@ -119,23 +120,23 @@ func (d *dialectpostgre) SyncCols(colLst core.ColLst) {
 func (d *dialectpostgre) Session() *core.Session {
 	return new(core.Session)
 }
-func (d *dialectpostgre) Insert(doc *core.Handle) (err error) {
-	// var nameLst, valueLst []string
-	// rootFields := doc.Query.getRootFields()
-	// rootFields = doc.selectValidFields(rootFields)
-	// for _, v := range rootFields {
-	// 	nameLst = append(nameLst, v.DocField.Name)
-	// 	valueLst = append(valueLst, pg_valueToString(v))
-	// }
-	// nameLstStr := strings.Join(nameLst, ",")
-	// valueLstStr := strings.Join(valueLst, ",")
-	// sql := "INSERT INTO $colName ($typeLst) VALUES ($valueLst) RETURNING *"
-	// rawsql := tool.ReplaceStrings(sql, []string{
-	// 	"$colName", doc.Col.name,
-	// 	"$typeLst", nameLstStr,
-	// 	"$valueLst", valueLstStr,
-	// })
-	// err = d.OpenWithHandle(rawsql, doc)
+func (d *dialectpostgre) Insert(h *core.Handle) (err error) {
+	var nameLst, valueLst []string
+	rootFields := h.Query.getRootFields()
+	rootFields = h.selectValidFields(rootFields)
+	for _, v := range rootFields {
+		nameLst = append(nameLst, v.DocField.Name)
+		valueLst = append(valueLst, pg_valueToString(v))
+	}
+	nameLstStr := strings.Join(nameLst, ",")
+	valueLstStr := strings.Join(valueLst, ",")
+	sql := "INSERT INTO $colName ($typeLst) VALUES ($valueLst) RETURNING *"
+	rawsql := tool.ReplaceStrings(sql, []string{
+		"$colName", h.Col.name,
+		"$typeLst", nameLstStr,
+		"$valueLst", valueLstStr,
+	})
+	err = d.OpenWithHandle(rawsql, h)
 	return
 }
 func (d *dialectpostgre) Update(doc *core.Handle) (err error) {

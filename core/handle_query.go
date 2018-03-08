@@ -20,11 +20,11 @@ type queryItem struct {
 	whereAnd   bool
 }
 
-func newQuery(rV *reflect.Value, o *Handle, t string) *query {
+func newQuery(o *Handle) *query {
 	r := &query{
-		Handle:    o,
-		queryV:    rV,
-		queryKind: t,
+		Handle: o,
+		// queryV:    rV,
+		// queryKind: t,
 	}
 	r.setDependToDoc()
 	return r

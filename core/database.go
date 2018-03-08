@@ -16,6 +16,7 @@ type Database struct {
 	dialect Dialect
 	ColLst
 	history *history
+	mapCols map[string]*Col
 }
 
 type history struct {
@@ -41,6 +42,9 @@ func (d *Database) GetClient() *client.Client {
 
 func (d *Database) RegisterCol(c interface{}) {
 	_col := newCol(d, c)
+	if _, ok := d.mapCols[_col.GetName()]; !ok {
+		d.mapCols[_col.GetName()] = _col
+	}
 	d.ColLst = append(d.ColLst, _col)
 	syncLock.Done()
 }
@@ -66,4 +70,8 @@ func (d *Database) setHistory() {
 	if err != nil {
 		tool.Panic("DB", errors.New("Get colNames ERROR"))
 	}
+}
+
+func (d *Database) getColByName(name string) *Col {
+	return d.mapCols[name]
 }

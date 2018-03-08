@@ -2,23 +2,51 @@ package core
 
 import "reflect"
 
-type HandleType int
+type handleType int
 
 const (
-	InsertData HandleType = iota
-	addData
+	insertData handleType = iota
 	updateData
 	deleteData
 )
 
+type contrast int
+
+const (
+	sameData      contrast = iota // like
+	sameDataLeft                  // ??like
+	sameDataRight                 // like??
+	equalData                     // ==
+)
+
+type HandleFilter struct {
+	target   *docField
+	contrast contrast
+	value    interface{}
+}
+type HandleFilterLst []*HandleFilter
+
+type HandleSetValue struct {
+	target     *docField
+	handleType handleType
+	value      interface{}
+}
+type HandleSetValueLst []*HandleSetValue
+
+type HandleGroup struct {
+	filterLst HandleFilterLst
+	setLst    HandleSetValue
+}
+
 type Handle struct {
-	col         *Col
-	target      *docField
-	Query       *query
-	Result      *result
-	OriginValue *reflect.Value
-	OriginType  reflect.Type
-	Err         error
+	// ptr to col
+	col            *Col
+	filterCols     HandleFilterLst
+	HandleGroupLst []*HandleGroup
+	Result         *result
+	OriginValue    *reflect.Value
+	OriginType     reflect.Type
+	Err            error
 }
 
 func newHandle(c *Col) *Handle {
@@ -29,20 +57,19 @@ func newHandle(c *Col) *Handle {
 
 }
 
-func (d *Handle) dbName() string {
-	return d.target.doc.col.database.name
+func (d *Handle) GetDBName() string {
+	return d.col.database.name
 }
 
-func (d *Handle) colName() string {
-	return d.target.doc.col.name
+func (d *Handle) GetColName() string {
+	return d.col.name
 }
 
-func (d *Handle) insert(i interface{}) (err error) {
+func (d *Handle) insert(db *Database, i interface{}) (err error) {
 	r := reflect.Indirect(reflect.ValueOf(i))
+	d.col = db.GetColByName(GetColNameByReflectType(r.Type()))
 	d.OriginValue = &r
 
-	d.Query = newQuery(&r, d, "insert")
-	d.Result = newResult(&r, d.col)
 	// modeInsert(d)
 	err = d.col.database.dialect.Insert(d) //.handle(d)
 	return

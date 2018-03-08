@@ -67,6 +67,12 @@ func (d *docField) isGroupType() (b bool) {
 	return d.kind.isGroupType()
 }
 
+func (d *docField) getValueFromRootValue(v *reflect.Value) (r *reflect.Value) {
+	return
+}
+func (d *docField) json(v *reflect.Value) (json []byte) {
+	return
+}
 func newDocField(_doc *doc, d *docFieldLst, t *reflect.StructField, parent *docField) {
 	fieldType := *t
 	reflectType := fieldType.Type

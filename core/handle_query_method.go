@@ -11,7 +11,7 @@ func (q *query) newQueryItem(wL ...interface{}) {
 	if wLL != 3 && wLL != 4 {
 		return
 	}
-	w := wL[0].(string)
+	// w := wL[0].(string)
 	contrast := wL[1].(string)
 	i := wL[2]
 	var b bool
@@ -21,9 +21,9 @@ func (q *query) newQueryItem(wL ...interface{}) {
 
 	qItem := queryItem{
 		queryRootField: queryRootField{
-			DocField: q.Handle.dependtoDocOneStr(w),
-			zero:     false,
-			value:    reflect.ValueOf(i),
+			// DocField: q.Handle.dependtoDocOneStr(w),
+			zero:  false,
+			value: reflect.ValueOf(i),
 		},
 		whereCheck: contrast,
 		whereAnd:   b,
