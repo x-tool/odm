@@ -73,7 +73,7 @@ func mapTypeToValue(b interface{}, v *reflect.Value) {
 	}
 }
 
-func reflectToType(r *reflect.Type) (k Kind) {
+func reflectToKind(r *reflect.Type) (k Kind) {
 	_r := *r
 	rKind := _r.Kind()
 	switch rKind {

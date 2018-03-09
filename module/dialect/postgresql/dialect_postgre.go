@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"reflect"
+	"strconv"
 	"strings"
 	"sync"
 
@@ -17,16 +18,25 @@ const (
 	pg_timeFormat = "2006-01-02 03:04:05"
 )
 
-var typeMap = map[string]string{
-	"int":   "int",
-	"float": "float8",
+var typeMap = map[core.Kind]string{
+	core.Int:   "int",
+	core.Float: "float8",
 	// "text":   "text",
-	"Byte":   "bytea",
-	"time":   "timestamp",
-	"array":  "json",
-	"bool":   "json",
-	"string": "text",
-	"struct": "json",
+	core.Byte:   "bytea",
+	core.Time:   "timestamp",
+	core.Array:  "json",
+	core.Bool:   "json",
+	core.String: "text",
+	core.Struct: "json",
+}
+
+func valueToString(k core.Value) (s string) {
+	value := k.Value()
+	switch k.Kind() {
+	case core.Int:
+		s = strconv.Itoa(value)
+
+	}
 }
 
 type postgreConn struct {

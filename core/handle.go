@@ -24,6 +24,17 @@ type HandleFilter struct {
 	contrast contrast
 	value    interface{}
 }
+
+func (h HandleFilter) Kind() Kind {
+	return h.target.GetKind()
+}
+func (h HandleFilter) FieldName() string {
+	return h.target.GetName()
+}
+func (h HandleFilter) Vakue() interface{} {
+	return h.value
+}
+
 type HandleFilterLst []*HandleFilter
 
 type HandleSetValue struct {
@@ -31,6 +42,17 @@ type HandleSetValue struct {
 	handleType handleType
 	value      interface{}
 }
+
+func (h HandleSetValue) Kind() Kind {
+	return h.target.GetKind()
+}
+func (h HandleSetValue) FieldName() string {
+	return h.target.GetName()
+}
+func (h HandleSetValue) Vakue() interface{} {
+	return h.value
+}
+
 type HandleSetValueLst []*HandleSetValue
 
 type HandleGroup struct {
@@ -55,12 +77,11 @@ func (d *Handle) GetColName() string {
 	return d.col.name
 }
 
-func (d *Handle) insert(i interface{}) (err error) {
+func (d *Handle) insert(db *Database, i interface{}) (err error) {
 	d.setOrigin(i)
-	d.col = db.GetColByName(GetColNameByReflectType(d.GetOrigin().OriginType))
+	d.col = db.GetColByName(GetColNameByReflectType(d.GetOrigin().Type()))
 
-	// modeInsert(d)
-	err = d.col.database.dialect.Insert(d) //.handle(d)
+	err = db.dialect.Insert(d)
 	return
 }
 
@@ -123,4 +144,12 @@ func (o *Origin) setOrigin(i interface{}) {
 
 func (o *Origin) GetOrigin() *Origin {
 	return o
+}
+
+func (o *Origin) Value() *reflect.Value {
+	return o.OriginValue
+}
+
+func (o *Origin) Type() reflect.Type {
+	return o.OriginType
 }

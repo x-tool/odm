@@ -50,7 +50,7 @@ func newDocField(_doc *doc, d *docFieldLst, t *reflect.StructField, parent *docF
 	fieldType := *t
 	reflectType := fieldType.Type
 	tag := fieldType.Tag.Get(tagName)
-	kind := reflectToType(&reflectType)
+	kind := reflectToKind(&reflectType)
 	isExtend := checkdocFieldisExtend(t)
 	var _dependLst dependLst
 	var _extendDependLst dependLst
