@@ -31,12 +31,24 @@ func (d *doc) getFieldById(id int) (o *docField) {
 	}
 	return
 }
+
 func (d *doc) getFieldByName(name string) (o docFieldLst) {
 	return d.fieldNameMap[name]
 }
+
 func (d *doc) getFieldByTag(tag string) (o *docField) {
 	return d.fieldTagMap[tag]
 }
+
+func (d *doc) GetRootFields() (lst docFieldLst) {
+	for _, v := range d.fields {
+		if v.extendParent == nil && v.IsExtend() == false {
+			lst = append(lst, v)
+		}
+	}
+	return
+}
+
 func NewDoc(c *Col, i interface{}) (_doc *doc) {
 
 	// append doc.fields

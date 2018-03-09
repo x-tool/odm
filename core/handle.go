@@ -43,18 +43,8 @@ type Handle struct {
 	col            *Col
 	filterCols     HandleFilterLst
 	HandleGroupLst []*HandleGroup
-	Result         *result
-	OriginValue    *reflect.Value
-	OriginType     reflect.Type
-	Err            error
-}
-
-func newHandle(c *Col) *Handle {
-	d := &Handle{
-		col: c,
-	}
-	return d
-
+	Origin
+	Err error
 }
 
 func (d *Handle) GetDBName() string {
@@ -65,10 +55,9 @@ func (d *Handle) GetColName() string {
 	return d.col.name
 }
 
-func (d *Handle) insert(db *Database, i interface{}) (err error) {
-	r := reflect.Indirect(reflect.ValueOf(i))
-	d.col = db.GetColByName(GetColNameByReflectType(r.Type()))
-	d.OriginValue = &r
+func (d *Handle) insert(i interface{}) (err error) {
+	d.setOrigin(i)
+	d.col = db.GetColByName(GetColNameByReflectType(d.GetOrigin().OriginType))
 
 	// modeInsert(d)
 	err = d.col.database.dialect.Insert(d) //.handle(d)
@@ -110,4 +99,28 @@ func (d *Handle) selectValidFields(dLst []*queryRootField) (vLst []*queryRootFie
 		}
 	}
 	return
+}
+
+func newHandle(c *Col) *Handle {
+	d := &Handle{
+		col: c,
+	}
+	return d
+
+}
+
+type Origin struct {
+	result
+	OriginValue *reflect.Value
+	OriginType  reflect.Type
+}
+
+func (o *Origin) setOrigin(i interface{}) {
+	value := reflect.Indirect(reflect.ValueOf(i))
+	o.OriginValue = &value
+	o.OriginType = o.OriginValue.Type()
+}
+
+func (o *Origin) GetOrigin() *Origin {
+	return o
 }

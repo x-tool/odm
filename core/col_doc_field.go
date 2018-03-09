@@ -3,17 +3,19 @@ package core
 import (
 	"reflect"
 	"sync"
+
+	"github.com/x-tool/tool"
 )
 
 type docField struct {
 	doc             *doc
 	name            string
-	selfType        *reflect.Type
+	selfType        reflect.Type
 	kind            Kind
 	id              int
 	isExtend        bool
-	parent          *docField // field golang parent real ID; default:-1
-	extendParent    *docField // field Handle parent ID; default:-1
+	parent          *docField // field golang parent real
+	extendParent    *docField // field Handle parent
 	childLst        docFieldLst
 	dependLst       dependLst
 	extendDependLst dependLst
@@ -36,29 +38,6 @@ func (d *docField) IsExtend() bool {
 	return d.isExtend
 }
 
-func (d *docField) getRootFieldDB() (r *docField) {
-	switch len(d.dependLst) {
-	case 0:
-		r = nil
-	default:
-		if d.dependLst[0].isExtend {
-			r = d.dependLst[1]
-		} else {
-			r = d.dependLst[0]
-		}
-	}
-	return r
-}
-
-func (d *docField) getDependLstDB() (r docFieldLst) {
-	for _, v := range d.dependLst {
-		if v.isExtend {
-			r = append(r, v)
-		}
-	}
-	return
-}
-
 func (d *docField) isSingleType() (b bool) {
 	return !d.kind.isGroupType()
 }
@@ -67,12 +46,6 @@ func (d *docField) isGroupType() (b bool) {
 	return d.kind.isGroupType()
 }
 
-func (d *docField) getValueFromRootValue(v *reflect.Value) (r *reflect.Value) {
-	return
-}
-func (d *docField) json(v *reflect.Value) (json []byte) {
-	return
-}
 func newDocField(_doc *doc, d *docFieldLst, t *reflect.StructField, parent *docField) {
 	fieldType := *t
 	reflectType := fieldType.Type
@@ -93,8 +66,8 @@ func newDocField(_doc *doc, d *docFieldLst, t *reflect.StructField, parent *docF
 
 	field := &docField{
 		doc:             _doc,
-		name:            fieldType.Name,
-		selfType:        &reflectType,
+		name:            tool.GetFullName(reflectType),
+		selfType:        reflectType,
 		kind:            kind,
 		parent:          parent,
 		isExtend:        isExtend,

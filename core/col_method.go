@@ -1,5 +1,5 @@
 package core
 
-func (c *Col) GetRootDetails() (lst docFieldLst) {
+func (c *Col) GetRootFields() (lst docFieldLst) {
 	return c.doc.GetRootFields()
 }
