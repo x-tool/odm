@@ -4,7 +4,6 @@ import (
 	"errors"
 	"fmt"
 	"reflect"
-	"strconv"
 	"strings"
 	"sync"
 
@@ -30,13 +29,36 @@ var typeMap = map[core.Kind]string{
 	core.Struct: "json",
 }
 
-func valueToString(k core.Value) (s string) {
-	value := k.Value()
-	switch k.Kind() {
-	case core.Int:
-		s = strconv.Itoa(value)
+func kindToString(k core.Kind) (s string) {
+	return typeMap[k]
+}
 
+func valueToString(value core.Value) (s string) {
+	_value := *value
+	_type := _value.Type()
+	str := core.ValueToString(value)
+
+	// postgre type handle
+	switch _type.Kind() {
+	case reflect.Struct:
+	default:
 	}
+
+	// format Strings
+	switch _type.Kind() {
+	case reflect.Int:
+		fallthrough
+	case reflect.Int8:
+		fallthrough
+	case reflect.Int16:
+		fallthrough
+	case reflect.Int32:
+		fallthrough
+	case reflect.Int64:
+	default:
+		s = "'" + str + "'"
+	}
+	return
 }
 
 type postgreConn struct {
@@ -82,9 +104,10 @@ func (d *dialectpostgre) Init(c *client.Client) {
 // 	return r
 // }
 
-func (d *dialectpostgre) SwitchType(s string) string {
-	return typeMap[s]
-}
+// func (d *dialectpostgre) SwitchType(s string) string {
+// 	return typeMap[s]
+// }
+
 func (d *dialectpostgre) GetColNames() (ColNames []string, err error) {
 	type _result struct {
 		Tablename  string
@@ -107,7 +130,7 @@ func (d *dialectpostgre) SyncCols(colLst core.ColLst) {
 			var sql string
 			var colFields string
 			colName := v.GetName()
-			fieldLst := v.GetRootDetails()
+			fieldLst := v.GetRootFields()
 			var fieldStringLst []string
 			//output field name and typestr in colFields
 			for _, _v := range fieldLst {
@@ -131,22 +154,19 @@ func (d *dialectpostgre) Session() *core.Session {
 	return new(core.Session)
 }
 func (d *dialectpostgre) Insert(h *core.Handle) (err error) {
-	var nameLst, valueLst []string
-	rootFields := h.Query.getRootFields()
-	rootFields = h.selectValidFields(rootFields)
+	var valueLst []string
+	rootFields := h.Col.GetRootFields()
 	for _, v := range rootFields {
-		nameLst = append(nameLst, v.DocField.Name)
-		valueLst = append(valueLst, pg_valueToString(v))
+		valueLst = append(valueLst, valueToString(v.GetValueFromRootValue(h.OriginValue)))
 	}
-	nameLstStr := strings.Join(nameLst, ",")
 	valueLstStr := strings.Join(valueLst, ",")
-	sql := "INSERT INTO $colName ($typeLst) VALUES ($valueLst) RETURNING *"
+	sql := "INSERT INTO $colName VALUES ($valueLst) RETURNING *"
 	rawsql := tool.ReplaceStrings(sql, []string{
-		"$colName", h.Col.name,
-		"$typeLst", nameLstStr,
+		"$colName", h.Col.GetName(),
 		"$valueLst", valueLstStr,
 	})
-	err = d.OpenWithHandle(rawsql, h)
+	err = d.Open(rawsql, nil)
+	// err = d.OpenWithHandle(rawsql, h)
 	return
 }
 func (d *dialectpostgre) Update(doc *core.Handle) (err error) {
@@ -274,7 +294,7 @@ func (d *dialectpostgre) Open(sql string, results interface{}) (err error) {
 // 	rows, err := pgConn.Query(sql)
 // 	defer pgConn.Close()
 
-// 	resultV := *Handle.R
+// 	resultV := *Handle.Result
 // 	resultT := resultV.Type()
 // 	if resultT.Kind() == reflect.Slice {
 // 		for rows.Next() {
@@ -295,7 +315,3 @@ func (d *dialectpostgre) Open(sql string, results interface{}) (err error) {
 // 	}
 
 // }
-
-func kindToString(k core.Kind) (s string) {
-	return typeMap[k.String()]
-}

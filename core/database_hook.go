@@ -12,7 +12,7 @@ type Dialect interface {
 	Init(*client.Client)
 	// Conn() (Conn, error)
 	GetColNames() ([]string, error)
-	SwitchType(string) string
+	// SwitchType(string) string
 	SyncCols(ColLst)
 	// base handel
 	Insert(*Handle) error

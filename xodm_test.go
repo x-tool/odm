@@ -37,6 +37,8 @@ func Test_connection(t *testing.T) {
 	testdata := new(myDoc)
 	testdata.Name = "haha,I get"
 	testdata.Id = 1
+
+	db.Insert(testdata)
 	// col := db.GetCol(new(myDoc))
 	// _, err := col.data(testdata)
 	// log.Print(testdata)

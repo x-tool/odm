@@ -3,8 +3,6 @@ package core
 import (
 	"reflect"
 	"sync"
-
-	"github.com/x-tool/tool"
 )
 
 type docField struct {
@@ -66,7 +64,7 @@ func newDocField(_doc *doc, d *docFieldLst, t *reflect.StructField, parent *docF
 
 	field := &docField{
 		doc:             _doc,
-		name:            tool.GetFullName(reflectType),
+		name:            t.Name,
 		selfType:        reflectType,
 		kind:            kind,
 		parent:          parent,
@@ -134,15 +132,6 @@ func (d *docFieldLst) getFieldsByName(name string) (o docFieldLst) {
 	for _, v := range *d {
 		if v.GetName() == name {
 			o = append(o, v)
-		}
-	}
-	return
-}
-
-func (d *docFieldLst) getRootFieldLst() (rd docFieldLst) {
-	for _, v := range *d {
-		if v.parent == nil {
-			rd = append(rd, v)
 		}
 	}
 	return

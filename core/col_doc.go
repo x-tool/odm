@@ -16,6 +16,7 @@ type doc struct {
 	mode         colMode
 	fieldTagMap  map[string]*docField
 	fieldNameMap map[string]docFieldLst
+	rootFields   []*docField
 }
 
 func (d *doc) getChildFields(i *docField) (r docFieldLst) {
@@ -62,8 +63,9 @@ func NewDoc(c *Col, i interface{}) (_doc *doc) {
 	fields := newDocFields(_doc, &docSourceT)
 	_doc.fields = *fields
 	_doc.mode = checkDocMode(docSourceT)
-	_doc.fieldTagMap = makeDocFieldTagMap(&_doc.fields)
-	_doc.fieldNameMap = makeDocFieldNameMap(&_doc.fields)
+	_doc.fieldTagMap = _doc.makeDocFieldTagMap()
+	_doc.fieldNameMap = _doc.makeDocFieldNameMap()
+	_doc.rootFields = _doc.makerootFieldNameMap()
 	return
 }
 
@@ -88,8 +90,8 @@ func newDocFields(d *doc, docSourceTPtr *reflect.Type) *docFieldLst {
 	return &lst
 }
 
-func makeDocFieldTagMap(d *docFieldLst) (m map[string]*docField) {
-	_d := *d
+func (d *doc) makeDocFieldTagMap() (m map[string]*docField) {
+	_d := d.fields
 	for _, v := range _d {
 		tagPtr := v.tag.ptr
 		if tagPtr != "" {
@@ -99,18 +101,29 @@ func makeDocFieldTagMap(d *docFieldLst) (m map[string]*docField) {
 	return m
 }
 
-func makeDocFieldNameMap(d *docFieldLst) (m map[string]docFieldLst) {
-	_d := *d
+func (d *doc) makeDocFieldNameMap() map[string]docFieldLst {
+	_d := d.fields
+	var _map = make(map[string]docFieldLst)
 	for _, v := range _d {
 		name := v.GetName()
-		if _, ok := m[name]; ok {
-			m[name] = append(m[name], v)
-		} else {
+		// new m[name]
+		if _, ok := _map[name]; !ok {
 			var temp docFieldLst
-			m[name] = append(temp, v)
+			_map[name] = temp
+		}
+		_map[name] = append(_map[name], v)
+	}
+	return _map
+}
+
+func (d *doc) makerootFieldNameMap() (lst []*docField) {
+	_d := d.fields
+	for _, v := range _d {
+		if v.extendParent == nil {
+			lst = append(lst, v)
 		}
 	}
-	return m
+	return
 }
 
 func checkDocMode(docSourceT reflect.Type) (m colMode) {

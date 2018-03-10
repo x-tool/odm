@@ -28,6 +28,7 @@ func NewDatabase(name string, c *client.Client, d Dialect) *Database {
 	_d.name = name
 	_d.client = c
 	_d.dialect = d
+	_d.mapCols = make(map[string]*Col)
 	_d.setHistory()
 	return _d
 }
@@ -74,4 +75,10 @@ func (d *Database) setHistory() {
 
 func (d *Database) getColByName(name string) *Col {
 	return d.mapCols[name]
+}
+
+func (d *Database) Insert(i interface{}) {
+	col := d.GetCol(i)
+	handle := newHandle(col)
+	handle.insert(d, i)
 }

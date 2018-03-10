@@ -61,8 +61,8 @@ type HandleGroup struct {
 }
 
 type Handle struct {
-	// ptr to col
-	col            *Col
+	// ptr to Col
+	Col            *Col
 	filterCols     HandleFilterLst
 	HandleGroupLst []*HandleGroup
 	Origin
@@ -70,17 +70,15 @@ type Handle struct {
 }
 
 func (d *Handle) GetDBName() string {
-	return d.col.database.name
+	return d.Col.database.name
 }
 
 func (d *Handle) GetColName() string {
-	return d.col.name
+	return d.Col.name
 }
 
 func (d *Handle) insert(db *Database, i interface{}) (err error) {
 	d.setOrigin(i)
-	d.col = db.GetColByName(GetColNameByReflectType(d.GetOrigin().Type()))
-
 	err = db.dialect.Insert(d)
 	return
 }
@@ -124,14 +122,14 @@ func (d *Handle) selectValidFields(dLst []*queryRootField) (vLst []*queryRootFie
 
 func newHandle(c *Col) *Handle {
 	d := &Handle{
-		col: c,
+		Col: c,
 	}
 	return d
 
 }
 
 type Origin struct {
-	result
+	Result
 	OriginValue *reflect.Value
 	OriginType  reflect.Type
 }

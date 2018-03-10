@@ -6,7 +6,7 @@ import (
 )
 
 /// error
-func (d *docField) getValueFromRootValue(rootValue *reflect.Value) *reflect.Value {
+func (d *docField) GetValueFromRootValue(rootValue *reflect.Value) *reflect.Value {
 	_r := *rootValue
 	if len(d.dependLst) != 0 {
 		for _, v := range d.dependLst {
