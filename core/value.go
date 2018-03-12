@@ -7,29 +7,46 @@ import (
 	"time"
 )
 
-type HandleValue struct {
-	v    interface{}
-	zero bool
-	doc  *doc
+type Value struct {
+	field    *docField
+	origin   interface{}
+	reflect  *reflect.Value
+	hasValue bool
+	zero     bool
 }
 
-func newValue(v interface{}, doc *doc) (o *HandleValue) {
-	o = &HandleValue{
-		v:   v,
-		doc: doc,
+func newValue(v interface{}, ptr string) (o *Value) {
+	_v := reflect.ValueOf(v)
+	o = &Value{
+		origin:  v,
+		reflect: &_v,
 	}
 	return o
 }
 
-type Value interface {
-	Name() string
-	Value() interface{}
-	Kind() Kind
+func (v *Value) Value() *docField {
+	return v.field
 }
 
-func ValueToString(value *reflect.Value) (s string) {
-	v := *value
-	valueType := v.Type()
+func (v *Value) Kind() Kind {
+	return v.field.GetKind()
+}
+
+func (v *Value) FieldName() string {
+	return v.field.GetName()
+}
+
+func (v *Value) ReflectValue() *reflect.Value {
+	return v.reflect
+}
+
+func (v *Value) ReflectType() reflect.Type {
+	return v.field.selfType
+}
+
+func ValueToString(value Value) (s string) {
+	v := *value.ReflectValue()
+	valueType := value.ReflectType()
 	switch valueType.Kind() {
 	case reflect.Bool:
 		s = strconv.FormatBool(v.Bool())
@@ -71,7 +88,7 @@ func ValueToString(value *reflect.Value) (s string) {
 			s = string(b)
 		}
 	case reflect.String:
-		s = value.String()
+		s = v.String()
 	case reflect.Struct:
 		pkgPath := valueType.PkgPath()
 		switch pkgPath {

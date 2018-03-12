@@ -29,13 +29,8 @@ func newCol(db *Database, i interface{}) *Col {
 
 // GetColName get interface name
 func GetColName(i interface{}) (name string) {
-	// if i = ColInterface use method to get name
-	if ColI, ok := i.(ColInterface); ok {
-		name = ColI.ColName()
-	} else {
-		v := reflect.TypeOf(i)
-		name = GetColNameByReflectType(v)
-	}
+	v := reflect.TypeOf(i)
+	name = GetColNameByReflectType(v)
 	return
 }
 
