@@ -2,6 +2,7 @@ package core
 
 import (
 	"errors"
+	"fmt"
 	"reflect"
 
 	"github.com/x-tool/tool"
@@ -12,7 +13,7 @@ type doc struct {
 	col          *Col
 	fields       docFieldLst
 	sourceType   *reflect.Type
-	mode         colMode
+	mode         *docField
 	fieldTagMap  map[string]*docField
 	fieldNameMap map[string]docFieldLst
 	rootFields   []*docField
@@ -56,10 +57,10 @@ func NewDoc(c *Col, i interface{}) (_doc *doc) {
 	}
 	fields := newDocFields(_doc, &docSourceT)
 	_doc.fields = *fields
-	_doc.mode = checkDocMode(docSourceT)
 	_doc.fieldTagMap = _doc.makeDocFieldTagMap()
 	_doc.fieldNameMap = _doc.makeDocFieldNameMap()
 	_doc.rootFields = _doc.makerootFieldNameMap()
+	_doc.mode = _doc.findDocMode()
 	return
 }
 
@@ -100,7 +101,7 @@ func (d *doc) makeDocFieldNameMap() map[string]docFieldLst {
 	_d := d.fields
 	var _map = make(map[string]docFieldLst)
 	for _, v := range _d {
-		name := v.GetName()
+		name := v.Name()
 		// new m[name]
 		if _, ok := _map[name]; !ok {
 			var temp docFieldLst
@@ -121,8 +122,29 @@ func (d *doc) makerootFieldNameMap() (lst []*docField) {
 	return
 }
 
-func checkDocMode(docSourceT reflect.Type) (m colMode) {
+func (d *doc) findDocMode() (field *docField) {
+	for _, v := range d.rootFields {
+		_value := reflect.New(v.selfType)
+		fmt.Print(v.selfType.PkgPath(), v.selfType.Name())
+		_, ok := _value.Interface().(DocMode)
+		if ok {
+
+		}
+		_type := reflect.TypeOf(*new(DocMode))
+		fmt.Print(_type.Kind())
+		if v.selfType.Implements(_type) {
+			field = v
+			break
+		}
+		// if v.selfType.Implements(reflect.TypeOf(modeInterface)) {
+
+		// }
+	}
 	return
+}
+
+func (d *doc) getDocMode() *docField {
+	return d.mode
 }
 
 type docLst []*doc

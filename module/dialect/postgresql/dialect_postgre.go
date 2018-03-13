@@ -132,13 +132,13 @@ func (d *dialectpostgre) SyncCols(colLst core.ColLst) {
 			defer syncLock.Done()
 			var sql string
 			var colFields string
-			colName := v.GetName()
+			colName := v.Name()
 			fieldLst := v.GetRootFields()
 			var fieldStringLst []string
 			//output field name and typestr in colFields
 			for _, _v := range fieldLst {
-				fieldKind := kindToString(_v.GetKind())
-				name := _v.GetName()
+				fieldKind := kindToString(_v.Kind())
+				name := _v.Name()
 				fieldStringLst = append(fieldStringLst, name+" "+fieldKind)
 			}
 			colFields = tool.JoinStringWithComma(fieldStringLst)
@@ -164,7 +164,7 @@ func (d *dialectpostgre) Insert(h *core.Handle) (err error) {
 	valueLstStr := strings.Join(valueLst, ",")
 	sql := "INSERT INTO $colName VALUES ($valueLst) RETURNING *"
 	rawsql := tool.ReplaceStrings(sql, []string{
-		"$colName", h.Col.GetName(),
+		"$colName", h.Col.Name(),
 		"$valueLst", valueLstStr,
 	})
 	err = d.Open(rawsql, nil)

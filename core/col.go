@@ -10,7 +10,7 @@ type Col struct {
 	doc      *doc
 }
 
-func (c *Col) GetName() string {
+func (c *Col) Name() string {
 	return c.name
 }
 
@@ -54,7 +54,7 @@ func (cL *ColLst) GetCol(i interface{}) (c *Col) {
 func (cL *ColLst) GetColByName(name string) *Col {
 	var Col *Col
 	for _, v := range *cL {
-		if v.GetName() == name {
+		if v.Name() == name {
 			Col = v
 			break
 		}

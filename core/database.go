@@ -28,7 +28,7 @@ func NewDatabase(name string, c *client.Client, d Dialect) *Database {
 	return _d
 }
 
-func (d *Database) GetName() string {
+func (d *Database) Name() string {
 	return d.name
 }
 

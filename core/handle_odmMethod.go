@@ -3,6 +3,7 @@ package core
 import "reflect"
 
 func (d *Handle) insert(v *reflect.Value) (err error) {
+	d.execBefore()
 	d.setValue = v
 	err = d.Col.database.dialect.Insert(d)
 	return
@@ -33,4 +34,11 @@ func (d *Handle) Where(s string) *Handle {
 func (d *Handle) Limit(s string) *Handle {
 	// d.Handle.limit = s
 	return d
+}
+
+func (d *Handle) execBefore() {
+	d.callDocMode()
+}
+func (d *Handle) callDocMode() {
+	callDocMode(d)
 }

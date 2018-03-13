@@ -21,7 +21,7 @@ type docField struct {
 	funcLst         map[string]string
 }
 
-func (d *docField) GetName() string {
+func (d *docField) Name() string {
 	return d.name
 }
 
@@ -29,7 +29,7 @@ func (d *docField) GetID() int {
 	return d.id
 }
 
-func (d *docField) GetKind() Kind {
+func (d *docField) Kind() Kind {
 	return d.kind
 }
 func (d *docField) IsExtend() bool {
@@ -132,7 +132,7 @@ func (d *docFieldLst) addItem(f *docField) *docField {
 
 func (d *docFieldLst) getFieldsByName(name string) (o docFieldLst) {
 	for _, v := range *d {
-		if v.GetName() == name {
+		if v.Name() == name {
 			o = append(o, v)
 		}
 	}

@@ -35,11 +35,11 @@ func (v *Value) Value() *docField {
 }
 
 func (v *Value) Kind() Kind {
-	return v.field.GetKind()
+	return v.field.Kind()
 }
 
 func (v *Value) FieldName() string {
-	return v.field.GetName()
+	return v.field.Name()
 }
 
 func (v *Value) ReflectValue() *reflect.Value {

@@ -29,10 +29,10 @@ type HandleFilter struct {
 }
 
 func (h HandleFilter) Kind() Kind {
-	return h.target.GetKind()
+	return h.target.Kind()
 }
 func (h HandleFilter) FieldName() string {
-	return h.target.GetName()
+	return h.target.Name()
 }
 func (h HandleFilter) Vakue() interface{} {
 	return h.value
@@ -47,10 +47,10 @@ type HandleSetValue struct {
 }
 
 func (h HandleSetValue) Kind() Kind {
-	return h.target.GetKind()
+	return h.target.Kind()
 }
 func (h HandleSetValue) FieldName() string {
-	return h.target.GetName()
+	return h.target.Name()
 }
 func (h HandleSetValue) Vakue() interface{} {
 	return h.value
@@ -81,7 +81,7 @@ func (d *Handle) GetDBName() string {
 }
 
 func (d *Handle) GetColName() string {
-	return d.Col.GetName()
+	return d.Col.Name()
 }
 
 func (d *Handle) Value() *reflect.Value {

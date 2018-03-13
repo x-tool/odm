@@ -12,14 +12,14 @@ func (d *docField) GetValueFromRootValue(rootValue *reflect.Value) *reflect.Valu
 		for _, v := range d.dependLst {
 			// if dependLst parent is extend, should get field from grandparent
 			if v.kind == Struct {
-				_r = _r.FieldByName(v.GetName())
+				_r = _r.FieldByName(v.Name())
 			} else {
 				break // !!!!!! mark wait modify !!!!!!!
 			}
 		}
-		_r = _r.FieldByName(d.GetName())
+		_r = _r.FieldByName(d.Name())
 	} else {
-		_r = _r.FieldByName(d.GetName())
+		_r = _r.FieldByName(d.Name())
 	}
 
 	return &_r

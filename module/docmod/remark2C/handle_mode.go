@@ -32,13 +32,6 @@ func (n *NormalCol) Name() (s string) {
 	return "NormalCol"
 }
 
-type Mode interface {
-	Create()
-	Update()
-	Delete()
-	Name()
-}
-
 func isDocMode(s string) bool {
 	var check bool
 	if s == "NormalCol" {

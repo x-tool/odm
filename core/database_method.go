@@ -9,8 +9,8 @@ import (
 
 func (d *Database) RegisterCol(c interface{}) {
 	_col := newCol(d, c)
-	if _, ok := d.mapCols[_col.GetName()]; !ok {
-		d.mapCols[_col.GetName()] = _col
+	if _, ok := d.mapCols[_col.Name()]; !ok {
+		d.mapCols[_col.Name()] = _col
 	}
 	d.ColLst = append(d.ColLst, _col)
 	syncLock.Done()
