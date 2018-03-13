@@ -18,7 +18,6 @@ func (d *Handle) delete(err error) {
 	// } else {
 	// 	err = d.DB.Dialect.Delete(d)
 	// }
-
 	// return
 }
 
