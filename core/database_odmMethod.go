@@ -2,8 +2,9 @@ package core
 
 import "reflect"
 
-func (d *Database) Insert(i interface{}) (h *Handle) {
+func (d *Database) Insert(i interface{}) (err error) {
 	value := reflect.Indirect(reflect.ValueOf(i))
 	col := d.GetColByName(value.Type().Name())
-	return newHandle(col, insertData, &value)
+	handle := newHandle(col, insertData, nil)
+	return handle.insert(&value)
 }

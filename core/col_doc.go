@@ -3,7 +3,6 @@ package core
 import (
 	"errors"
 	"reflect"
-	"sync"
 
 	"github.com/x-tool/tool"
 )
@@ -41,13 +40,8 @@ func (d *doc) getFieldByTag(tag string) (o *docField) {
 	return d.fieldTagMap[tag]
 }
 
-func (d *doc) GetRootFields() (lst docFieldLst) {
-	for _, v := range d.fields {
-		if v.extendParent == nil && v.IsExtend() == false {
-			lst = append(lst, v)
-		}
-	}
-	return
+func (d *doc) GetRootFields() docFieldLst {
+	return d.rootFields
 }
 
 func NewDoc(c *Col, i interface{}) (_doc *doc) {
@@ -69,7 +63,7 @@ func NewDoc(c *Col, i interface{}) (_doc *doc) {
 	return
 }
 
-var addFieldsLock sync.WaitGroup
+// var addFieldsLock sync.WaitGroup
 
 func newDocFields(d *doc, docSourceTPtr *reflect.Type) *docFieldLst {
 	var lst docFieldLst
@@ -78,15 +72,16 @@ func newDocFields(d *doc, docSourceTPtr *reflect.Type) *docFieldLst {
 		cont := docSourceT.NumField()
 		for i := 0; i < cont; i++ {
 			field := docSourceT.Field(i)
-			addFieldsLock.Add(1)
-			go newDocField(d, &lst, &field, nil)
+			// addFieldsLock.Add(1)
+			// go newDocField(d, &lst, &field, nil)
+			newDocField(d, &lst, &field, nil)
 		}
 		// check Fields Name, Can't both same name in one Col
 		// doc.checkFieldsName()
 	} else {
 		tool.Panic("DB", errors.New("doc type is "+docSourceT.Kind().String()+"!,Type should be Struct"))
 	}
-	addFieldsLock.Wait()
+	// addFieldsLock.Wait()
 	return &lst
 }
 
@@ -119,7 +114,7 @@ func (d *doc) makeDocFieldNameMap() map[string]docFieldLst {
 func (d *doc) makerootFieldNameMap() (lst []*docField) {
 	_d := d.fields
 	for _, v := range _d {
-		if v.extendParent == nil {
+		if v.extendParent == nil && v.IsExtend() == false {
 			lst = append(lst, v)
 		}
 	}

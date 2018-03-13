@@ -23,9 +23,11 @@ func (n *NormalCol) Create() {
 func (n *NormalCol) Update() {
 	n.UpdateTime = time.Now()
 }
+
 func (n *NormalCol) Delete() {
 	n.DeleteTime = time.Now()
 }
+
 func (n *NormalCol) Name() (s string) {
 	return "NormalCol"
 }

@@ -1,6 +1,9 @@
 package core
 
-import "reflect"
+import (
+	"context"
+	"reflect"
+)
 
 type handleType int
 
@@ -64,12 +67,13 @@ type Handle struct {
 	// ptr to Col
 	Col *Col
 	handleType
-	filterCols     HandleFilterLst
+	context        context.Context
+	filterDocs     HandleFilterLst
 	HandleGroupLst []*HandleGroup
-	Result
-	OriginValue *reflect.Value
-	OriginType  reflect.Type
-	Err         error
+	result         interface{}
+	setValue       *reflect.Value
+
+	Err error
 }
 
 func (d *Handle) GetDBName() string {
@@ -77,40 +81,11 @@ func (d *Handle) GetDBName() string {
 }
 
 func (d *Handle) GetColName() string {
-	return d.Col.name
+	return d.Col.GetName()
 }
 
-func (d *Handle) insert(db *Database, i interface{}) (err error) {
-	err = db.dialect.Insert(d)
-	return
-}
-
-func (d *Handle) update(i interface{}) {
-
-}
-
-func (d *Handle) delete(err error) {
-	// if d.Col.doc.getDeleteFieldName() != "" {
-	// 	err = d.DB.Dialect.Update(d)
-	// } else {
-	// 	err = d.DB.Dialect.Delete(d)
-	// }
-
-	// return
-}
-
-func (d *Handle) get(i interface{}) {
-
-}
-
-func (d *Handle) Where(s string) *Handle {
-	// d.Handle.where = s
-	return d
-}
-
-func (d *Handle) Limit(s string) *Handle {
-	// d.Handle.limit = s
-	return d
+func (d *Handle) Value() *reflect.Value {
+	return d.setValue
 }
 
 func (d *Handle) selectValidFields(dLst []*queryRootField) (vLst []*queryRootField) {
@@ -122,14 +97,11 @@ func (d *Handle) selectValidFields(dLst []*queryRootField) (vLst []*queryRootFie
 	return
 }
 
-func newHandle(col *Col, h handleType, value *reflect.Value) *Handle {
-	_value := *value
-	_type := _value.Type()
+func newHandle(col *Col, h handleType, con context.Context) *Handle {
 	d := &Handle{
-		Col:         col,
-		handleType:  h,
-		OriginValue: value,
-		OriginType:  _type,
+		Col:        col,
+		handleType: h,
+		context:    con,
 	}
 	return d
 

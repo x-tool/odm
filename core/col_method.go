@@ -9,9 +9,10 @@ func (c *Col) GetRootFields() docFieldLst {
 	return lst
 }
 
-func (c *Col) GetRootValues(rootValue *reflect.Value) (valueLst []*reflect.Value) {
+func (c *Col) GetRootValues(rootValue *reflect.Value) (valueLst ValueLst) {
 	for _, v := range c.GetRootFields() {
-		valueLst = append(valueLst, v.GetValueFromRootValue(rootValue))
+		value := newValueByReflect(v.GetValueFromRootValue(rootValue), v)
+		valueLst = append(valueLst, value)
 	}
 	return
 }

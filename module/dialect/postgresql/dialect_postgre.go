@@ -6,6 +6,7 @@ import (
 	"reflect"
 	"strings"
 	"sync"
+	"time"
 
 	"github.com/jackc/pgx"
 	"github.com/x-tool/odm/client"
@@ -33,19 +34,21 @@ func kindToString(k core.Kind) (s string) {
 	return typeMap[k]
 }
 
-func valueToString(value core.Value) (s string) {
+func valueToString(value *core.Value) (str string) {
 	_value := *value
-	_type := _value.Type()
-	str := core.ValueToString(value)
+	kind := _value.Kind()
 
 	// postgre type handle
-	switch _type.Kind() {
-	case reflect.Struct:
+	switch kind {
+	case core.Time:
+		str = value.Interface().(time.Time).Format("2006-01-02 15:04:05")
+	// default use core default process mode
 	default:
+		str = core.ValueToString(value)
 	}
 
 	// format Strings
-	switch _type.Kind() {
+	switch _value.ReflectType().Kind() {
 	case reflect.Int:
 		fallthrough
 	case reflect.Int8:
@@ -56,7 +59,7 @@ func valueToString(value core.Value) (s string) {
 		fallthrough
 	case reflect.Int64:
 	default:
-		s = "'" + str + "'"
+		str = "'" + str + "'"
 	}
 	return
 }
@@ -155,9 +158,8 @@ func (d *dialectpostgre) Session() *core.Session {
 }
 func (d *dialectpostgre) Insert(h *core.Handle) (err error) {
 	var valueLst []string
-	rootFields := h.Col.GetRootFields()
-	for _, v := range rootFields {
-		valueLst = append(valueLst, valueToString(v.GetValueFromRootValue(h.OriginValue)))
+	for _, v := range h.GetRootValues() {
+		valueLst = append(valueLst, valueToString(v))
 	}
 	valueLstStr := strings.Join(valueLst, ",")
 	sql := "INSERT INTO $colName VALUES ($valueLst) RETURNING *"

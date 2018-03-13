@@ -94,19 +94,21 @@ func newDocField(_doc *doc, d *docFieldLst, t *reflect.StructField, parent *docF
 		count := _fieldType.NumField()
 		for i := 0; i < count; i++ {
 			_f := _fieldType.Field(i)
-			addFieldsLock.Add(1)
-			go newDocField(_doc, d, &_f, field)
+			// addFieldsLock.Add(1)
+			// go newDocField(_doc, d, &_f, field)
+			newDocField(_doc, d, &_f, field)
 		}
 	case Struct:
 		count := fieldType.Type.NumField()
 		for i := 0; i < count; i++ {
 			_f := fieldType.Type.Field(i)
-			addFieldsLock.Add(1)
-			go newDocField(_doc, d, &_f, field)
+			// addFieldsLock.Add(1)
+			// go newDocField(_doc, d, &_f, field)
+			newDocField(_doc, d, &_f, field)
 		}
 
 	}
-	addFieldsLock.Done()
+	// addFieldsLock.Done()
 }
 
 func checkdocFieldisExtend(r *reflect.StructField) (b bool) {

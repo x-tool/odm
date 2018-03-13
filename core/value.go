@@ -7,23 +7,29 @@ import (
 	"time"
 )
 
+type ValueLst []*Value
 type Value struct {
 	field    *docField
-	origin   interface{}
 	reflect  *reflect.Value
 	hasValue bool
 	zero     bool
 }
 
-func newValue(v interface{}, ptr string) (o *Value) {
+func newValue(v interface{}, field *docField) (o *Value) {
 	_v := reflect.ValueOf(v)
 	o = &Value{
-		origin:  v,
+		field:   field,
 		reflect: &_v,
 	}
 	return o
 }
-
+func newValueByReflect(v *reflect.Value, field *docField) (o *Value) {
+	o = &Value{
+		field:   field,
+		reflect: v,
+	}
+	return o
+}
 func (v *Value) Value() *docField {
 	return v.field
 }
@@ -44,8 +50,17 @@ func (v *Value) ReflectType() reflect.Type {
 	return v.field.selfType
 }
 
-func ValueToString(value Value) (s string) {
-	v := *value.ReflectValue()
+func (v *Value) Interface() interface{} {
+	return v.reflect.Interface()
+}
+
+func (v *Value) String() string {
+	return ValueToString(v)
+}
+
+func ValueToString(value *Value) (s string) {
+	_value := *value
+	v := *_value.ReflectValue()
 	valueType := value.ReflectType()
 	switch valueType.Kind() {
 	case reflect.Bool:
