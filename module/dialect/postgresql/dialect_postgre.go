@@ -164,7 +164,7 @@ func (d *dialectpostgre) Insert(h *core.Handle) (err error) {
 	valueLstStr := strings.Join(valueLst, ",")
 	sql := "INSERT INTO $colName VALUES ($valueLst) RETURNING *"
 	rawsql := tool.ReplaceStrings(sql, []string{
-		"$colName", h.Col.Name(),
+		"$colName", h.GetColName(),
 		"$valueLst", valueLstStr,
 	})
 	err = d.Open(rawsql, nil)

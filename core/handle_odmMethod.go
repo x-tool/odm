@@ -4,8 +4,7 @@ import "reflect"
 
 func (d *Handle) insert(i interface{}) (err error) {
 	value := reflect.Indirect(reflect.ValueOf(i))
-	col := d.db.GetColByName(value.Type().Name())
-	d.col = col
+	d.setColbyValue(&value)
 	d.setValue = &value
 	d.execBefore()
 	err = d.col.database.dialect.Insert(d)
