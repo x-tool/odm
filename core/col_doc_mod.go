@@ -4,7 +4,7 @@ type DocMode interface {
 	Create()
 	Update()
 	Delete()
-	Name()
+	Name() string
 }
 
 var DocModeMethodMap = map[handleType]string{
@@ -17,7 +17,8 @@ func callDocMode(h *Handle) {
 	field := h.Col.doc.getDocMode()
 	if field != nil {
 		value := field.GetValueFromRootValue(h.setValue)
-		method := value.MethodByName(DocModeMethodMap[h.handleType])
+		valuePtr := value.Addr()
+		method := valuePtr.MethodByName(DocModeMethodMap[h.handleType])
 		method.Call(nil)
 	}
 

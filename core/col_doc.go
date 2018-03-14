@@ -2,7 +2,6 @@ package core
 
 import (
 	"errors"
-	"fmt"
 	"reflect"
 
 	"github.com/x-tool/tool"
@@ -16,7 +15,7 @@ type doc struct {
 	mode         *docField
 	fieldTagMap  map[string]*docField
 	fieldNameMap map[string]docFieldLst
-	rootFields   []*docField
+	rootFields   docFieldLst
 }
 
 func (d *doc) getChildFields(i *docField) (r docFieldLst) {
@@ -44,7 +43,14 @@ func (d *doc) getFieldByTag(tag string) (o *docField) {
 func (d *doc) GetRootFields() docFieldLst {
 	return d.rootFields
 }
-
+func (d *doc) getStructRootFields() (lst docFieldLst) {
+	for _, v := range d.fields {
+		if v.parent == nil {
+			lst = append(lst, v)
+		}
+	}
+	return
+}
 func NewDoc(c *Col, i interface{}) (_doc *doc) {
 
 	// append doc.fields
@@ -123,22 +129,13 @@ func (d *doc) makerootFieldNameMap() (lst []*docField) {
 }
 
 func (d *doc) findDocMode() (field *docField) {
-	for _, v := range d.rootFields {
+	for _, v := range d.getStructRootFields() {
 		_value := reflect.New(v.selfType)
-		fmt.Print(v.selfType.PkgPath(), v.selfType.Name())
 		_, ok := _value.Interface().(DocMode)
 		if ok {
-
-		}
-		_type := reflect.TypeOf(*new(DocMode))
-		fmt.Print(_type.Kind())
-		if v.selfType.Implements(_type) {
 			field = v
 			break
 		}
-		// if v.selfType.Implements(reflect.TypeOf(modeInterface)) {
-
-		// }
 	}
 	return
 }

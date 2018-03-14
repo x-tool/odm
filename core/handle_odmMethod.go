@@ -3,8 +3,8 @@ package core
 import "reflect"
 
 func (d *Handle) insert(v *reflect.Value) (err error) {
-	d.execBefore()
 	d.setValue = v
+	d.execBefore()
 	err = d.Col.database.dialect.Insert(d)
 	return
 }
