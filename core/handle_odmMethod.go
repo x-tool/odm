@@ -2,10 +2,13 @@ package core
 
 import "reflect"
 
-func (d *Handle) insert(v *reflect.Value) (err error) {
-	d.setValue = v
+func (d *Handle) insert(i interface{}) (err error) {
+	value := reflect.Indirect(reflect.ValueOf(i))
+	col := d.db.GetColByName(value.Type().Name())
+	d.col = col
+	d.setValue = &value
 	d.execBefore()
-	err = d.Col.database.dialect.Insert(d)
+	err = d.col.database.dialect.Insert(d)
 	return
 }
 
@@ -26,14 +29,24 @@ func (d *Handle) get(i interface{}) {
 
 }
 
-func (d *Handle) Where(s string) *Handle {
-	// d.Handle.where = s
-	return d
+func (d *Handle) Key(s string) (h *Handle) {
+	return
 }
 
-func (d *Handle) Limit(s string) *Handle {
-	// d.Handle.limit = s
-	return d
+func (d *Handle) Where(s string) (h *Handle) {
+	return
+}
+
+func (d *Handle) Desc(s string, isSmallFirst bool) (h *Handle) {
+	return
+}
+
+func (d *Handle) Limit(first int, last int) (h *Handle) {
+	return
+}
+
+func (d *Handle) Col(i interface{}) (h *Handle) {
+	return
 }
 
 func (d *Handle) execBefore() {

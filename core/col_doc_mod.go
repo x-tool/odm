@@ -14,7 +14,7 @@ var DocModeMethodMap = map[handleType]string{
 }
 
 func callDocMode(h *Handle) {
-	field := h.Col.doc.getDocMode()
+	field := h.col.doc.getDocMode()
 	if field != nil {
 		value := field.GetValueFromRootValue(h.setValue)
 		valuePtr := value.Addr()

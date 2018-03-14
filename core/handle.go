@@ -65,7 +65,8 @@ type HandleGroup struct {
 
 type Handle struct {
 	// ptr to Col
-	Col *Col
+	db  *Database
+	col *Col
 	handleType
 	context        context.Context
 	filterDocs     HandleFilterLst
@@ -77,15 +78,19 @@ type Handle struct {
 }
 
 func (d *Handle) GetDBName() string {
-	return d.Col.database.name
+	return d.col.database.name
 }
 
 func (d *Handle) GetColName() string {
-	return d.Col.Name()
+	return d.col.Name()
 }
 
 func (d *Handle) Value() *reflect.Value {
 	return d.setValue
+}
+
+func (d *Handle) GetCol() *Col {
+	return d.col
 }
 
 func (d *Handle) selectValidFields(dLst []*queryRootField) (vLst []*queryRootField) {
@@ -97,11 +102,10 @@ func (d *Handle) selectValidFields(dLst []*queryRootField) (vLst []*queryRootFie
 	return
 }
 
-func newHandle(col *Col, h handleType, con context.Context) *Handle {
+func newHandle(db *Database, con context.Context) *Handle {
 	d := &Handle{
-		Col:        col,
-		handleType: h,
-		context:    con,
+		db:      db,
+		context: con,
 	}
 	return d
 

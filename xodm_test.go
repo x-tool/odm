@@ -38,12 +38,13 @@ func Test_connection(t *testing.T) {
 	testdata.Name = "haha,I get"
 	testdata.Id = 1
 
-	db.Insert(testdata)
+	errInsert := db.Insert(testdata)
+	db.Query()
 	// col := db.GetCol(new(myDoc))
 	// _, err := col.data(testdata)
 	// log.Print(testdata)
 	// col.Key(testdata.Key).Delete()
-	t.Log(testdata)
+	t.Log(errInsert)
 }
 
 // func Test_formatType(t *testing.T) {
