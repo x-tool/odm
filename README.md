@@ -5,14 +5,14 @@ xodm is a pure Go odm for SQL or NoSQL. xodm is different from other orm or odm 
 Five Seconds Learn
 ```go
 client := NewClient("postgresql", connectionConf)
-db := client.Database("x")
-
-db.SyncCols(new(myDoc))
-col := db.GetCol(new(myDoc))
+db := client.Database()
+// sync cols to database
+db.RegisterCols(new(myDoc))
+db.SyncCols()
 
 testInsert := new(myDoc)
 testInsert.Name = "haha,I get"
-_, err := col.Insert(testInsert)
+_, err := db.Insert(testInsert)
 ```
 
 ## Features

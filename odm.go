@@ -18,12 +18,16 @@ type ODMClient struct {
 }
 
 // if d == nil use default dialect
-func (c *ODMClient) Database(d core.Dialect) *core.Database {
+func (c *ODMClient) Database(d ...core.Dialect) *core.Database {
+	var dialect core.Dialect
+	if len(d) >= 1 {
+		dialect = d[0]
+	}
 	// check default database
 	config := c.sourceClient.GetConnectConfig()
 	if config.Database == "postgresql" && d == nil {
-		d = defaultPostgre
+		dialect = defaultPostgre
 	}
-	d.Init(c.sourceClient)
-	return core.NewDatabase(config.DatabaseName, c.sourceClient, d)
+	dialect.Init(c.sourceClient)
+	return core.NewDatabase(config.DatabaseName, c.sourceClient, dialect)
 }
