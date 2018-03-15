@@ -17,9 +17,20 @@ type doc struct {
 	fieldNameMap map[string]docFieldLst
 	rootFields   docFieldLst
 }
+type docLst []*doc
 
 func (d *doc) getChildFields(i *docField) (r docFieldLst) {
 	return i.childLst
+}
+
+func (d *doc) getChildFieldByName(i *docField, s string) (r *docField) {
+	for _, v := range i.childLst {
+		if v.Name() == s {
+			r = v
+			break
+		}
+	}
+	return
 }
 
 func (d *doc) getFieldById(id int) (o *docField) {
@@ -127,21 +138,3 @@ func (d *doc) makerootFieldNameMap() (lst []*docField) {
 	}
 	return
 }
-
-func (d *doc) findDocMode() (field *docField) {
-	for _, v := range d.getStructRootFields() {
-		_value := reflect.New(v.selfType)
-		_, ok := _value.Interface().(DocMode)
-		if ok {
-			field = v
-			break
-		}
-	}
-	return
-}
-
-func (d *doc) getDocMode() *docField {
-	return d.mode
-}
-
-type docLst []*doc

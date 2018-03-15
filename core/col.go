@@ -7,7 +7,7 @@ import (
 type Col struct {
 	database *Database
 	name     string
-	doc      *doc
+	doc
 }
 
 func (c *Col) Name() string {
@@ -23,13 +23,8 @@ func newCol(db *Database, i interface{}) *Col {
 	c := new(Col)
 	c.name = GetColName(i)
 	c.database = db
-	c.doc = NewDoc(c, i)
+	c.doc = *NewDoc(c, i)
 	return c
-}
-
-func (c *Col) GetRootFields() docFieldLst {
-	lst := c.doc.GetRootFields()
-	return lst
 }
 
 func (c *Col) GetRootValues(rootValue *reflect.Value) (valueLst ValueLst) {

@@ -12,10 +12,10 @@ type docField struct {
 	kind            Kind
 	id              int
 	isExtend        bool
-	parent          *docField // field golang parent real
-	extendParent    *docField // field Handle parent
 	childLst        docFieldLst
+	parent          *docField // field golang parent real
 	dependLst       dependLst
+	extendParent    *docField // field Handle parent
 	extendDependLst dependLst
 	tag             *odmTag
 	funcLst         map[string]string
