@@ -8,5 +8,8 @@ func (h *Handle) GetRootValues() []*Value {
 }
 
 func (h *Handle) setColbyValue(r *reflect.Value) {
+	if h.col != nil {
+		return
+	}
 	h.col = h.db.GetColByName(r.Type().Name())
 }

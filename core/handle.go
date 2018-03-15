@@ -110,3 +110,13 @@ func newHandle(db *Database, con context.Context) *Handle {
 	return d
 
 }
+
+func newHandleByCol(c *Col, con context.Context) *Handle {
+	d := &Handle{
+		db:      c.database,
+		col:     c,
+		context: con,
+	}
+	return d
+
+}

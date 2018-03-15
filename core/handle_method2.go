@@ -2,7 +2,7 @@ package core
 
 import "reflect"
 
-func (d *Handle) insert(i interface{}) (err error) {
+func (d *Handle) Insert(i interface{}) (err error) {
 	value := reflect.Indirect(reflect.ValueOf(i))
 	d.setColbyValue(&value)
 	d.setValue = &value
@@ -11,11 +11,11 @@ func (d *Handle) insert(i interface{}) (err error) {
 	return
 }
 
-func (d *Handle) update(i interface{}) {
-
+func (d *Handle) Update(i interface{}) (err error) {
+	return
 }
 
-func (d *Handle) delete(err error) {
+func (d *Handle) Delete(err error) {
 	// if d.Col.doc.getDeleteFieldName() != "" {
 	// 	err = d.DB.Dialect.Update(d)
 	// } else {
@@ -24,8 +24,8 @@ func (d *Handle) delete(err error) {
 	// return
 }
 
-func (d *Handle) get(i interface{}) {
-
+func (d *Handle) Query(i interface{}) (err error) {
+	return
 }
 
 func (d *Handle) Key(s string) (h *Handle) {
@@ -45,6 +45,13 @@ func (d *Handle) Limit(first int, last int) (h *Handle) {
 }
 
 func (d *Handle) Col(i interface{}) (h *Handle) {
+	switch i.(type) {
+	case string:
+		d.col = d.db.getColByName(i.(string))
+	default:
+		name := reflect.TypeOf(i).Name()
+		d.col = d.db.getColByName(name)
+	}
 	return
 }
 
