@@ -102,6 +102,18 @@ func (d *Handle) selectValidFields(dLst []*queryRootField) (vLst []*queryRootFie
 	return
 }
 
+func (h *Handle) GetRootValues() []*Value {
+	values := h.col.GetRootValues(h.setValue)
+	return values
+}
+
+func (h *Handle) setColbyValue(r *reflect.Value) {
+	if h.col != nil {
+		return
+	}
+	h.col = h.db.GetColByName(r.Type().Name())
+}
+
 func newHandle(db *Database, con context.Context) *Handle {
 	d := &Handle{
 		db:      db,
