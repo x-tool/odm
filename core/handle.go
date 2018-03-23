@@ -34,16 +34,15 @@ func (h HandleFilter) Kind() Kind {
 func (h HandleFilter) FieldName() string {
 	return h.target.Name()
 }
-func (h HandleFilter) Vakue() interface{} {
+func (h HandleFilter) Value() interface{} {
 	return h.value
 }
 
 type HandleFilterLst []*HandleFilter
 
 type HandleSetValue struct {
-	target     *docField
-	handleType handleType
-	value      interface{}
+	target *docField
+	value  interface{}
 }
 
 func (h HandleSetValue) Kind() Kind {
@@ -52,7 +51,7 @@ func (h HandleSetValue) Kind() Kind {
 func (h HandleSetValue) FieldName() string {
 	return h.target.Name()
 }
-func (h HandleSetValue) Vakue() interface{} {
+func (h HandleSetValue) Value() interface{} {
 	return h.value
 }
 

@@ -29,22 +29,38 @@ func (d *Handle) Query(i interface{}) (err error) {
 }
 
 func (d *Handle) Key(s string) (h *Handle) {
+	if d.Err != nil {
+		return d
+	}
 	return
 }
 
-func (d *Handle) Where(s string) (h *Handle) {
+func (d *Handle) Where(s string, iLst ...interface{}) (h *Handle) {
+	if d.Err != nil {
+		return d
+	}
+	// formatStringToQuery(s, iLst)
 	return
 }
 
 func (d *Handle) Desc(s string, isSmallFirst bool) (h *Handle) {
+	if d.Err != nil {
+		return d
+	}
 	return
 }
 
 func (d *Handle) Limit(first int, last int) (h *Handle) {
+	if d.Err != nil {
+		return d
+	}
 	return
 }
 
 func (d *Handle) Col(i interface{}) (h *Handle) {
+	if d.Err != nil {
+		return d
+	}
 	switch i.(type) {
 	case string:
 		d.col = d.db.getColByName(i.(string))
