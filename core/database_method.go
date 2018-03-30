@@ -13,17 +13,36 @@ func (d *Database) RegisterCol(c interface{}) {
 		d.mapCols[_col.Name()] = _col
 	}
 	d.ColLst = append(d.ColLst, _col)
-	syncLock.Done()
+	rigisterCols.Done()
 }
 
-var syncLock sync.WaitGroup
+var rigisterCols sync.WaitGroup
 
 func (d *Database) RegisterCols(c ...interface{}) {
 	for _, v := range c {
-		syncLock.Add(1)
+		rigisterCols.Add(1)
 		go d.RegisterCol(v)
 	}
-	syncLock.Wait()
+	rigisterCols.Wait()
+}
+
+var rigisterStructs sync.WaitGroup
+
+func (d *Database) RegisterStruct(c interface{}) {
+	_col := newCol(d, c)
+	if _, ok := d.mapCols[_col.Name()]; !ok {
+		d.mapCols[_col.Name()] = _col
+	}
+	d.ColLst = append(d.ColLst, _col)
+	rigisterCols.Done()
+}
+
+func (d *Database) RegisterStructs(c ...interface{}) {
+	for _, v := range c {
+		rigisterStructs.Add(1)
+		go d.RegisterStruct(v)
+	}
+	rigisterStructs.Wait()
 }
 
 func (d *Database) SyncCols() {

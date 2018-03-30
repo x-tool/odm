@@ -10,6 +10,7 @@ type Database struct {
 	name    string
 	dialect Dialect
 	ColLst
+	structLst
 	history *history
 	mapCols map[string]*Col
 }

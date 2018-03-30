@@ -20,6 +20,7 @@ const (
 	DateTime
 	TimeStamp
 	Struct
+	Interface
 )
 
 var typeStringMap = map[Kind]string{
@@ -120,6 +121,9 @@ func reflectToKind(r *reflect.Type) (k Kind) {
 		} else {
 			k = Struct
 		}
+	case reflect.Interface:
+		k = Interface
 	}
+
 	return
 }

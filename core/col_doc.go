@@ -72,7 +72,7 @@ func NewDoc(c *Col, i interface{}) (_doc *doc) {
 		col:        c,
 		sourceType: &docSourceT,
 	}
-	fields := newDocFields(_doc, &docSourceT)
+	fields := newDocFields(_doc, docSourceT)
 	_doc.fields = *fields
 	_doc.fieldTagMap = _doc.makeDocFieldTagMap()
 	_doc.fieldNameMap = _doc.makeDocFieldNameMap()
@@ -83,9 +83,8 @@ func NewDoc(c *Col, i interface{}) (_doc *doc) {
 
 // var addFieldsLock sync.WaitGroup
 
-func newDocFields(d *doc, docSourceTPtr *reflect.Type) *docFieldLst {
+func newDocFields(d *doc, docSourceT reflect.Type) *docFieldLst {
 	var lst docFieldLst
-	docSourceT := *docSourceTPtr
 	if docSourceT.Kind() == reflect.Struct {
 		cont := docSourceT.NumField()
 		for i := 0; i < cont; i++ {
