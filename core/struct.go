@@ -10,6 +10,8 @@ import (
 
 type odmStruct struct {
 	name         string
+	path         string
+	allName      string // name+path
 	fields       structFieldLst
 	sourceType   *reflect.Type
 	mode         *structField
@@ -62,13 +64,15 @@ func (d *odmStruct) getStructRootFields() (lst structFieldLst) {
 	}
 	return
 }
-func NewOdmStruct(i interface{}) (_odmStruct *odmStruct) {
+func newOdmStruct(i interface{}) (_odmStruct *odmStruct) {
 
 	// append odmStruct.fields
 	_odmStructSourceT := reflect.TypeOf(i)
 	odmStructSourceT := _odmStructSourceT.Elem()
 	_odmStruct = &odmStruct{
 		name:       odmStructSourceT.Name(),
+		path:       odmStructSourceT.PkgPath(),
+		allName:    allName(odmStructSourceT),
 		sourceType: &odmStructSourceT,
 	}
 	fields := newstructFieldLst(_odmStruct, odmStructSourceT)

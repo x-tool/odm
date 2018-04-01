@@ -11,6 +11,6 @@ type docLst []*doc
 func newDoc(c *Col, i interface{}) *doc {
 	_doc := new(doc)
 	_doc.col = c
-	_doc.odmStruct = *NewOdmStruct(i)
+	_doc.odmStruct = *newOdmStruct(i)
 	return _doc
 }

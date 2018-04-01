@@ -29,11 +29,11 @@ func (d *Database) RegisterCols(c ...interface{}) {
 var rigisterStructs sync.WaitGroup
 
 func (d *Database) RegisterStruct(c interface{}) {
-	_col := newCol(d, c)
-	if _, ok := d.mapCols[_col.Name()]; !ok {
-		d.mapCols[_col.Name()] = _col
+	_struct := newOdmStruct(c)
+	if _, ok := d.mapStructs[_struct.allName]; !ok {
+		d.mapStructs[_struct.allName] = _struct
 	}
-	d.ColLst = append(d.ColLst, _col)
+	d.odmStructLst = append(d.odmStructLst, _struct)
 	rigisterCols.Done()
 }
 

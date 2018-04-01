@@ -11,8 +11,9 @@ type Database struct {
 	dialect Dialect
 	ColLst
 	odmStructLst
-	history *history
-	mapCols map[string]*Col
+	history    *history
+	mapCols    map[string]*Col       // use map to get col by name
+	mapStructs map[string]*odmStruct // use map to get structs by allname
 }
 
 type history struct {
