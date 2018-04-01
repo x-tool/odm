@@ -30,7 +30,7 @@ func Test_connection(t *testing.T) {
 		DatabaseName: "x",
 	}
 	odm := New(connectionConf)
-	db := odm.Database(nil)
+	db := odm.Database()
 	db.RegisterCols(new(myDoc))
 	db.SyncCols()
 
