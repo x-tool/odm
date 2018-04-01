@@ -23,7 +23,7 @@ const (
 )
 
 type HandleFilter struct {
-	target   *docField
+	target   *structField
 	contrast contrast
 	value    interface{}
 }
@@ -41,7 +41,7 @@ func (h HandleFilter) Value() interface{} {
 type HandleFilterLst []*HandleFilter
 
 type HandleSetValue struct {
-	target *docField
+	target *structField
 	value  interface{}
 }
 

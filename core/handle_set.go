@@ -5,7 +5,7 @@ type HandleSet struct {
 }
 
 type HandleSetItem struct {
-	dependDoc *docField
+	dependDoc *structField
 	value     interface{}
 }
 

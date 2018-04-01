@@ -53,22 +53,3 @@ func (d *doc) getDocFieldByStr(s string) (f *structField) {
 	}
 	return
 }
-
-func getFieldByDependLst(fields structFieldLst, Lst []string) (d *structField) {
-	for _, field := range fields {
-		var check bool = false
-		for i, dependField := range field.dependLst {
-			if dependField.Name() != Lst[i] {
-				check = false
-				break
-			} else {
-				check = true
-			}
-		}
-		if check == true {
-			d = field
-			break
-		}
-	}
-	return
-}

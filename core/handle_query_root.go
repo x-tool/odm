@@ -5,7 +5,7 @@ import (
 )
 
 type queryRootField struct {
-	DocField *docField
+	DocField *structField
 	zero     bool
 	value    reflect.Value
 }
