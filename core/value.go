@@ -9,13 +9,13 @@ import (
 
 type ValueLst []*Value
 type Value struct {
-	field    *docField
+	field    *structField
 	reflect  *reflect.Value
 	hasValue bool
 	zero     bool
 }
 
-func newValue(v interface{}, field *docField) (o *Value) {
+func newValue(v interface{}, field *structField) (o *Value) {
 	_v := reflect.ValueOf(v)
 	o = &Value{
 		field:   field,
@@ -23,14 +23,14 @@ func newValue(v interface{}, field *docField) (o *Value) {
 	}
 	return o
 }
-func newValueByReflect(v *reflect.Value, field *docField) (o *Value) {
+func newValueByReflect(v *reflect.Value, field *structField) (o *Value) {
 	o = &Value{
 		field:   field,
 		reflect: v,
 	}
 	return o
 }
-func (v *Value) Value() *docField {
+func (v *Value) Value() *structField {
 	return v.field
 }
 

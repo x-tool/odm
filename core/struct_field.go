@@ -2,68 +2,67 @@ package core
 
 import (
 	"reflect"
-	"sync"
 )
 
-type docField struct {
-	doc             *doc
+type structField struct {
+	odmStruct       *odmStruct
 	name            string
 	selfType        reflect.Type
 	kind            Kind
 	id              int
 	isExtend        bool
-	childLst        docFieldLst
-	parent          *docField // field golang parent real
+	childLst        structFieldLst
+	parent          *structField // field golang parent real
 	dependLst       dependLst
-	extendParent    *docField // field Handle parent
+	extendParent    *structField // field Handle parent
 	extendDependLst dependLst
 	tag             *odmTag
 	funcLst         map[string]string
 }
 
-func (d *docField) Name() string {
+func (d *structField) Name() string {
 	return d.name
 }
 
-func (d *docField) GetID() int {
+func (d *structField) GetID() int {
 	return d.id
 }
 
-func (d *docField) Kind() Kind {
+func (d *structField) Kind() Kind {
 	return d.kind
 }
-func (d *docField) IsExtend() bool {
+func (d *structField) IsExtend() bool {
 	return d.isExtend
 }
 
-func (d *docField) isSingleType() (b bool) {
+func (d *structField) isSingleType() (b bool) {
 	return !d.kind.isGroupType()
 }
 
-func (d *docField) isGroupType() (b bool) {
+func (d *structField) isGroupType() (b bool) {
 	return d.kind.isGroupType()
 }
 
-func newDocField(_doc *doc, d *docFieldLst, t *reflect.StructField, parent *docField) {
+func newStructField(_odmStruct *odmStruct, d *structFieldLst, t *reflect.StructField, parent *structField) {
 	fieldType := *t
 	reflectType := fieldType.Type
 	tag := fieldType.Tag.Get(tagName)
 	kind := reflectToKind(&reflectType)
-	isExtend := checkdocFieldisExtend(t)
+	isExtend := checkstructFieldisExtend(t)
 	var _dependLst dependLst
 	var _extendDependLst dependLst
 	// if field is root field parent == nil, can't use parent method
-	// if parent != nil {
-	// 	_dependLst = append(parent.dependLst, parent)
-	// 	if isExtend {
-	// 		_extendDependLst = parent.extendDependLst
-	// 	} else {
-	// 		_extendDependLst = append(parent.extendDependLst, parent)
-	// 	}
-	// }
+	if parent != nil {
+		_dependLst = append(parent.dependLst, parent)
+		if isExtend {
+			_extendDependLst = parent.extendDependLst
+		} else {
+			_extendDependLst = append(parent.extendDependLst, parent)
+		}
+	}
 
-	field := &docField{
-		doc:             _doc,
+	field := &structField{
+		odmStruct:       _odmStruct,
 		name:            t.Name,
 		selfType:        reflectType,
 		kind:            kind,
@@ -95,32 +94,33 @@ func newDocField(_doc *doc, d *docFieldLst, t *reflect.StructField, parent *docF
 		for i := 0; i < count; i++ {
 			_f := _fieldType.Field(i)
 			// addFieldsLock.Add(1)
-			// go newDocField(_doc, d, &_f, field)
-			newDocField(_doc, d, &_f, field)
+			// go newStructField(_doc, d, &_f, field)
+			newStructField(_odmStruct, d, &_f, field)
 		}
 	case Struct:
 		count := fieldType.Type.NumField()
 		for i := 0; i < count; i++ {
 			_f := fieldType.Type.Field(i)
 			// addFieldsLock.Add(1)
-			// go newDocField(_doc, d, &_f, field)
-			newDocField(_doc, d, &_f, field)
+			// go newStructField(_doc, d, &_f, field)
+			newStructField(_odmStruct, d, &_f, field)
 		}
 
 	}
 	// addFieldsLock.Done()
 }
 
-func checkdocFieldisExtend(r *reflect.StructField) (b bool) {
+func checkstructFieldisExtend(r *reflect.StructField) (b bool) {
 	return r.Anonymous
 }
 
 // lst /////////////////////////
-type docFieldLst []*docField
+type structFieldLst []*structField
+type dependLst structFieldLst
 
-var addFieldLock sync.Mutex
+// var addFieldLock sync.Mutex
 
-func (d *docFieldLst) addItem(f *docField) *docField {
+func (d *structFieldLst) addItem(f *structField) *structField {
 	// add lock
 	// addFieldLock.Lock()
 	// defer addFieldLock.Unlock()
@@ -129,7 +129,7 @@ func (d *docFieldLst) addItem(f *docField) *docField {
 	return f
 }
 
-func (d *docFieldLst) getFieldsByName(name string) (o docFieldLst) {
+func (d *structFieldLst) getFieldsByName(name string) (o structFieldLst) {
 	for _, v := range *d {
 		if v.Name() == name {
 			o = append(o, v)
@@ -138,7 +138,7 @@ func (d *docFieldLst) getFieldsByName(name string) (o docFieldLst) {
 	return
 }
 
-func (d *docFieldLst) getExtendFieldLst() (rd docFieldLst) {
+func (d *structFieldLst) getExtendFieldLst() (rd structFieldLst) {
 	for _, v := range *d {
 		if v.IsExtend() {
 			rd = append(rd, v)
@@ -147,7 +147,7 @@ func (d *docFieldLst) getExtendFieldLst() (rd docFieldLst) {
 	return
 }
 
-func (d *docFieldLst) getSingleTypeFieldLst() (rd docFieldLst) {
+func (d *structFieldLst) getSingleTypeFieldLst() (rd structFieldLst) {
 	for _, v := range *d {
 		if v.isSingleType() {
 			rd = append(rd, v)
@@ -155,7 +155,7 @@ func (d *docFieldLst) getSingleTypeFieldLst() (rd docFieldLst) {
 	}
 	return
 }
-func (d *docFieldLst) getGroupTypeFieldLst() (rd docFieldLst) {
+func (d *structFieldLst) getGroupTypeFieldLst() (rd structFieldLst) {
 	for _, v := range *d {
 		if v.isGroupType() {
 			rd = append(rd, v)
@@ -164,7 +164,7 @@ func (d *docFieldLst) getGroupTypeFieldLst() (rd docFieldLst) {
 	return
 }
 
-func (d *docFieldLst) getExtendParent(field *docField) (f *docField) {
+func (d *structFieldLst) getExtendParent(field *structField) (f *structField) {
 	if field.parent == nil {
 		f = nil
 	} else {

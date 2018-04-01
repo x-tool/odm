@@ -5,7 +5,7 @@ import (
 	"strings"
 )
 
-func (d *doc) findDocMode() (field *docField) {
+func (d *doc) findDocMode() (field *structField) {
 	for _, v := range d.getStructRootFields() {
 		_value := reflect.New(v.selfType)
 		_, ok := _value.Interface().(DocMode)
@@ -17,11 +17,11 @@ func (d *doc) findDocMode() (field *docField) {
 	return
 }
 
-func (d *doc) getDocMode() *docField {
+func (d *doc) getDocMode() *structField {
 	return d.mode
 }
 
-func (d *doc) getDocFieldByStr(s string) (f *docField) {
+func (d *doc) getDocFieldByStr(s string) (f *structField) {
 	// check dependLst
 	var dependLst []string
 	dependLst = strings.Split(s, ".")
@@ -54,7 +54,7 @@ func (d *doc) getDocFieldByStr(s string) (f *docField) {
 	return
 }
 
-func getFieldByDependLst(fields docFieldLst, Lst []string) (d *docField) {
+func getFieldByDependLst(fields structFieldLst, Lst []string) (d *structField) {
 	for _, field := range fields {
 		var check bool = false
 		for i, dependField := range field.dependLst {

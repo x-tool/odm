@@ -23,7 +23,7 @@ func newCol(db *Database, i interface{}) *Col {
 	c := new(Col)
 	c.name = GetColName(i)
 	c.database = db
-	c.doc = *NewDoc(c, i)
+	c.doc = *newDoc(c, i)
 	return c
 }
 

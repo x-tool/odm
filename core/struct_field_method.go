@@ -6,7 +6,7 @@ import (
 )
 
 /// error
-func (d *docField) GetValueFromRootValue(rootValue *reflect.Value) *reflect.Value {
+func (d *structField) GetValueFromRootValue(rootValue *reflect.Value) *reflect.Value {
 	_r := *rootValue
 	if len(d.dependLst) != 0 {
 		for _, v := range d.dependLst {
@@ -25,7 +25,7 @@ func (d *docField) GetValueFromRootValue(rootValue *reflect.Value) *reflect.Valu
 	return &_r
 }
 
-func (d *docField) json(v *reflect.Value) ([]byte, error) {
+func (d *structField) json(v *reflect.Value) ([]byte, error) {
 	_v := *v
 	return json.Marshal(_v.Interface())
 }
