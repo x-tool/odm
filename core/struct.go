@@ -9,15 +9,15 @@ import (
 )
 
 type odmStruct struct {
-	name         string
-	path         string
-	allName      string // name+path
-	fields       structFieldLst
-	sourceType   *reflect.Type
-	mode         *structField
-	fieldTagMap  map[string]*structField
-	fieldNameMap map[string]structFieldLst
-	rootFields   structFieldLst
+	name            string
+	path            string
+	allName         string // name+path
+	fields          structFieldLst
+	sourceType      *reflect.Type
+	interfaceFields structFieldLst
+	fieldTagMap     map[string]*structField
+	fieldNameMap    map[string]structFieldLst
+	rootFields      structFieldLst
 }
 type odmStructLst []*odmStruct
 
@@ -80,6 +80,7 @@ func newOdmStruct(i interface{}) (_odmStruct *odmStruct) {
 	_odmStruct.fieldTagMap = _odmStruct.makestructFieldLstTagMap()
 	_odmStruct.fieldNameMap = _odmStruct.makestructFieldLstNameMap()
 	_odmStruct.rootFields = _odmStruct.makerootFieldNameMap()
+	_odmStruct.interfaceFields = _odmStruct.getInterfaceFields()
 	return
 }
 
@@ -134,6 +135,15 @@ func (d *odmStruct) makerootFieldNameMap() (lst []*structField) {
 	_d := d.fields
 	for _, v := range _d {
 		if v.extendParent == nil && v.IsExtend() == false {
+			lst = append(lst, v)
+		}
+	}
+	return
+}
+
+func (d *odmStruct) getInterfaceFields() (lst structFieldLst) {
+	for _, v := range d.fields {
+		if v.Kind() == Interface {
 			lst = append(lst, v)
 		}
 	}
