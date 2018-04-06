@@ -14,7 +14,7 @@ type odmStruct struct {
 	allName         string // name+path
 	fields          structFieldLst
 	sourceType      *reflect.Type
-	interfaceFields structFieldLst
+	interfaceFields map[string]*structField
 	fieldTagMap     map[string]*structField
 	fieldNameMap    map[string]structFieldLst
 	rootFields      structFieldLst
@@ -141,11 +141,14 @@ func (d *odmStruct) makerootFieldNameMap() (lst []*structField) {
 	return
 }
 
-func (d *odmStruct) getInterfaceFields() (lst structFieldLst) {
+func (d *odmStruct) getInterfaceFields() (lst map[string]*structField) {
 	for _, v := range d.fields {
-		if v.Kind() == Interface {
-			lst = append(lst, v)
+		if _, ok := lst[v.name]; !ok {
+			if v.Kind() == Interface {
+				lst[v.name] = v
+			}
 		}
+
 	}
 	return
 }
