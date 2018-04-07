@@ -18,7 +18,7 @@ type Dialect interface {
 	Insert(*Handle) error
 	Update(*Handle) error
 	Delete(*Handle) error
-	Query(*Handle) (interface{}, error)
+	Query(*Handle) error
 	LogSql(string)
 	Session() *Session
 }

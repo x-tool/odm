@@ -5,7 +5,7 @@ import "reflect"
 func (d *Handle) Insert(i interface{}) (err error) {
 	value := reflect.Indirect(reflect.ValueOf(i))
 	d.setColbyValue(&value)
-	d.setValue = &value
+	d.addSetValue(newSetValue(&value, nil))
 	d.execBefore()
 	err = d.col.database.dialect.Insert(d)
 	return
@@ -24,10 +24,28 @@ func (d *Handle) Delete(err error) {
 	// return
 }
 
-func (d *Handle) Query(i interface{}) (err error) {
+func (d *Handle) Get(i interface{}) (err error) {
+	_d := d.Query(i)
+	return _d.Exec()
+}
+
+func (d *Handle) Exec() (err error) {
+	switch d.handleType {
+	case insertData:
+		err = d.col.database.dialect.Insert(d)
+	case updateData:
+		err = d.col.database.dialect.Update(d)
+	case deleteData:
+		err = d.col.database.dialect.Delete(d)
+	case queryData:
+		err = d.col.database.dialect.Query(d)
+	}
 	return
 }
 
+func (d *Handle) Query(i interface{}) (h *Handle) {
+	return
+}
 func (d *Handle) Key(s string) (h *Handle) {
 	if d.Err != nil {
 		return d

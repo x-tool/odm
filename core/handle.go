@@ -11,67 +11,60 @@ const (
 	insertData handleType = iota
 	updateData
 	deleteData
+	queryData
 )
 
-type contrast int
+type filterCompare string
 
 const (
-	sameData      contrast = iota // like
-	sameDataLeft                  // ??like
-	sameDataRight                 // like??
-	equalData                     // ==
+	sameCompare      filterCompare = "like"  // like
+	sameCompareLeft                = "?like" // ??like
+	sameCompareRight               = "like?" // like??
+	equalCompare                   = "=="    // ==
+	isNullCompare                  = "isNull"
+	betweenCompare                 = "between"
+	inCompare                      = "in"
 )
 
-type HandleFilter struct {
-	target   *structField
-	contrast contrast
-	value    interface{}
+type filterConnect string
+
+const (
+	andFilter filterConnect = "and"
+	orFilter                = "or"
+	notFilter               = "not"
+)
+
+type filters []filter
+
+type filter struct {
+	target       *structField
+	compare      filterCompare
+	value        interface{}
+	connect      filterConnect
+	childFilters filters
 }
 
-func (h HandleFilter) Kind() Kind {
-	return h.target.Kind()
-}
-func (h HandleFilter) FieldName() string {
-	return h.target.Name()
-}
-func (h HandleFilter) Value() interface{} {
-	return h.value
+type setValueLst []*setValue
+type setValue struct {
+	value interface{}
+	filter
 }
 
-type HandleFilterLst []*HandleFilter
-
-type HandleSetValue struct {
-	target *structField
-	value  interface{}
-}
-
-func (h HandleSetValue) Kind() Kind {
-	return h.target.Kind()
-}
-func (h HandleSetValue) FieldName() string {
-	return h.target.Name()
-}
-func (h HandleSetValue) Value() interface{} {
-	return h.value
-}
-
-type HandleSetValueLst []*HandleSetValue
-
-type HandleGroup struct {
-	filterLst HandleFilterLst
-	setLst    HandleSetValue
+func newSetValue(value interface{}, f filter) (s *setValue) {
+	s = &setValue{
+		value:  value,
+		filter: f,
+	}
+	return
 }
 
 type Handle struct {
-	// ptr to Col
-	db  *Database
-	col *Col
 	handleType
-	context        context.Context
-	filterDocs     HandleFilterLst
-	HandleGroupLst []*HandleGroup
-	result         interface{}
-	setValue       *reflect.Value
+	setValueLst
+	db      *Database
+	col     *Col
+	context context.Context
+	result  interface{}
 
 	Err error
 }
@@ -82,10 +75,6 @@ func (d *Handle) GetDBName() string {
 
 func (d *Handle) GetColName() string {
 	return d.col.Name()
-}
-
-func (d *Handle) Value() *reflect.Value {
-	return d.setValue
 }
 
 func (d *Handle) GetCol() *Col {
@@ -101,10 +90,10 @@ func (d *Handle) selectValidFields(dLst []*queryRootField) (vLst []*queryRootFie
 	return
 }
 
-func (h *Handle) GetRootValues() []*Value {
-	values := h.col.GetRootValues(h.setValue)
-	return values
-}
+// func (h *Handle) GetRootValues() []*Value {
+// 	values := h.col.GetRootValues(h.setValue)
+// 	return values
+// }
 
 func (h *Handle) setColbyValue(r *reflect.Value) {
 	if h.col != nil {
@@ -113,6 +102,9 @@ func (h *Handle) setColbyValue(r *reflect.Value) {
 	h.col = h.db.GetColByName(r.Type().Name())
 }
 
+func (h *Handle) addSetValue(s *setValue) {
+	h.setValueLst = append(h.setValueLst, s)
+}
 func newHandle(db *Database, con context.Context) *Handle {
 	d := &Handle{
 		db:      db,
