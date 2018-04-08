@@ -5,7 +5,7 @@ import "reflect"
 func (d *Handle) Insert(i interface{}) (err error) {
 	value := reflect.Indirect(reflect.ValueOf(i))
 	d.setColbyValue(&value)
-	d.addSetValue(newSetValue(&value, nil))
+	d.addSetValue(newSetValue(&value, *new(filter)))
 	d.execBefore()
 	err = d.col.database.dialect.Insert(d)
 	return

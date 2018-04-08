@@ -7,6 +7,7 @@ import (
 	"github.com/x-tool/tool"
 )
 
+type Handle = core.Handle
 type NormalCol struct {
 	Key         string
 	CreatedTime time.Time
@@ -15,16 +16,16 @@ type NormalCol struct {
 	State       int
 }
 
-func (n *NormalCol) Create() {
+func (n *NormalCol) Create(h *Handle) {
 	n.Key = tool.NewUniqueId()
 	n.CreatedTime = time.Now()
 }
 
-func (n *NormalCol) Update() {
+func (n *NormalCol) Update(h *Handle) {
 	n.UpdateTime = time.Now()
 }
 
-func (n *NormalCol) Delete() {
+func (n *NormalCol) Delete(h *Handle) {
 	n.DeleteTime = time.Now()
 }
 

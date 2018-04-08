@@ -5,6 +5,10 @@ import (
 	"reflect"
 )
 
+func (d *structField) newValue() (v reflect.Value) {
+	return reflect.New(d.selfType)
+}
+
 /// error
 func (d *structField) GetValueFromRootValue(rootValue *reflect.Value) *reflect.Value {
 	_r := *rootValue

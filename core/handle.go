@@ -46,11 +46,11 @@ type filter struct {
 
 type setValueLst []*setValue
 type setValue struct {
-	value interface{}
+	value *reflect.Value
 	filter
 }
 
-func newSetValue(value interface{}, f filter) (s *setValue) {
+func newSetValue(value *reflect.Value, f filter) (s *setValue) {
 	s = &setValue{
 		value:  value,
 		filter: f,
@@ -61,10 +61,11 @@ func newSetValue(value interface{}, f filter) (s *setValue) {
 type Handle struct {
 	handleType
 	setValueLst
-	db      *Database
-	col     *Col
-	context context.Context
-	result  interface{}
+	filterDoc filter
+	db        *Database
+	col       *Col
+	context   context.Context
+	result    interface{}
 
 	Err error
 }
@@ -105,6 +106,11 @@ func (h *Handle) setColbyValue(r *reflect.Value) {
 func (h *Handle) addSetValue(s *setValue) {
 	h.setValueLst = append(h.setValueLst, s)
 }
+
+func (h *Handle) getInsertValue() *reflect.Value {
+	return h.setValueLst[0].value
+}
+
 func newHandle(db *Database, con context.Context) *Handle {
 	d := &Handle{
 		db:      db,
