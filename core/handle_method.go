@@ -1,12 +1,18 @@
 package core
 
-import "reflect"
+import (
+	"errors"
+	"reflect"
+)
 
 func (d *Handle) Insert(i interface{}) (err error) {
 	value := reflect.Indirect(reflect.ValueOf(i))
 	d.setColbyValue(&value)
 	d.addSetValue(newSetValue(&value, *new(filter)))
 	d.execBefore()
+	if d.Err != nil {
+		return d.Err
+	}
 	err = d.col.database.dialect.Insert(d)
 	return
 }
@@ -79,16 +85,22 @@ func (d *Handle) Col(i interface{}) (h *Handle) {
 	if d.Err != nil {
 		return d
 	}
+	var _col *Col
 	switch i.(type) {
 	case string:
-		d.col = d.db.getColByName(i.(string))
+		_col = d.db.getColByName(i.(string))
 	default:
 		name := reflect.TypeOf(i).Name()
-		d.col = d.db.getColByName(name)
+		_col = d.db.getColByName(name)
 	}
+	if _col != nil {
+		d.Err = errors.New("can't Find Col")
+	}
+	d.col = _col
 	return
 }
 
+// do some thing before exec sql,like modify docmode
 func (d *Handle) execBefore() {
 	d.callDocMode()
 }
