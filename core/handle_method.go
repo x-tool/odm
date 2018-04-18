@@ -50,6 +50,7 @@ func (d *Handle) Exec() (err error) {
 }
 
 func (d *Handle) Query(i interface{}) (h *Handle) {
+	d.setResult(i)
 	return
 }
 func (d *Handle) Key(s string) (h *Handle) {
@@ -95,8 +96,9 @@ func (d *Handle) Col(i interface{}) (h *Handle) {
 	}
 	if _col != nil {
 		d.Err = errors.New("can't Find Col")
+	} else {
+		d.col = _col
 	}
-	d.col = _col
 	return
 }
 

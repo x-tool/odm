@@ -15,7 +15,7 @@ type query struct {
 }
 
 type queryItem struct {
-	queryRootField
+	field      structField
 	whereCheck string
 	whereAnd   bool
 }

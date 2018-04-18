@@ -1,11 +1,28 @@
 package core
 
+import "reflect"
+
 type result struct {
-	err error
+	handle       *Handle
+	value        interface{}
+	reflectValue reflect.Value
+	resultFieldLst
 }
 
-func (r *result) Err() error {
-	return r.err
+type resultFieldLst []*resultField
+type resultField struct {
+	field    *structField
+	function resultFunction
+}
+
+type resultFunction int
+
+const (
+	resultNumFunction resultFunction = iota
+)
+
+func newResult(i interface{}) (r result) {
+	return
 }
 
 // type result struct {

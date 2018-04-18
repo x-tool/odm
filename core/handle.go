@@ -65,21 +65,22 @@ type Handle struct {
 	db        *Database
 	col       *Col
 	context   context.Context
-	result    interface{}
+	// resultValue
+	result
 
 	Err error
 }
 
-func (d *Handle) GetDBName() string {
-	return d.col.database.name
+func (h *Handle) GetDBName() string {
+	return h.col.database.name
 }
 
-func (d *Handle) GetColName() string {
-	return d.col.Name()
+func (h *Handle) GetColName() string {
+	return h.col.Name()
 }
 
-func (d *Handle) GetCol() *Col {
-	return d.col
+func (h *Handle) GetCol() *Col {
+	return h.col
 }
 
 func (d *Handle) selectValidFields(dLst []*queryRootField) (vLst []*queryRootField) {
@@ -109,6 +110,10 @@ func (h *Handle) addSetValue(s *setValue) {
 
 func (h *Handle) getInsertValue() *reflect.Value {
 	return h.setValueLst[0].value
+}
+
+func (h *Handle) setResult(i interface{}) {
+	h.result = newResult(i)
 }
 
 func newHandle(db *Database, con context.Context) *Handle {
