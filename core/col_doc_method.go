@@ -21,6 +21,9 @@ func (d *doc) getDocMode() *structField {
 	return d.mode
 }
 
+// "fieldName"
+// "tagName"
+// "path.fieldName"
 func (d *doc) getDocFieldByStr(s string) (f *structField) {
 	// check dependLst
 	var dependLst []string

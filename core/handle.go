@@ -5,45 +5,6 @@ import (
 	"reflect"
 )
 
-type handleType int
-
-const (
-	insertData handleType = iota
-	updateData
-	deleteData
-	queryData
-)
-
-type filterCompare string
-
-const (
-	sameCompare      filterCompare = "like"  // like
-	sameCompareLeft                = "?like" // ??like
-	sameCompareRight               = "like?" // like??
-	equalCompare                   = "=="    // ==
-	isNullCompare                  = "isNull"
-	betweenCompare                 = "between"
-	inCompare                      = "in"
-)
-
-type filterConnect string
-
-const (
-	andFilter filterConnect = "and"
-	orFilter                = "or"
-	notFilter               = "not"
-)
-
-type filters []filter
-
-type filter struct {
-	target       *structField
-	compare      filterCompare
-	value        interface{}
-	connect      filterConnect
-	childFilters filters
-}
-
 type setValueLst []*setValue
 type setValue struct {
 	value *reflect.Value
