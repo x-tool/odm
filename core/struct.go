@@ -15,7 +15,6 @@ type odmStruct struct {
 	fields          structFieldLst
 	sourceType      *reflect.Type
 	interfaceFields map[string]*structField
-	fieldTagMap     map[string]*structField
 	fieldNameMap    map[string]structFieldLst
 	rootFields      structFieldLst
 }
@@ -49,10 +48,6 @@ func (d *odmStruct) getFieldByName(name string) (o structFieldLst) {
 	return d.fieldNameMap[name]
 }
 
-func (d *odmStruct) getFieldByTag(tag string) (o *structField) {
-	return d.fieldTagMap[tag]
-}
-
 func (d *odmStruct) GetRootFields() structFieldLst {
 	return d.rootFields
 }
@@ -77,7 +72,6 @@ func newOdmStruct(i interface{}) (_odmStruct *odmStruct) {
 	}
 	fields := newstructFieldLst(_odmStruct, odmStructSourceT)
 	_odmStruct.fields = *fields
-	_odmStruct.fieldTagMap = _odmStruct.makestructFieldLstTagMap()
 	_odmStruct.fieldNameMap = _odmStruct.makestructFieldLstNameMap()
 	_odmStruct.rootFields = _odmStruct.makerootFieldNameMap()
 	_odmStruct.interfaceFields = _odmStruct.getInterfaceFields()
@@ -103,17 +97,6 @@ func newstructFieldLst(d *odmStruct, odmStructSourceT reflect.Type) *structField
 	}
 	// addFieldsLock.Wait()
 	return &lst
-}
-
-func (d *odmStruct) makestructFieldLstTagMap() (m map[string]*structField) {
-	_d := d.fields
-	for _, v := range _d {
-		tagPtr := v.tag.ptr
-		if tagPtr != "" {
-			m[tagPtr] = v
-		}
-	}
-	return m
 }
 
 func (d *odmStruct) makestructFieldLstNameMap() map[string]structFieldLst {
@@ -160,19 +143,13 @@ func (d *odmStruct) getFieldByStr(s string) (f *structField) {
 	dependLen := len(dependLst)
 	// if has no dependLst Or is root field
 	if dependLen == 1 {
-		// get tag first
-		byTag := d.getFieldByTag(s)
-		if byTag != nil {
-			f = byTag
+		fLst := d.getFieldByName(s)
+		fLstLen := len(fLst)
+		// if docFieldLstLen != 1 return nil
+		if fLstLen == 1 {
+			f = fLst[0]
 		} else {
-			fLst := d.getFieldByName(s)
-			fLstLen := len(fLst)
-			// if docFieldLstLen != 1 return nil
-			if fLstLen == 1 {
-				f = fLst[0]
-			} else {
-				f = nil
-			}
+			f = nil
 		}
 	} else {
 		fields := d.getFieldByName(dependLst[dependLen-1])
