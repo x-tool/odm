@@ -1,7 +1,9 @@
 package core
 
 import (
+	"errors"
 	"reflect"
+	"strings"
 )
 
 func (d *doc) findDocMode() (field *structField) {
@@ -20,38 +22,28 @@ func (d *doc) getDocMode() *structField {
 	return d.mode
 }
 
-// "fieldName"
-// "tagName"
-// "path.fieldName"
-// func (d *doc) getDocFieldByStr(s string) (f *structField) {
-// 	// check dependLst
-// 	var dependLst []string
-// 	dependLst = strings.Split(s, ".")
-// 	dependLen := len(dependLst)
-// 	// if has no dependLst Or is root field
-// 	if dependLen == 1 {
-// 		// get tag first
-// 		byTag := d.getFieldByTag(s)
-// 		if byTag != nil {
-// 			f = byTag
-// 		} else {
-// 			fLst := d.getFieldByName(s)
-// 			fLstLen := len(fLst)
-// 			// if docFieldLstLen != 1 return nil
-// 			if fLstLen == 1 {
-// 				f = fLst[0]
-// 			} else {
-// 				f = nil
-// 			}
-// 		}
-// 	} else {
-// 		fields := d.getFieldByName(dependLst[dependLen-1])
-// 		// if docFieldLstLen != 1 range depend
-// 		if len(fields) == 1 {
-// 			f = fields[0]
-// 		} else {
-// 			f = getFieldByDependLst(fields, dependLst)
-// 		}
-// 	}
-// 	return
-// }
+// "path:structName.path..." // if doc field is interface, use ":" to get odmStruct from database, and search path
+func (d *doc) getFieldByDocPath(path string) (f *structField, err error) {
+	// check pathLst
+	pathLst := strings.Split(path, ":")
+	pathLen := len(pathLst)
+	if pathLen == 1 {
+		f = d.getFieldByPath(pathLst[0])
+	} else {
+		var acrossDependLst dependLst
+		f = d.getFieldByPath(pathLst[0])
+		acrossDependLst = append(acrossDependLst, f.dependLst)
+		for _, v := range pathLst {
+			structPath := strings.Split(v, ".")
+			structName := structPath[0]
+			_odmStruct := d.col.database.getStructByName(structName)
+			field := _odmStruct.getFieldByPath(strings.Join(structPath[1:], "."))
+			if field == nil {
+				err = errors.New("canot get field by path '" + v + "'")
+			} else {
+
+			}
+		}
+	}
+	return
+}

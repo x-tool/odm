@@ -5,19 +5,20 @@ import (
 )
 
 type structField struct {
-	odmStruct       *odmStruct
-	name            string
-	selfType        reflect.Type
-	kind            Kind
-	id              int
-	isExtend        bool
-	childLst        structFieldLst
-	parent          *structField // field golang parent real
-	dependLst       dependLst
-	extendParent    *structField // field Handle parent
-	extendDependLst dependLst
-	tag             *odmTag
-	funcLst         map[string]string
+	odmStruct             *odmStruct
+	name                  string
+	selfType              reflect.Type
+	kind                  Kind
+	id                    int
+	isExtend              bool
+	childLst              structFieldLst
+	parent                *structField // field golang parent real
+	dependLst             dependLst
+	AcrossStructdependLst dependLst    // struct can be value in col's interface field,use this field to get all path
+	extendParent          *structField // field Handle parent
+	extendDependLst       dependLst
+	tag                   *odmTag
+	funcLst               map[string]string
 }
 
 func (d *structField) Name() string {
@@ -116,7 +117,7 @@ func checkstructFieldisExtend(r *reflect.StructField) (b bool) {
 
 // lst /////////////////////////
 type structFieldLst []*structField
-type dependLst structFieldLst
+type dependLst []*structField
 
 // var addFieldLock sync.Mutex
 

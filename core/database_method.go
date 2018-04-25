@@ -61,3 +61,7 @@ func (d *Database) setHistory() {
 func (d *Database) getColByName(name string) *Col {
 	return d.mapCols[name]
 }
+
+func (d *Database) getStructByName(name string) *odmStruct {
+	return d.mapStructs[name]
+}
