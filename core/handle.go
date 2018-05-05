@@ -74,7 +74,7 @@ func (h *Handle) getInsertValue() *reflect.Value {
 }
 
 func (h *Handle) setResult(i interface{}) {
-	h.result = newResult(i)
+	h.result = *newResult(i)
 }
 
 func newHandle(db *Database, con context.Context) *Handle {

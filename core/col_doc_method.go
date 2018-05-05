@@ -32,18 +32,23 @@ func (d *doc) getFieldByDocPath(path string) (f *structField, err error) {
 	} else {
 		var acrossDependLst dependLst
 		f = d.getFieldByPath(pathLst[0])
-		acrossDependLst = append(acrossDependLst, f.dependLst)
+		acrossDependLst = append(acrossDependLst, f.dependLst...)
+
 		for _, v := range pathLst {
+			// add fieldSelf to acrossDependLst
+			acrossDependLst = append(acrossDependLst, f)
 			structPath := strings.Split(v, ".")
 			structName := structPath[0]
 			_odmStruct := d.col.database.getStructByName(structName)
-			field := _odmStruct.getFieldByPath(strings.Join(structPath[1:], "."))
-			if field == nil {
+			f = _odmStruct.getFieldByPath(strings.Join(structPath[1:], "."))
+			if f == nil {
 				err = errors.New("canot get field by path '" + v + "'")
+				return
 			} else {
-
+				acrossDependLst = append(acrossDependLst, f.dependLst...)
 			}
 		}
+		f.AcrossStructdependLst = acrossDependLst
 	}
 	return
 }

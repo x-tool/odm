@@ -21,8 +21,12 @@ const (
 	resultNumFunction resultFunction = iota
 )
 
-func newResult(i interface{}) (r result) {
-	return
+func newResult(i interface{}) *result {
+	reflect.TypeOf(i)
+	r := new(result)
+	r.value = i
+
+	return r
 }
 
 // type result struct {
