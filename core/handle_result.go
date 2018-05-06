@@ -64,13 +64,13 @@ func newResult(i interface{}) *result {
 // 	}
 // 	return &rV
 // }
-// func (r *result) getResultRootItemFieldAddr(rootV *reflect.Value) (v []reflect.Value) {
-// 	if rootV.Kind() == reflect.Struct {
-// 		lenR := rootV.NumField()
-// 		for i := 0; i < lenR; i++ {
-// 			_v := rootV.Field(i).Addr()
-// 			v = append(v, _v)
-// 		}
-// 	}
-// 	return
-// }
+func (r *result) getResultRootItemFieldAddr(rootV *reflect.Value) (v []reflect.Value) {
+	if rootV.Kind() == reflect.Struct {
+		lenR := rootV.NumField()
+		for i := 0; i < lenR; i++ {
+			_v := rootV.Field(i).Addr()
+			v = append(v, _v)
+		}
+	}
+	return
+}
