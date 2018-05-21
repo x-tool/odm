@@ -3,9 +3,9 @@ package core
 import "reflect"
 
 type result struct {
-	handle       *Handle
-	value        interface{}
-	reflectValue reflect.Value
+	handle     *Handle
+	raw        interface{}
+	rawReflect reflect.Value
 	resultFieldLst
 }
 
@@ -24,7 +24,7 @@ const (
 func newResult(i interface{}) *result {
 	reflect.TypeOf(i)
 	r := new(result)
-	r.value = i
+	r.raw = i
 
 	return r
 }
@@ -64,13 +64,19 @@ func newResult(i interface{}) *result {
 // 	}
 // 	return &rV
 // }
-// func (r *result) getResultRootItemFieldAddr(rootV *reflect.Value) (v []reflect.Value) {
-// 	if rootV.Kind() == reflect.Struct {
-// 		lenR := rootV.NumField()
-// 		for i := 0; i < lenR; i++ {
-// 			_v := rootV.Field(i).Addr()
-// 			v = append(v, _v)
-// 		}
-// 	}
-// 	return
-// }
+
+func (r *result) getResultRootItemFieldAddr(rootV *reflect.Value) (v []reflect.Value) {
+	if rootV.Kind() == reflect.Struct {
+		lenR := rootV.NumField()
+		for i := 0; i < lenR; i++ {
+			_v := rootV.Field(i).Addr()
+			v = append(v, _v)
+		}
+	}
+	return
+}
+
+func (r *result) AddRow(rowValues []interface{}) {
+	raws := r.getResultRootItemFieldAddr()
+
+}

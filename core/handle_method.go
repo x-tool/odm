@@ -10,7 +10,7 @@ func (d *Handle) Insert(i interface{}) (err error) {
 	d.setColbyValue(&value)
 	d.addSetValue(newSetValue(&value, *new(filter)))
 	d.execBefore()
-	if d.Err != nil {
+	if d.checkHandleErr() != nil {
 		return d.Err
 	}
 	err = d.col.database.dialect.Insert(d)
@@ -54,14 +54,14 @@ func (d *Handle) Query(i interface{}) (h *Handle) {
 	return
 }
 func (d *Handle) Key(s string) (h *Handle) {
-	if d.Err != nil {
+	if d.checkHandleErr() != nil {
 		return d
 	}
 	return
 }
 
 func (d *Handle) Where(s string, iLst ...interface{}) (h *Handle) {
-	if d.Err != nil {
+	if d.checkHandleErr() != nil {
 		return d
 	}
 	// formatStringToQuery(s, iLst)
@@ -69,21 +69,21 @@ func (d *Handle) Where(s string, iLst ...interface{}) (h *Handle) {
 }
 
 func (d *Handle) Desc(s string, isSmallFirst bool) (h *Handle) {
-	if d.Err != nil {
+	if d.checkHandleErr() != nil {
 		return d
 	}
 	return
 }
 
 func (d *Handle) Limit(first int, last int) (h *Handle) {
-	if d.Err != nil {
+	if d.checkHandleErr() != nil {
 		return d
 	}
 	return
 }
 
 func (d *Handle) Col(i interface{}) (h *Handle) {
-	if d.Err != nil {
+	if d.checkHandleErr() != nil {
 		return d
 	}
 	var _col *Col
@@ -108,4 +108,15 @@ func (d *Handle) execBefore() {
 }
 func (d *Handle) callDocMode() {
 	callDocMode(d)
+}
+
+func (d *Handle) checkHandleErr() *error {
+	if d.Err != nil {
+		return &d.Err
+	}
+	if d.col == nil {
+		d.Err = errors.New("Cannot find col, If write col method, Please move it to first")
+		return &d.Err
+	}
+	return nil
 }
