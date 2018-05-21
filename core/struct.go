@@ -56,9 +56,9 @@ func (d *odmStruct) getFieldByTag(tag string) (o *structField) {
 func (d *odmStruct) GetRootFields() structFieldLst {
 	return d.rootFields
 }
-func (d *odmStruct) getStructRootFields() (lst structFieldLst) {
+func (d *odmStruct) getExtendFields() (lst structFieldLst) {
 	for _, v := range d.fields {
-		if v.parent == nil {
+		if v.isExtend {
 			lst = append(lst, v)
 		}
 	}

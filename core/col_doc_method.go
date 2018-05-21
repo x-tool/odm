@@ -7,7 +7,7 @@ import (
 )
 
 func (d *doc) findDocMode() (field *structField) {
-	for _, v := range d.getStructRootFields() {
+	for _, v := range d.getExtendFields() {
 		_value := reflect.New(v.selfType)
 		_, ok := _value.Interface().(DocMode)
 		if ok {
