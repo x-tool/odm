@@ -53,10 +53,10 @@ func (d *Handle) selectValidFields(dLst []*queryRootField) (vLst []*queryRootFie
 	return
 }
 
-// func (h *Handle) GetRootValues() []*Value {
-// 	values := h.col.GetRootValues(h.setValue)
-// 	return values
-// }
+func (h *Handle) GetRootValues() []*Value {
+	values := h.col.GetRootValues(h.setValue)
+	return values
+}
 
 func (h *Handle) setColbyValue(r *reflect.Value) {
 	if h.col != nil {

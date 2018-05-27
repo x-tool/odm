@@ -286,34 +286,34 @@ func (d *dialectpostgre) Open(sql string, results interface{}) (err error) {
 	}
 }
 
-// func (d *dialectpostgre) OpenWithHandle(sql string, Handle *core.Handle) (err error) {
-// 	_conn, err := d.newConn()
-// 	if err != nil {
-// 		return err
-// 	}
-// 	pgConn := _conn.conn
-// 	d.LogSql(sql)
-// 	rows, err := pgConn.Query(sql)
-// 	defer pgConn.Close()
+func (d *dialectpostgre) OpenWithHandle(sql string, Handle *core.Handle) (err error) {
+	_conn, err := d.newConn()
+	if err != nil {
+		return err
+	}
+	pgConn := _conn.conn
+	d.LogSql(sql)
+	rows, err := pgConn.Query(sql)
+	defer pgConn.Close()
 
-// 	resultV := *Handle.Result
-// 	resultT := resultV.Type()
-// 	if resultT.Kind() == reflect.Slice {
-// 		for rows.Next() {
-// 			resultItemV := Handle.Result.newResultItem()
-// 			var resultSlicePtr []interface{}
-// 			for _, v := range Handle.Result.getResultRootItemFieldAddr(resultItemV) {
-// 				resultSlicePtr = append(resultSlicePtr, (v).Interface())
-// 			}
-// 			err = rows.Scan(resultSlicePtr...)
-// 			resultV.Set(reflect.Append(resultV, *resultItemV))
-// 			if err != nil {
-// 				break
-// 			}
-// 		}
-// 		return err
-// 	} else {
-// 		return nil
-// 	}
+	resultV := *Handle.Result
+	resultT := resultV.Type()
+	if resultT.Kind() == reflect.Slice {
+		for rows.Next() {
+			resultItemV := Handle.Result.newResultItem()
+			var resultSlicePtr []interface{}
+			for _, v := range Handle.Result.getResultRootItemFieldAddr(resultItemV) {
+				resultSlicePtr = append(resultSlicePtr, (v).Interface())
+			}
+			err = rows.Scan(resultSlicePtr...)
+			resultV.Set(reflect.Append(resultV, *resultItemV))
+			if err != nil {
+				break
+			}
+		}
+		return err
+	} else {
+		return nil
+	}
 
-// }
+}

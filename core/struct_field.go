@@ -25,7 +25,7 @@ func (d *structField) Name() string {
 	return d.name
 }
 
-func (d *structField) GetID() int {
+func (d *structField) ID() int {
 	return d.id
 }
 

@@ -12,6 +12,6 @@ func newDoc(c *Col, i interface{}) *doc {
 	_doc := new(doc)
 	_doc.col = c
 	_doc.odmStruct = *newOdmStruct(i)
-	_doc.mode = _doc.findDocMode()
+	_doc.mode = _doc.findDocModeField()
 	return _doc
 }

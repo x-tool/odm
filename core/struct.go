@@ -37,7 +37,7 @@ func (d *odmStruct) getChildFieldByName(i *structField, s string) (r *structFiel
 
 func (d *odmStruct) getFieldById(id int) (o *structField) {
 	for _, v := range d.fields {
-		if v.GetID() == id {
+		if v.ID() == id {
 			o = v
 			return o
 		}

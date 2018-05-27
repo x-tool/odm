@@ -6,7 +6,7 @@ import (
 	"strings"
 )
 
-func (d *doc) findDocMode() (field *structField) {
+func (d *doc) findDocModeField() (field *structField) {
 	for _, v := range d.getExtendFields() {
 		_value := reflect.New(v.selfType)
 		_, ok := _value.Interface().(DocMode)
