@@ -21,49 +21,6 @@ type odmStruct struct {
 }
 type odmStructLst []*odmStruct
 
-func (d *odmStruct) getChildFields(i *structField) (r structFieldLst) {
-	return i.childLst
-}
-
-func (d *odmStruct) getChildFieldByName(i *structField, s string) (r *structField) {
-	for _, v := range i.childLst {
-		if v.Name() == s {
-			r = v
-			break
-		}
-	}
-	return
-}
-
-func (d *odmStruct) getFieldById(id int) (o *structField) {
-	for _, v := range d.fields {
-		if v.ID() == id {
-			o = v
-			return o
-		}
-	}
-	return
-}
-
-func (d *odmStruct) getFieldByName(name string) (o structFieldLst) {
-	return d.fieldNameMap[name]
-}
-
-func (d *odmStruct) getFieldByTag(tag string) (o *structField) {
-	return d.fieldTagMap[tag]
-}
-
-func (d *odmStruct) GetRootFields() structFieldLst {
-	return d.rootFields
-}
-func (d *odmStruct) getExtendFields() (lst structFieldLst) {
-	for _, v := range d.fields {
-		if v.isExtend {
-			lst = append(lst, v)
-		}
-	}
-	return
-}
 func newOdmStruct(i interface{}) (_odmStruct *odmStruct) {
 
 	// append odmStruct.fields
@@ -77,14 +34,49 @@ func newOdmStruct(i interface{}) (_odmStruct *odmStruct) {
 	}
 	fields := newstructFieldLst(_odmStruct, odmStructSourceT)
 	_odmStruct.fields = *fields
-	_odmStruct.fieldTagMap = _odmStruct.makestructFieldLstTagMap()
-	_odmStruct.fieldNameMap = _odmStruct.makestructFieldLstNameMap()
-	_odmStruct.rootFields = _odmStruct.makerootFieldNameMap()
+	_odmStruct.fieldTagMap = makestructFieldLstTagMap(_odmStruct)
+	_odmStruct.fieldNameMap = makestructFieldLstNameMap(_odmStruct)
+	_odmStruct.rootFields = makerootFieldNameMap(_odmStruct)
 	_odmStruct.interfaceFields = _odmStruct.getInterfaceFields()
 	return
 }
 
-// var addFieldsLock sync.WaitGroup
+func (d *odmStruct) getFieldByName(name string) (o structFieldLst) {
+	return d.fieldNameMap[name]
+}
+
+func (d *odmStruct) getFieldByTag(tag string) (o *structField) {
+	return d.fieldTagMap[tag]
+}
+
+// "path.fieldName"
+func (d *odmStruct) getFieldByPath(pathStr string) (f *structField) {
+	// check dependLst
+	path := strings.Split(pathStr, ".")
+	fieldNamme := path[len(path)-1]
+	dependLst := path[len(path)-1:]
+	fields := d.getFieldByName(fieldNamme)
+
+	if len(fields) == 1 {
+		f = fields[0]
+	} else {
+		f = d.getFieldByDependLst(dependLst, fieldNamme)
+	}
+	return
+}
+
+func (d *odmStruct) GetRootFields() structFieldLst {
+	return d.rootFields
+}
+
+func (d *odmStruct) getExtendFields() (lst structFieldLst) {
+	for _, v := range d.fields {
+		if v.isExtend {
+			lst = append(lst, v)
+		}
+	}
+	return
+}
 
 func newstructFieldLst(d *odmStruct, odmStructSourceT reflect.Type) *structFieldLst {
 	var lst structFieldLst
@@ -105,7 +97,7 @@ func newstructFieldLst(d *odmStruct, odmStructSourceT reflect.Type) *structField
 	return &lst
 }
 
-func (d *odmStruct) makestructFieldLstTagMap() (m map[string]*structField) {
+func makestructFieldLstTagMap(d *odmStruct) (m map[string]*structField) {
 	_d := d.fields
 	for _, v := range _d {
 		tagPtr := v.tag.ptr
@@ -116,7 +108,7 @@ func (d *odmStruct) makestructFieldLstTagMap() (m map[string]*structField) {
 	return m
 }
 
-func (d *odmStruct) makestructFieldLstNameMap() map[string]structFieldLst {
+func makestructFieldLstNameMap(d *odmStruct) map[string]structFieldLst {
 	_d := d.fields
 	var _map = make(map[string]structFieldLst)
 	for _, v := range _d {
@@ -131,7 +123,7 @@ func (d *odmStruct) makestructFieldLstNameMap() map[string]structFieldLst {
 	return _map
 }
 
-func (d *odmStruct) makerootFieldNameMap() (lst []*structField) {
+func makerootFieldNameMap(d *odmStruct) (lst []*structField) {
 	_d := d.fields
 	for _, v := range _d {
 		if v.extendParent == nil && v.IsExtend() == false {
@@ -168,34 +160,6 @@ func (d *odmStruct) getFieldByDependLst(Lst []string, fieldName string) (_field 
 		if check == true {
 			_field = field
 			break
-		}
-	}
-	return
-}
-
-// "tagName"
-// "path.fieldName"
-func (d *odmStruct) getFieldByPath(pathStr string) (f *structField) {
-	// check dependLst
-	path := strings.Split(pathStr, ".")
-	fieldSign := path[len(path)-1]
-	dependLst := path[len(path)-1:]
-	dependLen := len(dependLst)
-	// if has no interface, could use tag to search
-	if dependLen == 1 {
-		fieldByTag := d.getFieldByTag(fieldSign)
-		if fieldByTag != nil {
-			return fieldByTag
-		} else {
-			f = d.getFieldByDependLst([]string{}, fieldSign)
-		}
-	} else {
-		fields := d.getFieldByName(fieldSign)
-		// if docFieldLstLen != 1 range depend
-		if len(fields) == 1 {
-			f = fields[0]
-		} else {
-			f = d.getFieldByDependLst(dependLst, fieldSign)
 		}
 	}
 	return
