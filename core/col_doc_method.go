@@ -8,7 +8,7 @@ import (
 
 func (d *doc) findDocModeField() (field *structField) {
 	for _, v := range d.getExtendFields() {
-		_value := reflect.New(v.selfType)
+		_value := reflect.New(v.sourceType)
 		_, ok := _value.Interface().(DocMode)
 		if ok {
 			field = v
@@ -48,7 +48,7 @@ func (d *doc) getFieldByDocPath(path string) (f *structField, err error) {
 				acrossDependLst = append(acrossDependLst, f.dependLst...)
 			}
 		}
-		f.AcrossStructdependLst = acrossDependLst
+		// f.AcrossStructdependLst = acrossDependLst
 	}
 	return
 }
