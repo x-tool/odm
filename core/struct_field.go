@@ -7,7 +7,7 @@ import (
 type structField struct {
 	odmStruct             *odmStruct
 	name                  string
-	selfType              reflect.Type
+	sourceType            reflect.Type
 	kind                  Kind
 	id                    int
 	isExtend              bool
@@ -65,7 +65,7 @@ func newStructField(_odmStruct *odmStruct, d *structFieldLst, t *reflect.StructF
 	field := &structField{
 		odmStruct:       _odmStruct,
 		name:            t.Name,
-		selfType:        reflectType,
+		sourceType:      reflectType,
 		kind:            kind,
 		parent:          parent,
 		isExtend:        isExtend,

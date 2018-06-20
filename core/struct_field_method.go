@@ -6,7 +6,7 @@ import (
 )
 
 func (d *structField) newValue() (v reflect.Value) {
-	return reflect.New(d.selfType)
+	return reflect.New(d.sourceType)
 }
 
 /// error

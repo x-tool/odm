@@ -47,7 +47,7 @@ func (v *Value) ReflectValue() *reflect.Value {
 }
 
 func (v *Value) ReflectType() reflect.Type {
-	return v.field.selfType
+	return v.field.sourceType
 }
 
 func (v *Value) Interface() interface{} {

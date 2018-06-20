@@ -3,7 +3,6 @@ package core
 import (
 	"errors"
 	"reflect"
-	"strings"
 
 	"github.com/x-tool/tool"
 )
@@ -37,44 +36,7 @@ func newOdmStruct(i interface{}) (_odmStruct *odmStruct) {
 	_odmStruct.fieldTagMap = makestructFieldLstTagMap(_odmStruct)
 	_odmStruct.fieldNameMap = makestructFieldLstNameMap(_odmStruct)
 	_odmStruct.rootFields = makerootFieldNameMap(_odmStruct)
-	_odmStruct.interfaceFields = _odmStruct.getInterfaceFields()
-	return
-}
-
-func (d *odmStruct) getFieldByName(name string) (o structFieldLst) {
-	return d.fieldNameMap[name]
-}
-
-func (d *odmStruct) getFieldByTag(tag string) (o *structField) {
-	return d.fieldTagMap[tag]
-}
-
-// "path.fieldName"
-func (d *odmStruct) getFieldByPath(pathStr string) (f *structField) {
-	// check dependLst
-	path := strings.Split(pathStr, ".")
-	fieldNamme := path[len(path)-1]
-	dependLst := path[len(path)-1:]
-	fields := d.getFieldByName(fieldNamme)
-
-	if len(fields) == 1 {
-		f = fields[0]
-	} else {
-		f = d.getFieldByDependLst(dependLst, fieldNamme)
-	}
-	return
-}
-
-func (d *odmStruct) GetRootFields() structFieldLst {
-	return d.rootFields
-}
-
-func (d *odmStruct) getExtendFields() (lst structFieldLst) {
-	for _, v := range d.fields {
-		if v.isExtend {
-			lst = append(lst, v)
-		}
-	}
+	_odmStruct.interfaceFields = makeInterfaceFields(_odmStruct)
 	return
 }
 
@@ -133,7 +95,7 @@ func makerootFieldNameMap(d *odmStruct) (lst []*structField) {
 	return
 }
 
-func (d *odmStruct) getInterfaceFields() (lst map[string]*structField) {
+func makeInterfaceFields(d *odmStruct) (lst map[string]*structField) {
 	for _, v := range d.fields {
 		if _, ok := lst[v.name]; !ok {
 			if v.Kind() == Interface {
@@ -141,26 +103,6 @@ func (d *odmStruct) getInterfaceFields() (lst map[string]*structField) {
 			}
 		}
 
-	}
-	return
-}
-
-func (d *odmStruct) getFieldByDependLst(Lst []string, fieldName string) (_field *structField) {
-	// fields := d.getFieldByName(fieldName)
-	for _, field := range d.fields {
-		var check bool = false
-		for i, dependField := range field.dependLst {
-			if dependField.Name() != Lst[i] {
-				check = false
-				break
-			} else {
-				check = true
-			}
-		}
-		if check == true {
-			_field = field
-			break
-		}
 	}
 	return
 }
