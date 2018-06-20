@@ -13,11 +13,11 @@ type odmStruct struct {
 	path            string
 	allName         string // name+path
 	fields          structFieldLst
+	rootFields      structFieldLst
 	sourceType      *reflect.Type
 	interfaceFields map[string]*structField
 	fieldTagMap     map[string]*structField
 	fieldNameMap    map[string]structFieldLst
-	rootFields      structFieldLst
 }
 type odmStructLst []*odmStruct
 
