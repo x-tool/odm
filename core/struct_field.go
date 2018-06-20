@@ -5,20 +5,18 @@ import (
 )
 
 type structField struct {
-	odmStruct             *odmStruct
-	name                  string
-	sourceType            reflect.Type
-	kind                  Kind
-	id                    int
-	isExtend              bool
-	childLst              structFieldLst
-	parent                *structField // field golang parent real
-	dependLst             dependLst
-	AcrossStructdependLst dependLst    // struct can be value in col's interface field,use this field to get all path
-	extendParent          *structField // field Handle parent
-	extendDependLst       dependLst
-	tag                   *odmTag
-	funcLst               map[string]string
+	odmStruct       *odmStruct
+	name            string
+	sourceType      reflect.Type
+	kind            Kind
+	id              int
+	isExtend        bool // is Anonymous field
+	childLst        structFieldLst
+	parent          *structField // field golang parent real
+	dependLst       dependLst
+	extendParent    *structField // field Handle parent
+	extendDependLst dependLst
+	tag             *odmTag
 }
 
 func (d *structField) Name() string {
@@ -82,7 +80,7 @@ func newStructField(_odmStruct *odmStruct, d *structFieldLst, t *reflect.StructF
 		}
 	}
 	// set extendparent
-	field.extendParent = d.getExtendParent(field)
+	field.extendParent = getExtendParent(d, field)
 	// add item to doc fieldlst, and set field id
 	field = d.addItem(field)
 
@@ -94,21 +92,16 @@ func newStructField(_odmStruct *odmStruct, d *structFieldLst, t *reflect.StructF
 		count := _fieldType.NumField()
 		for i := 0; i < count; i++ {
 			_f := _fieldType.Field(i)
-			// addFieldsLock.Add(1)
-			// go newStructField(_doc, d, &_f, field)
 			newStructField(_odmStruct, d, &_f, field)
 		}
 	case Struct:
 		count := fieldType.Type.NumField()
 		for i := 0; i < count; i++ {
 			_f := fieldType.Type.Field(i)
-			// addFieldsLock.Add(1)
-			// go newStructField(_doc, d, &_f, field)
 			newStructField(_odmStruct, d, &_f, field)
 		}
 
 	}
-	// addFieldsLock.Done()
 }
 
 func checkstructFieldisExtend(r *reflect.StructField) (b bool) {
@@ -119,12 +112,7 @@ func checkstructFieldisExtend(r *reflect.StructField) (b bool) {
 type structFieldLst []*structField
 type dependLst []*structField
 
-// var addFieldLock sync.Mutex
-
 func (d *structFieldLst) addItem(f *structField) *structField {
-	// add lock
-	// addFieldLock.Lock()
-	// defer addFieldLock.Unlock()
 	f.id = len(*d)
 	*d = append(*d, f)
 	return f
@@ -165,12 +153,12 @@ func (d *structFieldLst) getGroupTypeFieldLst() (rd structFieldLst) {
 	return
 }
 
-func (d *structFieldLst) getExtendParent(field *structField) (f *structField) {
+func getExtendParent(d *structFieldLst, field *structField) (f *structField) {
 	if field.parent == nil {
 		f = nil
 	} else {
 		if field.parent.isExtend {
-			f = d.getExtendParent(field.parent)
+			f = getExtendParent(d, field.parent)
 		} else {
 			f = field.parent
 		}
