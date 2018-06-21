@@ -7,6 +7,7 @@ import (
 type Col struct {
 	database *Database
 	name     string
+	alias    string
 	doc
 }
 

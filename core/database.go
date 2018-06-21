@@ -12,6 +12,7 @@ type Database struct {
 	ColLst
 	odmStructLst
 	config
+	states
 	history    *history
 	mapCols    map[string]*Col       // use map to get col by name
 	mapStructs map[string]*odmStruct // use map to get structs by name, I think struct name should be unique where ever package, if not user should write whole pkgPath and name in one string to get one struct
@@ -19,6 +20,10 @@ type Database struct {
 
 type config struct {
 	colNameAlias func(string) string
+}
+
+type states struct {
+	isSyncCols bool
 }
 
 type history struct {

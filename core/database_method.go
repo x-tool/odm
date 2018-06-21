@@ -14,6 +14,7 @@ func (d *Database) RegisterCol(c interface{}) {
 	_col := newCol(d, c)
 	d.ColLst = append(d.ColLst, _col)
 	d.mapCols[_col.Name()] = _col
+	d.RegisterStruct(_col.doc.odmStruct)
 	rigisterCols.Done()
 }
 
@@ -26,7 +27,13 @@ func (d *Database) RegisterCols(c ...interface{}) {
 }
 
 func (d *Database) RegisterStruct(c interface{}) {
-	_struct := newOdmStruct(c)
+	var _struct *odmStruct
+	if v, ok := c.(odmStruct); ok {
+		_struct = &v
+	} else {
+		_struct = newOdmStruct(c)
+	}
+
 	if _, ok := d.mapStructs[_struct.name]; !ok {
 		d.mapStructs[_struct.name] = _struct
 	}
@@ -43,6 +50,10 @@ func (d *Database) RegisterStructs(c ...interface{}) {
 }
 
 func (d *Database) SyncCols() {
+	for _, v := range d.ColLst {
+		col := *v
+		col.alias = d.config.colNameAlias(col.name)
+	}
 	d.dialect.SyncCols(d.ColLst)
 }
 
@@ -56,5 +67,8 @@ func (d *Database) setHistory() {
 }
 
 func (d *Database) ColNameAlias(f func(string) string) {
+	if d.isSyncCols {
+		tool.Panic("DB", errors.New("It can't works, because database has been sync, you should write ColNameAlias method before SyncCols method"))
+	}
 	d.config.colNameAlias = f
 }
