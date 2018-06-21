@@ -7,14 +7,15 @@ import (
 	"github.com/x-tool/tool"
 )
 
+var rigisterCols sync.WaitGroup
+var rigisterStructs sync.WaitGroup
+
 func (d *Database) RegisterCol(c interface{}) {
 	_col := newCol(d, c)
 	d.ColLst = append(d.ColLst, _col)
 	d.mapCols[_col.Name()] = _col
 	rigisterCols.Done()
 }
-
-var rigisterCols sync.WaitGroup
 
 func (d *Database) RegisterCols(c ...interface{}) {
 	for _, v := range c {
@@ -23,8 +24,6 @@ func (d *Database) RegisterCols(c ...interface{}) {
 	}
 	rigisterCols.Wait()
 }
-
-var rigisterStructs sync.WaitGroup
 
 func (d *Database) RegisterStruct(c interface{}) {
 	_struct := newOdmStruct(c)
