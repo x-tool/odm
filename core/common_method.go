@@ -7,6 +7,6 @@ func allName(t reflect.Type) string {
 	if t.Kind() == reflect.Ptr {
 		t = t.Elem()
 	}
-	s := t.Name() + t.PkgPath()
+	s := t.PkgPath() + t.Name()
 	return s
 }

@@ -11,9 +11,14 @@ type Database struct {
 	dialect Dialect
 	ColLst
 	odmStructLst
+	config
 	history    *history
 	mapCols    map[string]*Col       // use map to get col by name
-	mapStructs map[string]*odmStruct // use map to get structs by allname
+	mapStructs map[string]*odmStruct // use map to get structs by name, I think struct name should be unique where ever package, if not user should write whole pkgPath and name in one string to get one struct
+}
+
+type config struct {
+	colNameAlias func(string) string
 }
 
 type history struct {
@@ -36,4 +41,12 @@ func (d *Database) Name() string {
 
 func (d *Database) GetClient() *client.Client {
 	return d.client
+}
+
+func (d *Database) getColByName(name string) *Col {
+	return d.mapCols[name]
+}
+
+func (d *Database) getStructByName(name string) *odmStruct {
+	return d.mapStructs[name]
 }

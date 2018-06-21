@@ -9,10 +9,8 @@ import (
 
 func (d *Database) RegisterCol(c interface{}) {
 	_col := newCol(d, c)
-	if _, ok := d.mapCols[_col.Name()]; !ok {
-		d.mapCols[_col.Name()] = _col
-	}
 	d.ColLst = append(d.ColLst, _col)
+	d.mapCols[_col.Name()] = _col
 	rigisterCols.Done()
 }
 
@@ -30,8 +28,8 @@ var rigisterStructs sync.WaitGroup
 
 func (d *Database) RegisterStruct(c interface{}) {
 	_struct := newOdmStruct(c)
-	if _, ok := d.mapStructs[_struct.allName]; !ok {
-		d.mapStructs[_struct.allName] = _struct
+	if _, ok := d.mapStructs[_struct.name]; !ok {
+		d.mapStructs[_struct.name] = _struct
 	}
 	d.odmStructLst = append(d.odmStructLst, _struct)
 	rigisterCols.Done()
@@ -58,10 +56,6 @@ func (d *Database) setHistory() {
 	}
 }
 
-func (d *Database) getColByName(name string) *Col {
-	return d.mapCols[name]
-}
-
-func (d *Database) getStructByName(name string) *odmStruct {
-	return d.mapStructs[name]
+func (d *Database) ColNameAlias(f func(string) string) {
+	d.config.colNameAlias = f
 }
