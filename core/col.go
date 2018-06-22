@@ -15,11 +15,6 @@ func (c *Col) Name() string {
 	return c.name
 }
 
-// ColInterface to get name quick from interface
-type ColInterface interface {
-	ColName() string
-}
-
 func newCol(db *Database, i interface{}) *Col {
 	c := new(Col)
 	c.name = GetColName(i)
@@ -28,10 +23,10 @@ func newCol(db *Database, i interface{}) *Col {
 	return c
 }
 
-func (c *Col) GetRootValues(rootValue *reflect.Value) (valueLst ValueLst) {
+func (c *Col) GetRootValues(instance *reflect.Value) (RootValues ValueLst) {
 	for _, v := range c.GetRootFields() {
-		value := newValueByReflect(v.GetValueFromRootValue(rootValue), v)
-		valueLst = append(valueLst, value)
+		value := newValueByReflect(v.GetValueFromRootValue(instance), v)
+		RootValues = append(RootValues, value)
 	}
 	return
 }
@@ -43,7 +38,7 @@ func GetColName(i interface{}) (name string) {
 	return
 }
 
-// GetColName get interface name
+// sometimes get col name use reflect.Type Ex: when insert data, must use reflect, use this method could less one time to get name
 func GetColNameByReflectType(t reflect.Type) (name string) {
 	if t.Kind() == reflect.Ptr {
 		t = t.Elem()
