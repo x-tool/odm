@@ -1,6 +1,8 @@
 package core
 
 import (
+	"reflect"
+
 	"github.com/x-tool/odm/client"
 )
 
@@ -48,7 +50,13 @@ func (d *Database) GetClient() *client.Client {
 	return d.client
 }
 
-func (d *Database) getColByName(name string) *Col {
+func (d *Database) GetCol(i interface{}) *Col {
+	var name string
+	if v, ok := i.(string); !ok {
+		name = string(v)
+	} else {
+		name = reflect.TypeOf(i).Name()
+	}
 	return d.mapCols[name]
 }
 
