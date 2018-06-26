@@ -1,6 +1,10 @@
 package core
 
-import "strings"
+import (
+	"errors"
+	"fmt"
+	"strings"
+)
 
 func (d *odmStruct) getFieldByName(name string) (o structFieldLst) {
 	return d.fieldNameMap[name]
@@ -49,12 +53,15 @@ func (d *odmStruct) getFieldByDependLst(fieldName string, Lst []string) (_field 
 // "@tag"
 // "fieldName"
 // "path.fieldName"
-func (d *odmStruct) getFieldByString(str string)(f *structField, err error) {
+func (d *odmStruct) getFieldByString(str string) (f *structField, err error) {
 	var sign = str[:1]
 	if sign == tag_Tag {
 		f = d.getFieldByTag(str[1:])
 	} else {
 		f = d.getFieldByPath(str)
+	}
+	if !f {
+		err = errors.New(fmt.Sprintf("Can't find field use string %d in struct %d", str, d.name))
 	}
 	return
 }
@@ -71,4 +78,3 @@ func (d *odmStruct) getExtendFields() (lst structFieldLst) {
 	}
 	return
 }
-

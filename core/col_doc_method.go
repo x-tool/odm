@@ -1,7 +1,6 @@
 package core
 
 import (
-	"errors"
 	"reflect"
 	"strings"
 )
@@ -24,4 +23,18 @@ func (d *doc) findDocModeField() (field *structField) {
 
 func (d *doc) getDocMode() *structField {
 	return d.mode
+}
+
+// "@tag"
+// "path"
+// "path:@tag"
+// "path:path"
+func (d *doc) getFieldValue(s string) (f *structField, err error) {
+	structLst := strings.Split(s, splitStructStr)
+	if len(structLst) == 1 {
+		return d.getFieldByString()
+	} else {
+		d.getFieldByString(structLst[0])
+
+	}
 }

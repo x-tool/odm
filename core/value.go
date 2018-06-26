@@ -10,7 +10,7 @@ import (
 type ValueLst []*Value
 type Value struct {
 	field    *structField
-	reflect  *reflect.Value
+	addr     *reflect.Value
 	hasValue bool
 	zero     bool
 }
@@ -18,15 +18,15 @@ type Value struct {
 func newValue(v interface{}, field *structField) (o *Value) {
 	_v := reflect.ValueOf(v)
 	o = &Value{
-		field:   field,
-		reflect: &_v,
+		field: field,
+		addr:  &_v,
 	}
 	return o
 }
 func newValueByReflect(v *reflect.Value, field *structField) (o *Value) {
 	o = &Value{
-		field:   field,
-		reflect: v,
+		field: field,
+		addr:  v,
 	}
 	return o
 }
