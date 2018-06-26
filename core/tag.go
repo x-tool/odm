@@ -7,7 +7,7 @@ import (
 var (
 	tagName      = "xodm"
 	tagSeparator = ";"
-	tag_sign     = "@"
+	tag_Tag     = "@"
 )
 
 // `xodm:"@sign"`
@@ -25,14 +25,14 @@ func newTag(s string) *odmTag {
 		fieldLst := strings.Split(v, ":")
 		fieldLstLen := len(fieldLst)
 		if fieldLstLen == 1 {
-			if strings.Index(fieldLst[0], tag_sign) == 0 {
+			if strings.Index(fieldLst[0], tag_Tag) == 0 {
 				_o.sign = string([]rune(fieldLst[0])[1:])
 			}
 		} else if fieldLstLen == 2 {
 			name := strings.TrimSpace(fieldLst[0])
 			value := strings.TrimSpace(fieldLst[1])
 			switch name {
-			case tag_sign:
+			case tag_Tag:
 				_o.sign = value
 			}
 		}

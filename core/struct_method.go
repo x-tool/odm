@@ -10,6 +10,7 @@ func (d *odmStruct) getFieldByTag(tag string) (o *structField) {
 	return d.fieldTagMap[tag]
 }
 
+// "fieldName"
 // "path.fieldName"
 func (d *odmStruct) getFieldByPath(pathStr string) (f *structField) {
 	// check dependLst
@@ -21,26 +22,12 @@ func (d *odmStruct) getFieldByPath(pathStr string) (f *structField) {
 	if len(fields) == 1 {
 		f = fields[0]
 	} else {
-		f = d.getFieldByDependLst(dependLst, fieldNamme)
+		f = d.getFieldByDependLst(fieldNamme, dependLst)
 	}
 	return
 }
 
-func (d *odmStruct) GetRootFields() structFieldLst {
-	return d.rootFields
-}
-
-func (d *odmStruct) getExtendFields() (lst structFieldLst) {
-	for _, v := range d.fields {
-		if v.isExtend {
-			lst = append(lst, v)
-		}
-	}
-	return
-}
-
-func (d *odmStruct) getFieldByDependLst(Lst []string, fieldName string) (_field *structField) {
-	// fields := d.getFieldByName(fieldName)
+func (d *odmStruct) getFieldByDependLst(fieldName string, Lst []string) (_field *structField) {
 	for _, field := range d.fields {
 		var check bool = false
 		for i, dependField := range field.dependLst {
@@ -58,3 +45,30 @@ func (d *odmStruct) getFieldByDependLst(Lst []string, fieldName string) (_field 
 	}
 	return
 }
+
+// "@tag"
+// "fieldName"
+// "path.fieldName"
+func (d *odmStruct) getFieldByString(str string)(f *structField, err error) {
+	var sign = str[:1]
+	if sign == tag_Tag {
+		f = d.getFieldByTag(str[1:])
+	} else {
+		f = d.getFieldByPath(str)
+	}
+	return
+}
+
+func (d *odmStruct) GetRootFields() structFieldLst {
+	return d.rootFields
+}
+
+func (d *odmStruct) getExtendFields() (lst structFieldLst) {
+	for _, v := range d.fields {
+		if v.isExtend {
+			lst = append(lst, v)
+		}
+	}
+	return
+}
+
