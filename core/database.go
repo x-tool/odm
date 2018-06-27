@@ -1,6 +1,8 @@
 package core
 
 import (
+	"errors"
+	"fmt"
 	"reflect"
 
 	"github.com/x-tool/odm/client"
@@ -60,6 +62,10 @@ func (d *Database) GetCol(i interface{}) *Col {
 	return d.mapCols[name]
 }
 
-func (d *Database) getStructByName(name string) *odmStruct {
-	return d.mapStructs[name]
+func (d *Database) getStructByName(name string) (o *odmStruct, err error) {
+	o = d.mapStructs[name]
+	if o == nil {
+		err = errors.New(fmt.Sprintf("Can't find struct name %d in database", name))
+	}
+	return
 }

@@ -2,6 +2,8 @@ package core
 
 import (
 	"encoding/json"
+	"errors"
+	"fmt"
 	"reflect"
 )
 
@@ -9,24 +11,24 @@ func (d *structField) newValue() (v reflect.Value) {
 	return reflect.New(d.sourceType)
 }
 
-/// error
-func (d *structField) GetValueFromRootValue(rootValue *reflect.Value) *reflect.Value {
-	_r := *rootValue
-	if len(d.dependLst) != 0 {
-		for _, v := range d.dependLst {
-			// if dependLst parent is extend, should get field from grandparent
-			if v.kind == Struct {
-				_r = _r.FieldByName(v.Name())
-			} else {
-				break // !!!!!! mark wait modify !!!!!!!
-			}
+/// error ,should be rewrite
+func (d *structField) GetValueFromRootValue(rootValue *reflect.Value) (value *Value, err error) {
+	rawValue := *rootValue
+	for _, v := range d.dependLst {
+		if v.kind == Struct {
+			rawValue = rawValue.FieldByName(v.Name())
+		} else {
+			// can't get field in slice or map, but should be
+			err = errors.New(fmt.Sprintf("Can't get Values in struct %d, because fieldName %d parent type is %d", d.name, v.name, v.kind.String()))
+			break
 		}
-		_r = _r.FieldByName(d.Name())
-	} else {
-		_r = _r.FieldByName(d.Name())
 	}
-
-	return &_r
+	rawValue = rawValue.FieldByName(d.Name())
+	if rawValue.CanInterface() {
+		rawValue = rawValue.Interface()
+	}
+	value = newValueByReflect(&rawValue.Addr(), d)
+	return
 }
 
 func (d *structField) json(v *reflect.Value) ([]byte, error) {
