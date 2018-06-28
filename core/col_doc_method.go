@@ -9,10 +9,10 @@ const (
 	splitStructStr = ":"
 )
 
-var splitStructNameToFieldPath = []string{
-	".",
-	tag_Tag
-}
+// var splitStructNameToFieldPath = []string{
+// 	".",
+// 	tag_Tag
+// }
 
 func (d *doc) findDocModeField() (field *structField) {
 	for _, v := range d.getExtendFields() {
@@ -48,7 +48,8 @@ func (d *doc) getFieldByAllPath(s string, rootValue *reflect.Value) (value *Valu
 	for _, v := range structLst[1:] {
 		// now just should find "@", if add more sign to split struct in the fultrue, should modify
 		var sign string
-		index := strings.index(v, "@")
+		var targetStruct *odmStruct
+		index := strings.Index(v, "@")
 		if index == -1 {
 			sign = "."
 		} else {
@@ -58,7 +59,7 @@ func (d *doc) getFieldByAllPath(s string, rootValue *reflect.Value) (value *Valu
 		slice := strings.SplitN(v, sign, 2)
 		structName := slice[0]
 		fieldRoute := slice[1]
-		targetStruct, err := d.col.database.getStructByName(structName)
+		targetStruct, err = d.col.database.getStructByName(structName)
 		if err != nil {
 			return
 		}
