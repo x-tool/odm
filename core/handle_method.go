@@ -89,10 +89,10 @@ func (d *Handle) Col(i interface{}) (h *Handle) {
 	var _col *Col
 	switch i.(type) {
 	case string:
-		_col = d.db.getColByName(i.(string))
+		_col = d.db.GetColByName(i.(string))
 	default:
 		name := reflect.TypeOf(i).Name()
-		_col = d.db.getColByName(name)
+		_col = d.db.GetColByName(name)
 	}
 	if _col != nil {
 		d.Err = errors.New("can't Find Col")
