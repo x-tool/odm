@@ -24,10 +24,7 @@ func (d *structField) GetValueFromRootValue(rootValue *reflect.Value) (value *Va
 		}
 	}
 	rawValue = rawValue.FieldByName(d.Name())
-	if rawValue.CanInterface() {
-		rawValue = rawValue.Interface()
-	}
-	value = newValueByReflect(&rawValue.Addr(), d)
+	value = newValueByReflect(&rawValue, d)
 	return
 }
 

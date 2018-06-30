@@ -60,7 +60,7 @@ func (d *odmStruct) getFieldByString(str string) (f *structField, err error) {
 	} else {
 		f = d.getFieldByPath(str)
 	}
-	if !f {
+	if f == nil {
 		err = errors.New(fmt.Sprintf("Can't find field use string %d in struct %d", str, d.name))
 	}
 	return

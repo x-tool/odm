@@ -23,7 +23,8 @@ func callDocMode(h *Handle) {
 		var value reflect.Value
 		switch h.handleType {
 		case insertData:
-			value = *field.GetValueFromRootValue(h.getInsertValue())
+			_value, _ := field.GetValueFromRootValue(h.getInsertValue())
+			value = *_value.Get()
 		case updateData:
 			value = field.newValue()
 

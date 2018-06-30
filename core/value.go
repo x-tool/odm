@@ -10,7 +10,7 @@ import (
 type ValueLst []*Value
 type Value struct {
 	field    *structField
-	addr     *reflect.Value
+	value    *reflect.Value
 	hasValue bool
 	zero     bool
 }
@@ -19,49 +19,22 @@ func newValue(v interface{}, field *structField) (o *Value) {
 	_v := reflect.ValueOf(v)
 	o = &Value{
 		field: field,
-		addr:  &_v,
+		value: &_v,
 	}
 	return o
 }
 func newValueByReflect(v *reflect.Value, field *structField) (o *Value) {
 	o = &Value{
 		field: field,
-		addr:  v,
+		value: v,
 	}
 	return o
-}
-func (v *Value) Value() *structField {
-	return v.field
-}
-
-func (v *Value) Kind() Kind {
-	return v.field.Kind()
-}
-
-func (v *Value) FieldName() string {
-	return v.field.Name()
-}
-
-func (v *Value) ReflectValue() *reflect.Value {
-	return v.reflect
-}
-
-func (v *Value) ReflectType() reflect.Type {
-	return v.field.sourceType
-}
-
-func (v *Value) Interface() interface{} {
-	return v.reflect.Interface()
-}
-
-func (v *Value) String() string {
-	return ValueToString(v)
 }
 
 func ValueToString(value *Value) (s string) {
 	_value := *value
-	v := *_value.ReflectValue()
-	valueType := value.ReflectType()
+	v := *_value.Get()
+	valueType := v.Type()
 	switch valueType.Kind() {
 	case reflect.Bool:
 		s = strconv.FormatBool(v.Bool())

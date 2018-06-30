@@ -41,11 +41,13 @@ func (d *doc) getFieldByAllPath(s string, rootValue *reflect.Value) (value *Valu
 	if err != nil {
 		return
 	}
-	rawValue, err = field.GetValueFromRootValue(rawValue)
+	_value, err := field.GetValueFromRootValue(rawValue)
+	rawValue = _value.Get()
 	if err != nil {
 		return
 	}
-	for _, v := range structLst[1:] {
+	lstLen := len(structLst)
+	for i, v := range structLst[1:] {
 		// now just should find "@", if add more sign to split struct in the fultrue, should modify
 		var sign string
 		var targetStruct *odmStruct
@@ -67,11 +69,14 @@ func (d *doc) getFieldByAllPath(s string, rootValue *reflect.Value) (value *Valu
 		if err != nil {
 			return
 		}
-		rawValue, err = field.GetValueFromRootValue(rawValue)
+		_value, err = field.GetValueFromRootValue(rawValue)
+		rawValue = _value.Get()
 		if err != nil {
 			return
 		}
+		if i == lstLen-1 {
+			value = _value
+		}
 	}
-	value = rawValue
 	return
 }
