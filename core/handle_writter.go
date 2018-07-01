@@ -1,6 +1,6 @@
 package core
 
-type HandleSet struct {
+type writter struct {
 	setLst []HandleSetItem
 }
 

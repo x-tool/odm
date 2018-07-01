@@ -2,42 +2,42 @@ package core
 
 import "reflect"
 
-type result struct {
+type reader struct {
 	handle     *Handle
 	raw        interface{}
 	rawReflect reflect.Value
-	resultFieldLst
+	readerFieldLst
 }
 
-type resultFieldLst []*resultField
-type resultField struct {
+type readerFieldLst []*readerField
+type readerField struct {
 	field    *structField
-	function resultFunction
+	function readerFunction
 }
 
-type resultFunction int
+type readerFunction int
 
 const (
-	resultNumFunction resultFunction = iota
+	readerNumFunction readerFunction = iota
 )
 
-func newResult(i interface{}) *result {
+func newreader(i interface{}) *reader {
 	reflect.TypeOf(i)
-	r := new(result)
+	r := new(reader)
 	r.raw = i
 
 	return r
 }
 
-// type result struct {
+// type reader struct {
 // 	Col            *Col
-// 	resultFieldLst []*docField
-// 	resultV        *reflect.Value
-// 	resultKind     int
-// 	resultElem     *reflect.Value
+// 	readerFieldLst []*docField
+// 	readerV        *reflect.Value
+// 	readerKind     int
+// 	readerElem     *reflect.Value
 // }
 
-// func newResult(rV *reflect.Value, c *Col) (r *result) {
+// func newreader(rV *reflect.Value, c *Col) (r *reader) {
 // 	var vK int
 // 	var vE reflect.Value
 // 	if rV.Kind() == reflect.Slice {
@@ -47,25 +47,25 @@ func newResult(i interface{}) *result {
 // 		vK = 1
 // 		vE = *rV
 // 	}
-// 	r = &result{
+// 	r = &reader{
 // 		Col:        c,
-// 		resultV:    rV,
-// 		resultKind: vK,
-// 		resultElem: &vE,
+// 		readerV:    rV,
+// 		readerKind: vK,
+// 		readerElem: &vE,
 // 	}
 // 	return
 // }
-// func (r *result) newResultItem() (v *reflect.Value) {
+// func (r *reader) newreaderItem() (v *reflect.Value) {
 // 	var rV reflect.Value
-// 	if r.resultKind == 0 {
-// 		rV = reflect.New(r.resultElem.Type())
+// 	if r.readerKind == 0 {
+// 		rV = reflect.New(r.readerElem.Type())
 // 	} else {
-// 		rV = reflect.New(r.resultV.Type())
+// 		rV = reflect.New(r.readerV.Type())
 // 	}
 // 	return &rV
 // }
 
-func (r *result) getResultRootItemFieldAddr(rootV *reflect.Value) (v []reflect.Value) {
+func (r *reader) getreaderRootItemFieldAddr(rootV *reflect.Value) (v []reflect.Value) {
 	if rootV.Kind() == reflect.Struct {
 		lenR := rootV.NumField()
 		for i := 0; i < lenR; i++ {
@@ -76,7 +76,7 @@ func (r *result) getResultRootItemFieldAddr(rootV *reflect.Value) (v []reflect.V
 	return
 }
 
-func (r *result) AddRow(rowValues []interface{}) {
-	raws := r.getResultRootItemFieldAddr()
+func (r *reader) AddRow(rowValues []interface{}) {
+	raws := r.getreaderRootItemFieldAddr()
 
 }

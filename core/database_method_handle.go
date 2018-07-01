@@ -1,7 +1,7 @@
 package core
 
 func (d *Database) Insert(i interface{}) (err error) {
-	return newHandle(d, nil).Insert(i)
+	return newHandle(d).Insert(i)
 }
 
 func (d *Database) Get(i interface{}) (err error) {
