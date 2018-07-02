@@ -12,9 +12,9 @@ type DocMode interface {
 }
 
 var DocModeMethodMap = map[handleType]string{
-	insertData: "Create",
-	updateData: "Update",
-	deleteData: "Delete",
+	InsertData: "Create",
+	UpdateData: "Update",
+	DeleteData: "Delete",
 }
 
 func callDocMode(h *Handle) {
@@ -22,10 +22,10 @@ func callDocMode(h *Handle) {
 	if field != nil {
 		var value reflect.Value
 		switch h.handleType {
-		case insertData:
+		case InsertData:
 			_value, _ := field.GetValueFromRootValue(h.getInsertValue())
 			value = *_value.Get()
-		case updateData:
+		case UpdateData:
 			value = field.newValue()
 
 		}

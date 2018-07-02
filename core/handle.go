@@ -21,9 +21,7 @@ type Handle struct {
 
 func newHandle(c *Col) *Handle {
 	d := &Handle{
-		db:      c.database,
-		col:     c,
-		context: con,
+		col: c,
 	}
 	return d
 
