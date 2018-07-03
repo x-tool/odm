@@ -2,17 +2,20 @@ package core
 
 import "reflect"
 
-type reader struct {
-	handle     *Handle
-	isSingle   bool // true read single item ,false read item slice
-	raw        interface{}
-	rawReflect reflect.Value
-	readerFieldLst
-}
+// return col item type, Ex: by fieldname, by count, by list...
+type readerType int
 
+const (
+	readField readerType = iota
+	readFunc
+)
+
+// return col list
 type readerFieldLst []*readerField
+
 type readerField struct {
-	field    *structField
+	readerType
+	dependLst
 	function readerFunction
 }
 
@@ -22,11 +25,16 @@ const (
 	readerNumFunction readerFunction = iota
 )
 
+type reader struct {
+	raw        interface{}
+	rawReflect reflect.Value
+	readerFieldLst
+}
+
 func newreader(i interface{}) *reader {
 	reflect.TypeOf(i)
 	r := new(reader)
 	r.raw = i
-
 	return r
 }
 
