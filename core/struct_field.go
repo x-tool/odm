@@ -12,7 +12,7 @@ type structField struct {
 	id              int
 	isExtend        bool // is Anonymous field
 	childLst        structFieldLst
-	parent          *structField // field golang parent real
+	parent          *structField // field golang stack parent real
 	dependLst       dependLst
 	extendParent    *structField // field Handle parent
 	extendDependLst dependLst
@@ -50,15 +50,6 @@ func newStructField(_odmStruct *odmStruct, d *structFieldLst, t *reflect.StructF
 	isExtend := checkstructFieldisExtend(t)
 	var _dependLst dependLst
 	var _extendDependLst dependLst
-	// if field is root field parent == nil, can't use parent method
-	if parent != nil {
-		_dependLst = append(parent.dependLst, parent)
-		if isExtend {
-			_extendDependLst = parent.extendDependLst
-		} else {
-			_extendDependLst = append(parent.extendDependLst, parent)
-		}
-	}
 
 	field := &structField{
 		odmStruct:       _odmStruct,
@@ -75,6 +66,16 @@ func newStructField(_odmStruct *odmStruct, d *structFieldLst, t *reflect.StructF
 	// add parent childs
 	// if field is root field parent == nil, can't use parent method
 	if parent != nil {
+		field.dependLst = append(parent.dependLst, parent)
+		if isExtend {
+			field.extendDependLst = parent.extendDependLst
+		} else {
+			field.extendDependLst = append(parent.extendDependLst, parent)
+		}
+		if !kind.isGroupType() {
+			field.dependLst = append(field.dependLst, field)
+			field.extendDependLst = append(field.extendDependLst, field)
+		}
 		if parent.isGroupType() {
 			parent.childLst = append(parent.childLst, field)
 		}
@@ -110,7 +111,6 @@ func checkstructFieldisExtend(r *reflect.StructField) (b bool) {
 
 // lst /////////////////////////
 type structFieldLst []*structField
-type dependLst []*structField
 
 func (d *structFieldLst) addItem(f *structField) *structField {
 	f.id = len(*d)
@@ -152,6 +152,8 @@ func (d *structFieldLst) getGroupTypeFieldLst() (rd structFieldLst) {
 	}
 	return
 }
+
+type dependLst []*structField
 
 func getExtendParent(d *structFieldLst, field *structField) (f *structField) {
 	if field.parent == nil {

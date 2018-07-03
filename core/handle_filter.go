@@ -1,67 +1,63 @@
 package core
 
-import (
-	"reflect"
-)
+// type filters []filter
 
-type filters []filter
+// type handleType int
 
-type handleType int
+// const (
+// 	insertData handleType = iota
+// 	updateData
+// 	deleteData
+// 	queryData
+// )
 
-const (
-	insertData handleType = iota
-	updateData
-	deleteData
-	queryData
-)
+// type filterCompare string
 
-type filterCompare string
+// const (
+// 	sameCompare      filterCompare = "like"  // like
+// 	sameCompareLeft                = "?like" // ??like
+// 	sameCompareRight               = "like?" // like??
+// 	equalCompare                   = "=="    // ==
+// 	isNullCompare                  = "isNull"
+// 	betweenCompare                 = "between"
+// 	inCompare                      = "in"
+// )
 
-const (
-	sameCompare      filterCompare = "like"  // like
-	sameCompareLeft                = "?like" // ??like
-	sameCompareRight               = "like?" // like??
-	equalCompare                   = "=="    // ==
-	isNullCompare                  = "isNull"
-	betweenCompare                 = "between"
-	inCompare                      = "in"
-)
+// type filterJoin string
 
-type filterJoin string
+// const (
+// 	andFilter filterJoin = "and"
+// 	orFilter             = "or"
+// 	notFilter            = "not"
+// )
 
-const (
-	andFilter filterJoin = "and"
-	orFilter             = "or"
-	notFilter            = "not"
-)
+// type filterItem struct {
+// 	target       *structField
+// 	compare      filterCompare
+// 	value        interface{}
+// 	connect      filterJoin
+// 	childFilters filters
+// }
 
-type filterItem struct {
-	target       *structField
-	compare      filterCompare
-	value        interface{}
-	connect      filterJoin
-	childFilters filters
-}
+// type filter struct {
+// 	Handle    *Handle
+// 	queryKind string
+// 	queryV    *reflect.Value
+// 	modeV     *reflect.Value
+// 	queryLst  []filterItem
+// 	limitNum  int
+// 	limitDesc bool
+// }
 
-type filter struct {
-	Handle    *Handle
-	queryKind string
-	queryV    *reflect.Value
-	modeV     *reflect.Value
-	queryLst  []filterItem
-	limitNum  int
-	limitDesc bool
-}
-
-func newFilter(o *Handle) *filter {
-	r := &filter{
-		Handle: o,
-		// filterV:    rV,
-		// filterKind: t,
-	}
-	// r.setDependToDoc()
-	return r
-}
+// func newFilter(o *Handle) *filter {
+// 	r := &filter{
+// 		Handle: o,
+// 		// filterV:    rV,
+// 		// filterKind: t,
+// 	}
+// 	// r.setDependToDoc()
+// 	return r
+// }
 
 // func newfilterWithoutCol(rV *reflect.Value) *filter {
 // 	r := &filter{
