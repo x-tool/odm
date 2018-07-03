@@ -4,6 +4,7 @@ import "reflect"
 
 type reader struct {
 	handle     *Handle
+	isSingle   bool // true read single item ,false read item slice
 	raw        interface{}
 	rawReflect reflect.Value
 	readerFieldLst
@@ -28,42 +29,6 @@ func newreader(i interface{}) *reader {
 
 	return r
 }
-
-// type reader struct {
-// 	Col            *Col
-// 	readerFieldLst []*docField
-// 	readerV        *reflect.Value
-// 	readerKind     int
-// 	readerElem     *reflect.Value
-// }
-
-// func newreader(rV *reflect.Value, c *Col) (r *reader) {
-// 	var vK int
-// 	var vE reflect.Value
-// 	if rV.Kind() == reflect.Slice {
-// 		vK = 0
-// 		vE = rV.Elem()
-// 	} else {
-// 		vK = 1
-// 		vE = *rV
-// 	}
-// 	r = &reader{
-// 		Col:        c,
-// 		readerV:    rV,
-// 		readerKind: vK,
-// 		readerElem: &vE,
-// 	}
-// 	return
-// }
-// func (r *reader) newreaderItem() (v *reflect.Value) {
-// 	var rV reflect.Value
-// 	if r.readerKind == 0 {
-// 		rV = reflect.New(r.readerElem.Type())
-// 	} else {
-// 		rV = reflect.New(r.readerV.Type())
-// 	}
-// 	return &rV
-// }
 
 func (r *reader) getreaderRootItemFieldAddr(rootV *reflect.Value) (v []reflect.Value) {
 	if rootV.Kind() == reflect.Struct {
