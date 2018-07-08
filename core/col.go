@@ -24,7 +24,7 @@ func newCol(db *Database, i interface{}) *Col {
 	return c
 }
 
-func (c *Col) GetRootValues(instance *reflect.Value) (RootValues ValueLst, err error) {
+func (c *Col) GetRootValues(instance *reflect.Value) (RootValues []*reflect.Value, err error) {
 	name := allName(instance.Type())
 	if name != c.doc.odmStruct.allName {
 		err = errors.New("Should use col type to get values")

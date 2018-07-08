@@ -7,29 +7,29 @@ import (
 	"time"
 )
 
-type ValueLst []*Value
-type Value struct {
-	field    *structField
-	value    *reflect.Value
-	hasValue bool
-	zero     bool
-}
+// type ValueLst []*Value
+// type Value struct {
+// 	field    *structField
+// 	value    *reflect.Value
+// 	hasValue bool
+// 	zero     bool
+// }
 
-func newValue(v interface{}, field *structField) (o *Value) {
-	_v := reflect.ValueOf(v)
-	o = &Value{
-		field: field,
-		value: &_v,
-	}
-	return o
-}
-func newValueByReflect(v *reflect.Value, field *structField) (o *Value) {
-	o = &Value{
-		field: field,
-		value: v,
-	}
-	return o
-}
+// func newValue(v interface{}, field *structField) (o *Value) {
+// 	_v := reflect.ValueOf(v)
+// 	o = &Value{
+// 		field: field,
+// 		value: &_v,
+// 	}
+// 	return o
+// }
+// func newValueByReflect(v *reflect.Value, field *structField) (o *Value) {
+// 	o = &Value{
+// 		field: field,
+// 		value: v,
+// 	}
+// 	return o
+// }
 
 func ValueToString(value *Value) (s string) {
 	_value := *value

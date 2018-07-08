@@ -10,7 +10,7 @@ func (d *structField) newValue() (v reflect.Value) {
 }
 
 /// error ,should be rewrite
-func (d *structField) GetValueFromRootValue(rootValue *reflect.Value) (value *Value, err error) {
+func (d *structField) GetValueFromRootValue(rootValue *reflect.Value) (value *reflect.Value, err error) {
 	return getValueByDependLst(d.dependLst, rootValue)
 }
 

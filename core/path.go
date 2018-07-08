@@ -51,17 +51,17 @@ func getDependLstByAllPath(d Database, o *odmStruct, s string) (dLst dependLst, 
 }
 
 //****** can't get field in slice or map
-func getValueByDependLst(dLst dependLst, rootValue *reflect.Value) (value *Value, err error) {
-	rawValue := *rootValue
+func getValueByDependLst(dLst dependLst, rootValue *reflect.Value) (value *reflect.Value, err error) {
+	_value := *rootValue
 	for _, v := range dLst {
 		if v.kind == Struct {
-			rawValue = rawValue.FieldByName(v.Name())
+			_value = _value.FieldByName(v.Name())
 		} else {
 			// can't get field in slice or map
 			err = errors.New(fmt.Sprintf("Can't get Values in struct %d, because fieldName %d parent type is %d", d.name, v.name, v.kind.String()))
 			break
 		}
 	}
-	value = newValueByReflect(&rawValue, d)
+	value = &_value
 	return
 }
