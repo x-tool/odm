@@ -9,8 +9,6 @@ type Database struct {
 	client  *client.Client
 	name    string
 	dialect Dialect
-	ColLst
-	odmStructLst
 	config
 	states      // database some state
 	zoneMap     map[string]*zone
@@ -19,7 +17,6 @@ type Database struct {
 }
 
 type config struct {
-	colNameAlias func(string) string
 }
 
 type states struct {

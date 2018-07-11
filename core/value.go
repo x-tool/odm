@@ -31,9 +31,8 @@ import (
 // 	return o
 // }
 
-func ValueToString(value *Value) (s string) {
-	_value := *value
-	v := *_value.Get()
+func ValueToString(value *reflect.Value) (s string) {
+	v := *value
 	valueType := v.Type()
 	switch valueType.Kind() {
 	case reflect.Bool:

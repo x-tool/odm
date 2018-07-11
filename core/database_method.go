@@ -7,11 +7,13 @@ import (
 )
 
 func (d *Database) SyncCols() {
-	for _, v := range d.ColLst {
-		col := *v
-		col.alias = d.config.colNameAlias(col.name)
+	var colLst []*Col
+	for _, v := range d.zoneMap {
+		for _, col := range v.ColLst {
+			colLst = append(colLst, col)
+		}
 	}
-	d.dialect.SyncCols(d.ColLst)
+	d.dialect.SyncCols(colLst)
 }
 
 func (d *Database) setHistory() {
@@ -21,11 +23,4 @@ func (d *Database) setHistory() {
 	if err != nil {
 		tool.Panic("DB", errors.New("Get colNames ERROR"))
 	}
-}
-
-func (d *Database) ColNameAlias(f func(string) string) {
-	if d.isSyncCols {
-		tool.Panic("DB", errors.New("It can't works, because database has been sync, you should write ColNameAlias method before SyncCols method"))
-	}
-	d.config.colNameAlias = f
 }

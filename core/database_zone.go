@@ -8,16 +8,20 @@ import (
 )
 
 type zone struct {
-	name       string
+	name string
+	ColLst
+	odmStructLst
 	mapCols    map[string]*Col       // use map to get col by name
 	mapStructs map[string]*odmStruct // use map to get structs by name, I think struct name should be unique where ever package, if not user should write whole pkgPath and name in one string to get one struct
-	nameFunc   func(string) string
+	aliasFunc  func(string) string
 }
 
 type zoneLst []*zone
 
-func newZone(name string) {
-
+func newZone(name string) *zone {
+	z := &zone{}
+	// col.alias = v.aliasFunc(col.name)
+	return z
 }
 
 func (z *zone) GetCol(i interface{}) *Col {
@@ -42,17 +46,17 @@ var rigisterCols sync.WaitGroup
 var rigisterStructs sync.WaitGroup
 
 func (z *zone) RegisterCol(c interface{}) {
-	_col := newCol(d, c)
-	d.ColLst = append(d.ColLst, _col)
-	d.mapCols[_col.Name()] = _col
-	d.RegisterStruct(_col.doc.odmStruct)
+	_col := newCol(z, c)
+	z.ColLst = append(z.ColLst, _col)
+	z.mapCols[_col.Name()] = _col
+	z.RegisterStruct(_col.doc.odmStruct)
 	rigisterCols.Done()
 }
 
 func (z *zone) RegisterCols(c ...interface{}) {
 	for _, v := range c {
 		rigisterCols.Add(1)
-		go d.RegisterCol(v)
+		go z.RegisterCol(v)
 	}
 	rigisterCols.Wait()
 }
@@ -65,17 +69,17 @@ func (z *zone) RegisterStruct(c interface{}) {
 		_struct = newOdmStruct(c)
 	}
 
-	if _, ok := d.mapStructs[_struct.name]; !ok {
-		d.mapStructs[_struct.name] = _struct
+	if _, ok := z.mapStructs[_struct.name]; !ok {
+		z.mapStructs[_struct.name] = _struct
 	}
-	d.odmStructLst = append(d.odmStructLst, _struct)
+	z.odmStructLst = append(z.odmStructLst, _struct)
 	rigisterCols.Done()
 }
 
 func (z *zone) RegisterStructs(c ...interface{}) {
 	for _, v := range c {
 		rigisterStructs.Add(1)
-		go d.RegisterStruct(v)
+		go z.RegisterStruct(v)
 	}
 	rigisterStructs.Wait()
 }
