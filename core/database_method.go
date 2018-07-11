@@ -2,52 +2,9 @@ package core
 
 import (
 	"errors"
-	"sync"
 
 	"github.com/x-tool/tool"
 )
-
-var rigisterCols sync.WaitGroup
-var rigisterStructs sync.WaitGroup
-
-func (d *Database) RegisterCol(c interface{}) {
-	_col := newCol(d, c)
-	d.ColLst = append(d.ColLst, _col)
-	d.mapCols[_col.Name()] = _col
-	d.RegisterStruct(_col.doc.odmStruct)
-	rigisterCols.Done()
-}
-
-func (d *Database) RegisterCols(c ...interface{}) {
-	for _, v := range c {
-		rigisterCols.Add(1)
-		go d.RegisterCol(v)
-	}
-	rigisterCols.Wait()
-}
-
-func (d *Database) RegisterStruct(c interface{}) {
-	var _struct *odmStruct
-	if v, ok := c.(odmStruct); ok {
-		_struct = &v
-	} else {
-		_struct = newOdmStruct(c)
-	}
-
-	if _, ok := d.mapStructs[_struct.name]; !ok {
-		d.mapStructs[_struct.name] = _struct
-	}
-	d.odmStructLst = append(d.odmStructLst, _struct)
-	rigisterCols.Done()
-}
-
-func (d *Database) RegisterStructs(c ...interface{}) {
-	for _, v := range c {
-		rigisterStructs.Add(1)
-		go d.RegisterStruct(v)
-	}
-	rigisterStructs.Wait()
-}
 
 func (d *Database) SyncCols() {
 	for _, v := range d.ColLst {
