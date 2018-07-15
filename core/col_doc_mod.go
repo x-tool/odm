@@ -18,20 +18,21 @@ var DocModeMethodMap = map[handleType]string{
 }
 
 func callDocMode(h *Handle) {
-	field := h.col.doc.getDocMode()
-	if field != nil {
-		var value reflect.Value
-		switch h.handleType {
-		case InsertData:
-			_value, _ := field.GetValueFromRootValue(h.getInsertValue())
-			value = *_value
-		case UpdateData:
-			value = field.newValue()
+	for _, v := range h.ColLst {
+		field := v.doc.getDocMode()
+		if field != nil {
+			var value reflect.Value
+			switch h.handleType {
+			case InsertData:
+				_value, _ := field.GetValueFromRootValue(h.getInsertValue())
+				value = *_value
+			case UpdateData:
+				value = field.newValue()
 
+			}
+			valuePtr := value.Addr()
+			method := valuePtr.MethodByName(DocModeMethodMap[h.handleType])
+			method.Call(nil)
 		}
-		valuePtr := value.Addr()
-		method := valuePtr.MethodByName(DocModeMethodMap[h.handleType])
-		method.Call(nil)
 	}
-
 }

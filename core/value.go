@@ -31,10 +31,9 @@ import (
 // 	return o
 // }
 
-func ValueToString(value *Value) (s string) {
+func ValueToString(value *reflect.Value) (s string) {
 	_value := *value
-	v := *_value.Get()
-	valueType := v.Type()
+	valueType := _value.Type()
 	switch valueType.Kind() {
 	case reflect.Bool:
 		s = strconv.FormatBool(v.Bool())

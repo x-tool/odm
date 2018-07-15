@@ -12,7 +12,7 @@ const (
 // handle struct is hock for plugin
 type Handle struct {
 	handleType
-	col *Col
+	ColLst
 	aimer
 	writter
 	reader
@@ -20,8 +20,9 @@ type Handle struct {
 }
 
 func newHandle(c *Col) *Handle {
+	var lst ColLst
 	d := &Handle{
-		col: c,
+		ColLst: append(lst, c),
 	}
 	return d
 
