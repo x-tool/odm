@@ -9,6 +9,7 @@ import (
 
 type zone struct {
 	name string
+	db   *Database
 	ColLst
 	odmStructLst
 	mapCols    map[string]*Col       // use map to get col by name
@@ -18,8 +19,10 @@ type zone struct {
 
 type zoneLst []*zone
 
-func newZone(name string) *zone {
-	z := &zone{}
+func newZone(name string, d *Database) *zone {
+	z := &zone{
+		db: d,
+	}
 	// col.alias = v.aliasFunc(col.name)
 	return z
 }

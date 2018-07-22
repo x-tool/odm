@@ -7,6 +7,7 @@ import (
 
 type Col struct {
 	zone  *zone
+	db    *Database
 	name  string
 	alias string // name to database
 	doc

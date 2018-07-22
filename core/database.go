@@ -43,3 +43,9 @@ func (d *Database) Name() string {
 func (d *Database) GetClient() *client.Client {
 	return d.client
 }
+
+func (d *Database) NewZone(s string) *zone {
+	z := newZone(s, d)
+	d.zoneMap[s] = z
+	return z
+}
