@@ -32,13 +32,8 @@ import (
 // }
 
 func ValueToString(value *reflect.Value) (s string) {
-<<<<<<< HEAD
 	_value := *value
 	valueType := _value.Type()
-=======
-	v := *value
-	valueType := v.Type()
->>>>>>> 314a364ec47897e822bd43b5e555ea8d557c22ef
 	switch valueType.Kind() {
 	case reflect.Bool:
 		s = strconv.FormatBool(v.Bool())

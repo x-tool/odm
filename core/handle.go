@@ -19,11 +19,7 @@ type Handle struct {
 	Err error
 }
 
-func newHandle(c *Col) *Handle {
-	var lst ColLst
-	d := &Handle{
-		ColLst: append(lst, c),
-	}
+func newHandle() *Handle {
+	d := &Handle{}
 	return d
-
 }
