@@ -153,8 +153,6 @@ func (d *structFieldLst) getGroupTypeFieldLst() (rd structFieldLst) {
 	return
 }
 
-type dependLst []*structField
-
 func getExtendParent(d *structFieldLst, field *structField) (f *structField) {
 	if field.parent == nil {
 		f = nil

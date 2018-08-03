@@ -13,6 +13,7 @@ const (
 type Handle struct {
 	handleType
 	ColLst
+	mapColsNameLst map[string]*Col // allow aliasname
 	aimer
 	writter
 	reader

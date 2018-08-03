@@ -7,6 +7,7 @@ import (
 	"strings"
 )
 
+type dependLst []*structField
 // "@tag"
 // "path"
 // "path:structName@tag"
