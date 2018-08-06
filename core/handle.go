@@ -1,6 +1,7 @@
 package core
 
 type handleType int
+type collection interface{}
 
 const (
 	InsertData handleType = iota
@@ -12,7 +13,7 @@ const (
 // handle struct is hock for plugin
 type Handle struct {
 	handleType
-	ColLst
+	collectionNamesMap map[string]collection
 	aimer
 	writter
 	reader
