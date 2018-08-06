@@ -14,7 +14,8 @@ testInsert := new(myDoc)
 testInsert.Name = "haha,I get"
 _, err := db.Insert(testInsert)
 ```
-
+## Percentage of progress
+45%
 ## Features
 
 * JSON support, You can get field in struct from database simple.
@@ -30,7 +31,6 @@ xodm only support postgresql now, it may support orther sql future.
 ## Todo
 
 * [ ] fix bugs
-* [ ] add arangodb
 
 ## Performance
 
