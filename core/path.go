@@ -8,9 +8,10 @@ import (
 )
 
 type dependLst []*structField
-// "@tag"
+
+// "@mark"
 // "path"
-// "path:structName@tag"
+// "path:structName@mark"
 // "path:structName.path"
 func getDependLstByAllPath(d Database, o *odmStruct, s string) (dLst dependLst, err error) {
 	var rawValue = rootValue

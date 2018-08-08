@@ -15,7 +15,7 @@ type odmStruct struct {
 	rootFields      structFieldLst
 	sourceType      *reflect.Type
 	interfaceFields map[string]*structField
-	fieldTagMap     map[string]*structField
+	fieldMarkMap    map[string]*structField
 	fieldNameMap    map[string]structFieldLst
 }
 type odmStructLst []*odmStruct
@@ -33,7 +33,7 @@ func newOdmStruct(i interface{}) (_odmStruct *odmStruct) {
 	}
 	fields := newstructFieldLst(_odmStruct, odmStructSourceT)
 	_odmStruct.fields = *fields
-	_odmStruct.fieldTagMap = makestructFieldLstTagMap(_odmStruct)
+	_odmStruct.fieldMarkMap = makestructFieldLstMarkMap(_odmStruct)
 	_odmStruct.fieldNameMap = makestructFieldLstNameMap(_odmStruct)
 	_odmStruct.rootFields = makerootFieldNameMap(_odmStruct)
 	_odmStruct.interfaceFields = makeInterfaceFields(_odmStruct)
@@ -59,7 +59,7 @@ func newstructFieldLst(d *odmStruct, odmStructSourceT reflect.Type) *structField
 	return &lst
 }
 
-func makestructFieldLstTagMap(d *odmStruct) (m map[string]*structField) {
+func makestructFieldLstMarkMap(d *odmStruct) (m map[string]*structField) {
 	_d := d.fields
 	for _, v := range _d {
 		tagPtr := v.tag.sign
