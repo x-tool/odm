@@ -1,7 +1,22 @@
 package core
 
 type handleType int
-type collection interface{}
+
+// select item from collection, collection like documents and temp documents
+type collection struct {
+	alias string
+	structFieldLst
+}
+type collectionLst []*collection
+
+func (cLst collectionLst) getColByAlias(s string) (c structFieldLst) {
+	for _, v := range cLst {
+		if v.alias == s {
+			c = v.structFieldLst
+		}
+	}
+	return
+}
 
 const (
 	InsertData handleType = iota
@@ -13,7 +28,7 @@ const (
 // handle struct is hock for plugin
 type Handle struct {
 	handleType
-	collectionNamesMap map[string]collection
+	collectionNamesMap collectionLst
 	aimer
 	writter
 	reader
