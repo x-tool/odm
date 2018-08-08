@@ -4,11 +4,11 @@ import (
 	"reflect"
 )
 
+// xodm type
 const (
 	Invalid Kind = iota
 	Bool
 	Int
-	Uint
 	Byte
 	Float
 	Complex
@@ -26,7 +26,6 @@ const (
 var typeStringMap = map[Kind]string{
 	Bool:      "bool",
 	Int:       "int",
-	Uint:      "unit",
 	Byte:      "byte",
 	Float:     "float",
 	Complex:   "complex",
@@ -74,6 +73,7 @@ func mapTypeToValue(b interface{}, v *reflect.Value) {
 	}
 }
 
+// golang type to xodm type sign
 func reflectToKind(r *reflect.Type) (k Kind) {
 	_r := *r
 	rKind := _r.Kind()
@@ -89,7 +89,7 @@ func reflectToKind(r *reflect.Type) (k Kind) {
 	case reflect.Int32:
 		fallthrough
 	case reflect.Int64:
-		k = Int
+		fallthrough
 	case reflect.Uint:
 		fallthrough
 	case reflect.Uint8:
@@ -99,7 +99,7 @@ func reflectToKind(r *reflect.Type) (k Kind) {
 	case reflect.Uint32:
 		fallthrough
 	case reflect.Uint64:
-		k = Uint
+		k = Int
 	case reflect.Float32:
 		fallthrough
 	case reflect.Float64:
