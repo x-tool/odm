@@ -5,16 +5,23 @@ import (
 	"reflect"
 )
 
+// do some thing before exec sql,like modify docmode
+func (d *Handle) execBefore() {
+	d.callDocMode()
+}
+func (d *Handle) callDocMode() {
+	callDocMode(d)
+}
+
 func (d *Handle) Insert(i interface{}) (err error) {
 	value := reflect.Indirect(reflect.ValueOf(i))
 	d.setColbyValue(&value)
-	d.addSetValue(newSetValue(&value, *new(filter)))
 	d.execBefore()
 	if d.checkHandleErr() != nil {
 		return d.Err
 	}
-	err = d.col.database.dialect.Insert(d)
-	return
+	d.writter = newWritter(i)
+	return d.Exec()
 }
 
 func (d *Handle) Update(i interface{}) (err error) {
@@ -36,6 +43,9 @@ func (d *Handle) Get(i interface{}) (err error) {
 }
 
 func (d *Handle) Exec() (err error) {
+	if len(d.collectionLst) == 0 {
+		return errors.New("you should set col")
+	}
 	switch d.handleType {
 	case insertData:
 		err = d.col.database.dialect.Insert(d)
@@ -100,14 +110,6 @@ func (d *Handle) Col(i interface{}) (h *Handle) {
 		d.col = _col
 	}
 	return
-}
-
-// do some thing before exec sql,like modify docmode
-func (d *Handle) execBefore() {
-	d.callDocMode()
-}
-func (d *Handle) callDocMode() {
-	callDocMode(d)
 }
 
 func (d *Handle) checkHandleErr() *error {

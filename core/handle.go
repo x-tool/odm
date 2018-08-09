@@ -4,18 +4,22 @@ type handleType int
 
 // select item from collection, collection like documents and temp documents
 type collection struct {
-	alias string
-	structFieldLst
+	alias      string
+	rootValues []interface{}
 }
 type collectionLst []*collection
 
-func (cLst collectionLst) getColByAlias(s string) (c structFieldLst) {
+func (cLst collectionLst) getColByAlias(s string) (c []interface{}) {
 	for _, v := range cLst {
 		if v.alias == s {
-			c = v.structFieldLst
+			c = v.rootValues
 		}
 	}
 	return
+}
+
+func (cLst collectionLst) isSingle() bool {
+	return len(cLst) == 1
 }
 
 const (
@@ -28,7 +32,7 @@ const (
 // handle struct is hock for plugin
 type Handle struct {
 	handleType
-	collectionNamesMap collectionLst
+	collectionLst
 	aimer
 	writter
 	reader

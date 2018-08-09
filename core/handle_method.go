@@ -27,16 +27,12 @@ func (h *Handle) GetRootValues() ([]*Value, error) {
 	return values, err
 }
 
-func (h *Handle) setColbyValue(r *reflect.Value) {
-	if h.col != nil {
-		return
-	}
-	h.col = h.db.GetColByName(r.Type().Name())
-}
-
-func (h *Handle) addSetValue(s *setValue) {
-	h.setValueLst = append(h.setValueLst, s)
-}
+// func (h *Handle) setColbyValue(r *reflect.Value) {
+// 	if h.col != nil {
+// 		return
+// 	}
+// 	h.col = h.db.GetColByName(r.Type().Name())
+// }
 
 func (h *Handle) getInsertValue() *reflect.Value {
 	return h.setValueLst[0].value
