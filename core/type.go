@@ -19,6 +19,7 @@ const (
 	Date
 	DateTime
 	TimeStamp
+	money
 	Struct
 	Interface
 )

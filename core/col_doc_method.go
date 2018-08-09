@@ -10,7 +10,7 @@ const (
 
 // var splitStructNameToFieldPath = []string{
 // 	".",
-// 	tag_Tag
+// 	tagMark
 // }
 
 func (d *doc) findDocModeField() (field *structField) {
