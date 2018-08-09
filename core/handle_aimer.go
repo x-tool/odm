@@ -8,16 +8,24 @@ const (
 	relationLikeR   = "like?" // like??
 	relationequal   = "=="    // ==
 	relationNull    = "isNull"
+	relationNotNull = "notNull"
 	relationBetween = "between"
 	relationIn      = "in"
 )
 
-type aimer struct {
-	whereLst []whereItem
-}
-
 type whereItem struct {
 	f *structField
 	relation
-	values interface{}
+	values []interface{}
+}
+
+type aimer struct {
+	collectionLst
+	whereLst []whereItem
+}
+
+func newAimer(lst collectionLst) *aimer {
+	return &aimer{
+		collectionLst: lst,
+	}
 }
