@@ -43,18 +43,18 @@ func (d *Handle) Get(i interface{}) (err error) {
 }
 
 func (d *Handle) Exec() (err error) {
-	if len(d.collectionLst) == 0 {
+	if len(d.handleCols) == 0 {
 		return errors.New("you should set col")
 	}
 	switch d.handleType {
-	case insertData:
-		err = d.col.database.dialect.Insert(d)
-	case updateData:
-		err = d.col.database.dialect.Update(d)
-	case deleteData:
-		err = d.col.database.dialect.Delete(d)
-	case queryData:
-		err = d.col.database.dialect.Query(d)
+	case InsertData:
+		err = d.db.dialect.Insert(d)
+	case UpdateData:
+		err = d.db.dialect.Update(d)
+	case DeleteData:
+		err = d.db.dialect.Delete(d)
+	case QueryData:
+		err = d.db.dialect.Query(d)
 	}
 	return
 }

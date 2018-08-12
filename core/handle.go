@@ -2,26 +2,11 @@ package core
 
 type handleType int
 
-// select item from collection, collection like documents and temp documents
-type collection struct {
-	alias      string
-	rootValues []interface{}
-	col        *Col
+type handleCol struct {
+	sign string // alias || col.name
+	col  *Col
 }
-type collectionLst []*collection
-
-func (cLst collectionLst) getColByAlias(s string) (c []interface{}) {
-	for _, v := range cLst {
-		if v.alias == s {
-			c = v.rootValues
-		}
-	}
-	return
-}
-
-func (cLst collectionLst) isSingle() bool {
-	return len(cLst) == 1
-}
+type handleCols []*handleCol
 
 const (
 	InsertData handleType = iota
@@ -32,8 +17,9 @@ const (
 
 // handle struct is hock for plugin
 type Handle struct {
+	db *Database
 	handleType
-	collectionLst
+	handleCols
 	aimer
 	writter
 	reader

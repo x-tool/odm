@@ -20,12 +20,12 @@ type whereItem struct {
 }
 
 type aimer struct {
-	collectionLst
+	handleCols
 	whereLst []whereItem
 }
 
-func newAimer(lst collectionLst) *aimer {
+func newAimer(lst *handleCols) *aimer {
 	return &aimer{
-		collectionLst: lst,
+		handleCols: lst,
 	}
 }

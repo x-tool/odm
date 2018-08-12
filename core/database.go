@@ -10,8 +10,10 @@ type Database struct {
 	name    string
 	dialect Dialect
 	config
-	states      // database some state
-	zoneMap     map[string]*zone
+	states  // database some state
+	zoneMap map[string]*zone
+	odmStructLst
+	mapStructs  map[string]*odmStruct // use map to get structs by name, I think struct name should be unique where ever package, if not user should write whole pkgPath and name in one string to get one struct
 	defaultZone *zone
 	history     *history
 }

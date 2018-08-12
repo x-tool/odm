@@ -14,7 +14,6 @@ type dependLst []*structField
 // "path:structName@mark"
 // "path:structName.path"
 func getDependLstByAllPath(d Database, o *odmStruct, s string) (dLst dependLst, err error) {
-	var rawValue = rootValue
 	structLst := strings.Split(s, splitStructStr)
 	// firstPath, without structname
 	field, err := o.getFieldByString(structLst[0])
