@@ -1,8 +1,8 @@
 package core
 
 type writter struct {
-	setLst   []*writeItem
-	rawValue interface{} // if insert, use this value
+	setLst []*writeItem
+	raw    interface{} // if insert, use this value
 }
 
 type writeItem struct {
@@ -12,7 +12,7 @@ type writeItem struct {
 
 func newWritter(insertRawValue interface{}) *writter {
 	w := &writter{
-		rawValue: insertRawValue,
+		raw: insertRawValue,
 	}
 	return w
 }

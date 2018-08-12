@@ -17,20 +17,22 @@ var DocModeMethodMap = map[handleType]string{
 	DeleteData: "Delete",
 }
 
-func callDocMode(h *Handle, c *Col) {
-	field := v.doc.getDocMode()
-	if field != nil {
-		var value reflect.Value
-		switch h.handleType {
-		case InsertData:
-			_value, _ := field.GetValueFromRootValue(h.getInsertValue())
-			value = *_value
-		case UpdateData:
-			value = field.newValue()
+func callDocMode(h *Handle) {
+	for _, v := range h.collectionLst {
+		field := v.col.doc.getDocMode()
+		if field != nil {
+			var value reflect.Value
+			switch h.handleType {
+			case InsertData:
+				_value, _ := field.GetValueFromRootValue(h.getInsertValue())
+				value = *_value
+			case UpdateData:
+				value = field.newValue()
 
+			}
+			valuePtr := value.Addr()
+			method := valuePtr.MethodByName(DocModeMethodMap[h.handleType])
+			method.Call(nil)
 		}
-		valuePtr := value.Addr()
-		method := valuePtr.MethodByName(DocModeMethodMap[h.handleType])
-		method.Call(nil)
 	}
 }

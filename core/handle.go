@@ -6,6 +6,7 @@ type handleType int
 type collection struct {
 	alias      string
 	rootValues []interface{}
+	col        *Col
 }
 type collectionLst []*collection
 
