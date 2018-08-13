@@ -6,7 +6,6 @@ import (
 )
 
 type Col struct {
-	zone  *zone
 	db    *Database
 	name  string
 	alias string // name to database
@@ -17,10 +16,10 @@ func (c *Col) Name() string {
 	return c.name
 }
 
-func newCol(z *zone, i interface{}) *Col {
+func newCol(d *Database, i interface{}) *Col {
 	c := new(Col)
 	c.name = GetColName(i)
-	c.zone = z
+	c.db = d
 	c.doc = *newDoc(c, i)
 	return c
 }

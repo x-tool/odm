@@ -1,8 +1,11 @@
 package core
 
+import "reflect"
+
 type writter struct {
-	setLst []*writeItem
-	raw    interface{} // if insert, use this value
+	setLst   []*writeItem
+	raw      interface{} // if insert, use this value
+	rawValue *reflect.Value
 }
 
 type writeItem struct {

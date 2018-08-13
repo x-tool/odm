@@ -26,6 +26,6 @@ type aimer struct {
 
 func newAimer(lst *handleCols) *aimer {
 	return &aimer{
-		handleCols: lst,
+		handleCols: *lst,
 	}
 }

@@ -11,7 +11,7 @@ func (d *odmStruct) getFieldByName(name string) (o structFieldLst) {
 }
 
 func (d *odmStruct) getFieldByMark(tag string) (o *structField) {
-	return d.fieldTagMap[tag]
+	return d.fieldMarkMap[tag]
 }
 
 // "fieldName"
@@ -56,7 +56,7 @@ func (d *odmStruct) getFieldByDependLst(fieldName string, Lst []string) (_field 
 func (d *odmStruct) getFieldByString(str string) (f *structField, err error) {
 	var sign = str[:1]
 	if sign == tagMark {
-		f = d.getFieldByTag(str[1:])
+		f = d.getFieldByMark(str[1:])
 	} else {
 		f = d.getFieldByPath(str)
 	}

@@ -50,6 +50,6 @@ func (r *reader) getreaderRootItemFieldAddr(rootV *reflect.Value) (v []reflect.V
 }
 
 func (r *reader) AddRow(rowValues []interface{}) {
-	raws := r.getreaderRootItemFieldAddr()
+	// raws := r.getreaderRootItemFieldAddr()
 
 }

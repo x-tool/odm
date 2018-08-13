@@ -8,14 +8,15 @@ import (
 type Database struct {
 	client  *client.Client
 	name    string
-	dialect Dialect
+	dialect Dialect // third module hook
 	config
-	states  // database some state
-	zoneMap map[string]*zone
+	states // database some state
 	odmStructLst
-	mapStructs  map[string]*odmStruct // use map to get structs by name, I think struct name should be unique where ever package, if not user should write whole pkgPath and name in one string to get one struct
-	defaultZone *zone
-	history     *history
+	mapStructs map[string]*odmStruct // use map to get structs by name, I think struct name should be unique where ever package, if not user should write whole pkgPath and name in one string to get one struct
+	ColLst
+	mapCols   map[string]*Col // use map to get col by name
+	aliasFunc func(string) string
+	history   *history
 }
 
 type config struct {
@@ -44,10 +45,4 @@ func (d *Database) Name() string {
 
 func (d *Database) GetClient() *client.Client {
 	return d.client
-}
-
-func (d *Database) NewZone(s string) *zone {
-	z := newZone(s, d)
-	d.zoneMap[s] = z
-	return z
 }

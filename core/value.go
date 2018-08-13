@@ -36,7 +36,7 @@ func ValueToString(value *reflect.Value) (s string) {
 	valueType := _value.Type()
 	switch valueType.Kind() {
 	case reflect.Bool:
-		s = strconv.FormatBool(v.Bool())
+		s = strconv.FormatBool(value.Bool())
 	case reflect.Int:
 		fallthrough
 	case reflect.Int8:
@@ -46,7 +46,7 @@ func ValueToString(value *reflect.Value) (s string) {
 	case reflect.Int32:
 		fallthrough
 	case reflect.Int64:
-		s = strconv.FormatInt(v.Int(), 10)
+		s = strconv.FormatInt(value.Int(), 10)
 	case reflect.Uint:
 		fallthrough
 	case reflect.Uint8:
@@ -56,11 +56,11 @@ func ValueToString(value *reflect.Value) (s string) {
 	case reflect.Uint32:
 		fallthrough
 	case reflect.Uint64:
-		s = strconv.FormatUint(v.Uint(), 10)
+		s = strconv.FormatUint(value.Uint(), 10)
 	case reflect.Float32:
 		fallthrough
 	case reflect.Float64:
-		s = strconv.FormatFloat(v.Float(), 'f', -1, 64)
+		s = strconv.FormatFloat(value.Float(), 'f', -1, 64)
 	case reflect.Complex64:
 		fallthrough
 	case reflect.Complex128:
@@ -68,21 +68,21 @@ func ValueToString(value *reflect.Value) (s string) {
 	case reflect.Array:
 		fallthrough
 	case reflect.Slice:
-		b, err := json.Marshal(v.Interface())
+		b, err := json.Marshal(value.Interface())
 		if err != nil {
 			s = ""
 		} else {
 			s = string(b)
 		}
 	case reflect.String:
-		s = v.String()
+		s = value.String()
 	case reflect.Struct:
 		pkgPath := valueType.PkgPath()
 		switch pkgPath {
 		case "time":
-			s = v.Interface().(time.Time).String()
+			s = value.Interface().(time.Time).String()
 		default:
-			b, err := json.Marshal(v)
+			b, err := json.Marshal(value)
 			if err != nil {
 				s = ""
 			} else {

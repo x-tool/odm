@@ -3,16 +3,16 @@ package core
 import (
 	"errors"
 	"fmt"
+	"reflect"
+	"sync"
 
 	"github.com/x-tool/tool"
 )
 
 func (d *Database) SyncCols() {
 	var colLst []*Col
-	for _, v := range d.zoneMap {
-		for _, col := range v.ColLst {
-			colLst = append(colLst, col)
-		}
+	for _, col := range d.ColLst {
+		colLst = append(colLst, col)
 	}
 	d.dialect.SyncCols(colLst)
 }
@@ -55,4 +55,33 @@ func (d *Database) RegisterStructs(c ...interface{}) {
 		go d.RegisterStruct(v)
 	}
 	rigisterStructs.Wait()
+}
+
+func (d *Database) GetCol(i interface{}) *Col {
+	var name string
+	if v, ok := i.(string); !ok {
+		name = string(v)
+	} else {
+		name = reflect.TypeOf(i).Name()
+	}
+	return d.mapCols[name]
+}
+
+var rigisterCols sync.WaitGroup
+var rigisterStructs sync.WaitGroup
+
+func (d *Database) RegisterCol(c interface{}) {
+	_col := newCol(d, c)
+	d.ColLst = append(d.ColLst, _col)
+	d.mapCols[_col.Name()] = _col
+	d.RegisterStruct(_col.doc.odmStruct)
+	rigisterCols.Done()
+}
+
+func (d *Database) RegisterCols(c ...interface{}) {
+	for _, v := range c {
+		rigisterCols.Add(1)
+		go d.RegisterCol(v)
+	}
+	rigisterCols.Wait()
 }

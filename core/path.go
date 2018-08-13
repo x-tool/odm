@@ -1,8 +1,6 @@
 package core
 
 import (
-	"errors"
-	"fmt"
 	"reflect"
 	"strings"
 )
@@ -46,7 +44,9 @@ func getDependLstByAllPath(d Database, o *odmStruct, s string) (dLst dependLst, 
 		if err != nil {
 			return
 		}
-		dLst = append(dLst, field.dependLst)
+		for _, v := range field.dependLst {
+			dLst = append(dLst, v)
+		}
 	}
 	return
 }
@@ -59,7 +59,7 @@ func getValueByDependLst(dLst dependLst, rootValue *reflect.Value) (value *refle
 			_value = _value.FieldByName(v.Name())
 		} else {
 			// can't get field in slice or map
-			err = errors.New(fmt.Sprintf("Can't get Values in struct %d, because fieldName %d parent type is %d", d.name, v.name, v.kind.String()))
+			// err = errors.New(fmt.Sprintf("Can't get Values in struct %d, because fieldName %d parent type is %d", d.name, v.name, v.kind.String()))
 			break
 		}
 	}
