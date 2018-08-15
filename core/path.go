@@ -5,13 +5,38 @@ import (
 	"strings"
 )
 
+// this vars could be user modify, so use var not const
+var (
+	dependPathSplit = "."
+)
+
 type dependLst []*structField
+
+type fieldPathCell struct {
+	db *Database
+}
+
+func (f *fieldPathCell) getDependLstByPathStr(o *odmStruct, str string) (dLst dependLst, err error) {
+	field, err := o.getFieldByString(str)
+	if err != nil {
+		return
+	}
+	return field.dependLst, err
+}
+func (f *fieldPathCell) getDependLstByAllPathStr(str string) (dLst dependLst, err error) {
+	splitLst := strings.SplitN(str, dependPathSplit, 2)
+	targetStruct, err := f.db.getStructByName(splitLst[0])
+	if err != nil {
+		return
+	}
+	return f.getDependLstByPathStr(targetStruct, splitLst[1])
+}
 
 // "@mark"
 // "path"
 // "path:structName@mark"
 // "path:structName.path"
-func getDependLstByAllPath(d Database, o *odmStruct, s string) (dLst dependLst, err error) {
+func getDependLstByAllPathInStruct(d Database, o *odmStruct, s string) (dLst dependLst, err error) {
 	structLst := strings.Split(s, splitStructStr)
 	// firstPath, without structname
 	field, err := o.getFieldByString(structLst[0])
@@ -21,7 +46,16 @@ func getDependLstByAllPath(d Database, o *odmStruct, s string) (dLst dependLst, 
 	dLst = field.dependLst
 	// orther struct path
 	lstLen := len(structLst)
-	for i, v := range structLst[1:] {
+	getDependLstBySplitStr(structLst[1:])
+	return
+}
+
+func getDependLstByAllPath(d Database, s string) (dLst dependLst, err error) {
+
+}
+
+func getDependLstBySplitStr(d *Database, strLst []string) (dLst dependLst, err error) {
+	for i, v := range strLst {
 		// split name and path
 		// now just need find "@", if add more sign to split struct in the fultrue, should modify use splitStructNameToFieldPath
 		var sign string
@@ -36,19 +70,9 @@ func getDependLstByAllPath(d Database, o *odmStruct, s string) (dLst dependLst, 
 		slice := strings.SplitN(v, sign, 2)
 		structName := slice[0]
 		fieldRoute := slice[1]
-		targetStruct, err = d.getStructByName(structName)
-		if err != nil {
-			return
-		}
-		field, err = targetStruct.getFieldByString(fieldRoute)
-		if err != nil {
-			return
-		}
-		for _, v := range field.dependLst {
-			dLst = append(dLst, v)
-		}
+
+		dLst = append(dLst, field.dependLst...)
 	}
-	return
 }
 
 //****** can't get field in slice or map
