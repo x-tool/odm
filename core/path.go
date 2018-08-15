@@ -1,6 +1,8 @@
 package core
 
 import (
+	"errors"
+	"fmt"
 	"reflect"
 	"strings"
 )
@@ -23,6 +25,7 @@ func (f *fieldPathCell) getDependLstByPathStr(o *odmStruct, str string) (dLst de
 	}
 	return field.dependLst, err
 }
+
 func (f *fieldPathCell) getDependLstByAllPathStr(str string) (dLst dependLst, err error) {
 	splitLst := strings.SplitN(str, dependPathSplit, 2)
 	targetStruct, err := f.db.getStructByName(splitLst[0])
@@ -30,6 +33,30 @@ func (f *fieldPathCell) getDependLstByAllPathStr(str string) (dLst dependLst, er
 		return
 	}
 	return f.getDependLstByPathStr(targetStruct, splitLst[1])
+}
+
+func (f *fieldPathCell) getDependLstByMarkStr(o *odmStruct, str string) (dLst dependLst, err error) {
+	field := o.getFieldByMark(str)
+	if field == nil {
+		return nil, errors.New(fmt.Sprint("Can't Find Mark By String (%v) in Struct (%v)", str, o.name))
+	}
+	return field.dependLst, err
+}
+
+func (f *fieldPathCell) getDependLstByStr(o *odmStruct, str string) (dLst dependLst, err error) {
+	field := o.getFieldByMark(str)
+	if field == nil {
+		return nil, errors.New(fmt.Sprint("Can't Find Mark By String (%v) in Struct (%v)", str, o.name))
+	}
+	return field.dependLst, err
+}
+
+func (f *fieldPathCell) getDependLstByAllStr(o *odmStruct, str string) (dLst dependLst, err error) {
+	field := o.getFieldByMark(str)
+	if field == nil {
+		return nil, errors.New(fmt.Sprint("Can't Find Mark By String (%v) in Struct (%v)", str, o.name))
+	}
+	return field.dependLst, err
 }
 
 // "@mark"
