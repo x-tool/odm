@@ -20,7 +20,8 @@ func (d *Handle) Insert(i interface{}) (err error) {
 	if d.checkHandleErr() != nil {
 		return d.Err
 	}
-	d.writter = newWritter(i)
+	d.writter = *newWritter()
+	d.writter.setValue(i)
 	return d.Exec()
 }
 

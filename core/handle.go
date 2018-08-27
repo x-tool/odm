@@ -26,7 +26,9 @@ type Handle struct {
 	Err error
 }
 
-func newHandle() *Handle {
-	d := &Handle{}
+func newHandle(db *Database) *Handle {
+	d := &Handle{
+		db: db,
+	}
 	return d
 }
