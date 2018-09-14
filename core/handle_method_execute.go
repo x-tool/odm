@@ -123,9 +123,5 @@ func (d *Handle) checkHandleErr() *error {
 	if d.Err != nil {
 		return &d.Err
 	}
-	if len(d.handleCols) == 0 {
-		d.Err = errors.New("Cannot find col, If write col method, Please move it to first")
-		return &d.Err
-	}
 	return nil
 }

@@ -51,10 +51,8 @@ func (h *Handle) setDB(db *Database) {
 	}
 }
 func (h *Handle) setColbyValue(r *reflect.Value) {
-	// if h.col != nil {
-	// 	return
-	// }
-	// h.col = h.db.GetColByName(r.Type().Name())
+	_col := h.db.GetColByName(r.Type().Name())
+	h.handleCols = append(h.handleCols, &handleCol{_col.name, _col})
 }
 
 func (h *Handle) setResult(i interface{}) {
