@@ -93,7 +93,7 @@ func (d *Handle) Limit(first int, last int) (h *Handle) {
 	return
 }
 
-func (d *Handle) Col(i interface{}) (h *Handle) {
+func (d *Handle) Col(name string, i interface{}) (h *Handle) {
 	if d.checkHandleErr() != nil {
 		return d
 	}
@@ -102,22 +102,28 @@ func (d *Handle) Col(i interface{}) (h *Handle) {
 	case string:
 		_col = d.db.GetColByName(i.(string))
 	default:
-		name := reflect.TypeOf(i).Name()
-		_col = d.db.GetColByName(name)
+		iName := reflect.TypeOf(i).Name()
+		_col = d.db.GetColByName(iName)
 	}
 	if _col != nil {
 		d.Err = errors.New("can't Find Col")
 	} else {
-		d.col = _col
+		d.handleCols.add(&handleCol{_col.name, _col})
 	}
 	return
+}
+
+func (h *Handle) Cols(m map[string]interface{}) {
+	for k, v := range m {
+		h.Col(k, v)
+	}
 }
 
 func (d *Handle) checkHandleErr() *error {
 	if d.Err != nil {
 		return &d.Err
 	}
-	if d.col == nil {
+	if len(d.handleCols) == 0 {
 		d.Err = errors.New("Cannot find col, If write col method, Please move it to first")
 		return &d.Err
 	}

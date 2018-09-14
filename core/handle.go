@@ -2,12 +2,6 @@ package core
 
 type handleType int
 
-type handleCol struct {
-	sign string // alias || col.name
-	col  *Col
-}
-type handleCols []*handleCol
-
 const (
 	InsertData handleType = iota
 	UpdateData
@@ -31,4 +25,15 @@ func newHandle(db *Database) *Handle {
 		db: db,
 	}
 	return d
+}
+
+type handleCol struct {
+	sign string // alias || col.name
+	col  *Col
+}
+type handleCols []*handleCol
+
+func (hLst *handleCols) add(h *handleCol) {
+	l := *hLst
+	l = append(l, h)
 }
