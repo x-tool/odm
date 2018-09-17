@@ -1,6 +1,10 @@
 package core
 
-// import "reflect"
+import (
+	"reflect"
+
+	"github.com/x-tool/tool"
+)
 
 // func (v *Value) Field() *structField {
 // 	return v.field
@@ -28,3 +32,7 @@ package core
 // 	}
 // 	return
 // }
+
+func ValueToString(value *reflect.Value) (s string) {
+	return tool.ReflectValueToString(value)
+}

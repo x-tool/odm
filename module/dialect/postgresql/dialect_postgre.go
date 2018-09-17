@@ -34,10 +34,8 @@ func kindToString(k core.Kind) (s string) {
 	return typeMap[k]
 }
 
-func valueToString(value *core.Value) (str string) {
+func valueToString(kind core.Kind, value *reflect.Value) (str string) {
 	_value := *value
-	kind := _value.Kind()
-
 	// postgre type handle
 	switch kind {
 	case core.Time:
@@ -48,7 +46,7 @@ func valueToString(value *core.Value) (str string) {
 	}
 
 	// format Strings
-	switch _value.ReflectType().Kind() {
+	switch _value.Kind() {
 	case reflect.Int:
 		fallthrough
 	case reflect.Int8:
@@ -158,8 +156,14 @@ func (d *dialectpostgre) Session() *core.Session {
 }
 func (d *dialectpostgre) Insert(h *core.Handle) (err error) {
 	var valueLst []string
-	for _, v := range h.GetRootValues() {
-		valueLst = append(valueLst, valueToString(v))
+	_col := h.GetCol()
+	fields := _col.GetRootFields()
+	_valueLst, err := _col.GetFieldsValueByRootValue(h.rawValue)
+	if err != nil {
+		return
+	}
+	for i := 0; i < len(fields); i++ {
+		valueLst = append(valueLst, valueToString(fields[i].Kind(), valueLst[i]))
 	}
 	valueLstStr := strings.Join(valueLst, ",")
 	sql := "INSERT INTO $colName VALUES ($valueLst) RETURNING *"

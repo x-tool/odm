@@ -36,6 +36,10 @@ func (h *Handle) addCol(c *Col, signs ...interface{}) {
 
 }
 
+// get single Col
+func (h *Handle) GetCol() *Col {
+	return h.handleCols[0].col
+}
 func (h *Handle) getColBySign(s string) (c *Col) {
 	for _, v := range h.handleCols {
 		if s == v.sign {

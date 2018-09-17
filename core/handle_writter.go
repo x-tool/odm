@@ -3,6 +3,7 @@ package core
 import "reflect"
 
 type writter struct {
+	handle   *Handle
 	setLst   []*writeItem
 	raw      interface{} // if insert, use this value
 	rawValue reflect.Value
@@ -13,8 +14,10 @@ type writeItem struct {
 	value           interface{}
 }
 
-func newWritter() *writter {
-	w := &writter{}
+func newWritter(h *Handle) *writter {
+	w := &writter{
+		handle: h,
+	}
 	return w
 }
 

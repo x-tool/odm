@@ -2,6 +2,7 @@ package core
 
 import (
 	"errors"
+	"fmt"
 	"reflect"
 )
 
@@ -20,8 +21,9 @@ func (d *Handle) Insert(i interface{}) (err error) {
 	if d.checkHandleErr() != nil {
 		return d.Err
 	}
-	d.writter = *newWritter()
+	d.writter = *newWritter(d)
 	d.writter.setValue(i)
+	fmt.Println("emmmm")
 	return d.Exec()
 }
 
