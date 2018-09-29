@@ -158,7 +158,7 @@ func (d *dialectpostgre) Insert(h *core.Handle) (err error) {
 	var valueLst []string
 	_col := h.GetCol()
 	fields := _col.GetRootFields()
-	_valueLst, err := _col.GetFieldsValueByRootValue(h.rawValue)
+	_valueLst, err := _col.GetFieldsValueByRootValue(h.writter.raw)
 	if err != nil {
 		return
 	}
@@ -168,7 +168,7 @@ func (d *dialectpostgre) Insert(h *core.Handle) (err error) {
 	valueLstStr := strings.Join(valueLst, ",")
 	sql := "INSERT INTO $colName VALUES ($valueLst) RETURNING *"
 	rawsql := tool.ReplaceStrings(sql, []string{
-		"$colName", h.GetColName(),
+		"$colName", _col.Name(),
 		"$valueLst", valueLstStr,
 	})
 	err = d.Open(rawsql, nil)
