@@ -5,7 +5,7 @@ import "reflect"
 type writter struct {
 	handle   *Handle
 	setLst   []*writeItem
-	raw      interface{} // if insert, use this value
+	raw      interface{}
 	rawValue reflect.Value
 }
 
@@ -21,9 +21,13 @@ func newWritter(h *Handle) *writter {
 	return w
 }
 
-func (w *writter) setValue(i interface{}) {
+func (w *writter) setRaw(i interface{}) {
 	w.raw = i
 	w.rawValue = reflect.ValueOf(i)
+}
+
+func (w *writter) getRawValue() *reflect.Value {
+	return &w.rawValue
 }
 
 func (w *writter) add(d dependLst, value interface{}) {
