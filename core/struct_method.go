@@ -72,7 +72,7 @@ func (d *odmStruct) GetRootFields() structFieldLst {
 }
 
 // *********
-func (d *odmStruct) GetFieldsValueByRootValue(fields structFieldLst, r *reflect.Value) (valueLst []*reflect.Value, err error) {
+func (d *odmStruct) GetFieldsValueFromRootValue(fields structFieldLst, r *reflect.Value) (valueLst []*reflect.Value, err error) {
 	for _, v := range fields {
 		field, _err := v.GetValueFromRootValue(r)
 		if _err != nil {
@@ -82,6 +82,10 @@ func (d *odmStruct) GetFieldsValueByRootValue(fields structFieldLst, r *reflect.
 		valueLst = append(valueLst, field)
 	}
 	return
+}
+
+func (d *odmStruct) GetRootFieldsValueFromRootValue(r *reflect.Value) (ValueLst []*reflect.Value, err error) {
+	return d.GetFieldsValueFromRootValue(d.GetRootFields(), r)
 }
 
 func (d *odmStruct) getExtendFields() (lst structFieldLst) {

@@ -26,7 +26,7 @@ func (w *writter) setRaw(i interface{}) {
 	w.rawValue = reflect.ValueOf(i)
 }
 
-func (w *writter) getRawValue() *reflect.Value {
+func (w *writter) GetRawValues() []*reflect.Value {
 	return &w.rawValue
 }
 

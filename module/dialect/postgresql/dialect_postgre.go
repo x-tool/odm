@@ -158,7 +158,7 @@ func (d *dialectpostgre) Insert(h *core.Handle) (err error) {
 	var valueLst []string
 	_col := h.GetCol()
 	fields := _col.GetRootFields()
-	_valueLst, err := _col.GetFieldsValueByRootValue(h.rawValue)
+	_valueLst, err := _col.GetFieldsValueFromRootValue(h.GetRawValues())
 	if err != nil {
 		return
 	}
