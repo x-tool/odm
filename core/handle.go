@@ -16,7 +16,7 @@ type Handle struct {
 	handleCols
 	aimer
 	writter
-	reader
+	Reader
 	Err error
 }
 

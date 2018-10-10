@@ -22,7 +22,7 @@ func (d *Handle) Insert(i interface{}) (err error) {
 		return d.Err
 	}
 	d.writter = *newWritter(d)
-	d.writter.setRaw(i)
+	d.writter.setWritterValue(i)
 	fmt.Println("emmmm")
 	return d.Exec()
 }

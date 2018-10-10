@@ -25,20 +25,20 @@ const (
 	readerNumFunction readerFunction = iota
 )
 
-type reader struct {
+type Reader struct {
 	raw        interface{}
 	rawReflect reflect.Value
 	readerFieldLst
 }
 
-func newreader(i interface{}) *reader {
+func newreader(i interface{}) *Reader {
 	reflect.TypeOf(i)
-	r := new(reader)
+	r := new(Reader)
 	r.raw = i
 	return r
 }
 
-func (r *reader) getreaderRootItemFieldAddr(rootV *reflect.Value) (v []reflect.Value) {
+func (r *Reader) getreaderRootItemFieldAddr(rootV *reflect.Value) (v []reflect.Value) {
 	if rootV.Kind() == reflect.Struct {
 		lenR := rootV.NumField()
 		for i := 0; i < lenR; i++ {
@@ -49,7 +49,7 @@ func (r *reader) getreaderRootItemFieldAddr(rootV *reflect.Value) (v []reflect.V
 	return
 }
 
-func (r *reader) AddRow(rowValues []interface{}) {
+func (r *Reader) AddRow(rowValues []interface{}) {
 	// raws := r.getreaderRootItemFieldAddr()
 
 }

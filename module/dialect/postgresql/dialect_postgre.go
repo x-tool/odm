@@ -158,7 +158,7 @@ func (d *dialectpostgre) Insert(h *core.Handle) (err error) {
 	var valueLst []string
 	_col := h.GetCol()
 	fields := _col.GetRootFields()
-	_valueLst, err := _col.GetFieldsValueFromRootValue(h.GetWritterValue())
+	_valueLst, err := _col.GetRootFieldsValueFromRootValue(h.GetWritterValue())
 	if err != nil {
 		return
 	}
@@ -300,13 +300,13 @@ func (d *dialectpostgre) OpenWithHandle(sql string, Handle *core.Handle) (err er
 	rows, err := pgConn.Query(sql)
 	defer pgConn.Close()
 
-	resultV := *Handle.Result
+	resultV := *Handle.Reader
 	resultT := resultV.Type()
 	if resultT.Kind() == reflect.Slice {
 		for rows.Next() {
-			resultItemV := Handle.Result.newResultItem()
+			resultItemV := Handle.Reader.newResultItem()
 			var resultSlicePtr []interface{}
-			for _, v := range Handle.Result.getResultRootItemFieldAddr(resultItemV) {
+			for _, v := range Handle.Reader.getResultRootItemFieldAddr(resultItemV) {
 				resultSlicePtr = append(resultSlicePtr, (v).Interface())
 			}
 			err = rows.Scan(resultSlicePtr...)
