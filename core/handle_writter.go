@@ -5,7 +5,7 @@ import "reflect"
 type writter struct {
 	handle   *Handle
 	setLst   []*writeItem
-	raw      interface{} // if insert, use this value
+	raw      interface{}
 	rawValue reflect.Value
 }
 
