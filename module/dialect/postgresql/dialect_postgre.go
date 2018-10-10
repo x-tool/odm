@@ -158,12 +158,12 @@ func (d *dialectpostgre) Insert(h *core.Handle) (err error) {
 	var valueLst []string
 	_col := h.GetCol()
 	fields := _col.GetRootFields()
-	_valueLst, err := _col.GetFieldsValueByRootValue(h.writter.raw)
+	_valueLst, err := _col.GetFieldsValueByRootValue(h.GetWritterValue())
 	if err != nil {
 		return
 	}
 	for i := 0; i < len(fields); i++ {
-		valueLst = append(valueLst, valueToString(fields[i].Kind(), valueLst[i]))
+		valueLst = append(valueLst, valueToString(fields[i].Kind(), _valueLst[i]))
 	}
 	valueLstStr := strings.Join(valueLst, ",")
 	sql := "INSERT INTO $colName VALUES ($valueLst) RETURNING *"
@@ -181,7 +181,7 @@ func (d *dialectpostgre) Update(doc *core.Handle) (err error) {
 func (d *dialectpostgre) Delete(doc *core.Handle) (err error) {
 	return
 }
-func (d *dialectpostgre) Query(doc *core.Handle) (r interface{}, err error) {
+func (d *dialectpostgre) Query(doc *core.Handle) (err error) {
 	return
 }
 

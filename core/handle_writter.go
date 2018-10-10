@@ -21,11 +21,14 @@ func newWritter(h *Handle) *writter {
 	return w
 }
 
-func (w *writter) setValue(i interface{}) {
+func (w *writter) setWritterValue(i interface{}) {
 	w.raw = i
 	w.rawValue = reflect.ValueOf(i)
 }
 
+func (w *writter) GetWritterValue() *reflect.Value {
+	return &w.rawValue
+}
 func (w *writter) add(d dependLst, value interface{}) {
 	item := &writeItem{
 		dependLstToRoot: d,
