@@ -300,7 +300,7 @@ func (d *dialectpostgre) OpenWithHandle(sql string, Handle *core.Handle) (err er
 	rows, err := pgConn.Query(sql)
 	defer pgConn.Close()
 
-	resultV := *Handle.Reader
+	resultV := Handle.Reader
 	resultT := resultV.Type()
 	if resultT.Kind() == reflect.Slice {
 		for rows.Next() {

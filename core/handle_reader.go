@@ -38,7 +38,7 @@ func newreader(i interface{}) *Reader {
 	return r
 }
 
-func (r *Reader) getreaderRootItemFieldAddr(rootV *reflect.Value) (v []reflect.Value) {
+func (r *Reader) getreaderRootItemFieldsAddr(rootV *reflect.Value) (v []reflect.Value) {
 	if rootV.Kind() == reflect.Struct {
 		lenR := rootV.NumField()
 		for i := 0; i < lenR; i++ {
