@@ -300,15 +300,21 @@ func (d *dialectpostgre) OpenWithHandle(sql string, Handle *core.Handle) (err er
 	rows, err := pgConn.Query(sql)
 	defer pgConn.Close()
 
-	resultV := Handle.Reader
+	resultV := Handle.Reader.GetRawReflect()
 	resultT := resultV.Type()
+
+	var resultHandle = func() []interface{} {
+		resultItemV := Handle.Reader.NewResultItem()
+		var resultSlicePtr []interface{}
+		for _, v := range Handle.Reader.GetResultRootItemFieldAddr(resultItemV) {
+			resultSlicePtr = append(resultSlicePtr, (v).Interface())
+		}
+		return resultSlicePtr
+	}
+
 	if resultT.Kind() == reflect.Slice {
 		for rows.Next() {
-			resultItemV := Handle.Reader.newResultItem()
-			var resultSlicePtr []interface{}
-			for _, v := range Handle.Reader.getResultRootItemFieldAddr(resultItemV) {
-				resultSlicePtr = append(resultSlicePtr, (v).Interface())
-			}
+			resultSlicePtr := resultHandle()
 			err = rows.Scan(resultSlicePtr...)
 			resultV.Set(reflect.Append(resultV, *resultItemV))
 			if err != nil {
