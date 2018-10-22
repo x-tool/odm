@@ -35,7 +35,7 @@ type Reader struct {
 	readerFieldLst
 }
 
-func newreader(i interface{}, h *Handle) *Reader {
+func newReader(i interface{}, h *Handle) *Reader {
 	r := new(Reader)
 	r.raw = i
 	r.rawReflect = tool.GetRealReflectValue(reflect.ValueOf(i))
