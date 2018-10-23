@@ -6,39 +6,25 @@ import (
 	"github.com/x-tool/tool"
 )
 
-// return col item type, Ex: by fieldname, by count, by list...
-type readerType int
-
-const (
-	readField readerType = iota
-	readFunc
-)
-
-// return col list
-type readerFieldLst []*readerField
-
-type readerField struct {
-	readerType
-	dependLst
-	function readerFunction
+type Row struct {
+	raw          *reflect.Value
+	fieldAddrLst []*reflect.Value
+	fieldLst     structFieldLst
 }
-
-type readerFunction int
-
-const (
-	readerNumFunction readerFunction = iota
-)
 
 type Reader struct {
 	raw        interface{}
 	rawReflect *reflect.Value
-	readerFieldLst
+	IsComplex  bool
 }
 
 func newReader(i interface{}, h *Handle) *Reader {
 	r := new(Reader)
 	r.raw = i
 	r.rawReflect = tool.GetRealReflectValue(reflect.ValueOf(i))
+	if r.rawReflect.Kind() == reflect.Array || r.rawReflect.Kind() == reflect.Slice {
+		r.IsComplex = true
+	}
 	return r
 }
 
@@ -52,20 +38,34 @@ func (r *Reader) GetRawReflect() *reflect.Value {
 
 // get single item fields addr
 func (r *Reader) GetReaderRootItemFieldsAddr() (v []reflect.Value) {
-	if r.rawReflect.Kind() == reflect.Struct {
-		lenR := r.rawReflect.NumField()
-		for i := 0; i < lenR; i++ {
-			_v := r.rawReflect.Field(i).Addr()
-			v = append(v, _v)
+	if r.IsComplex {
+		if item.Kind() == reflect.Struct {
+			lenR := item.NumField()
+			for i := 0; i < lenR; i++ {
+				_v := item.Field(i).Addr()
+				_row.fieldLst = append(_row.fieldLst, _v)
+			}
 		}
-	}
-	if r.rawReflect.Kind() == reflect.Slice {
-
 	}
 	return
 }
 
-func (r *Reader) AddRow(rowValues []interface{}) {
-	// raws := r.getreaderRootItemFieldAddr()
-
+func (r *Reader) NewRow() (_row *Row) {
+	var item reflect.Value
+	if r.IsComplex {
+		item = reflect.New(r.rawReflect.Type().Elem())
+	} else {
+		item = *r.rawReflect
+	}
+	_row.raw = &item
+	if item.Kind() == reflect.Struct {
+		lenR := item.NumField()
+		for i := 0; i < lenR; i++ {
+			_v := item.Field(i).Addr()
+			_row.fieldLst = append(_row.fieldLst, _v)
+		}
+	} else {
+		_row.fieldLst = item
+	}
+	return
 }
