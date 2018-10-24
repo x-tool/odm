@@ -36,6 +36,10 @@ func (h *Handle) addCol(c *Col, signs ...interface{}) {
 
 }
 
+func (h *Handle) IsSingleCol() bool {
+	return len(h.handleCols) == 1
+}
+
 // get single Col
 func (h *Handle) GetCol() *Col {
 	return h.handleCols[0].col

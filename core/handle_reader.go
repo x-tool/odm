@@ -14,6 +14,7 @@ type Row struct {
 }
 
 type Reader struct {
+	handle     *Handle
 	raw        interface{}
 	rawReflect *reflect.Value
 	IsComplex  bool
@@ -22,6 +23,7 @@ type Reader struct {
 func newReader(i interface{}, h *Handle) *Reader {
 	r := new(Reader)
 	r.raw = i
+	r.handle = h
 	r.rawReflect = tool.GetRealReflectValue(reflect.ValueOf(i))
 	if r.rawReflect.Kind() == reflect.Array || r.rawReflect.Kind() == reflect.Slice {
 		r.IsComplex = true
@@ -37,20 +39,6 @@ func (r *Reader) GetRawReflect() *reflect.Value {
 	return r.rawReflect
 }
 
-// get single item fields addr
-func (r *Row) GetReaderRootItemFieldsAddr() (v []reflect.Value) {
-	if r.reader.IsComplex {
-		if r.raw.Kind() == reflect.Struct {
-			lenR := r.raw.NumField()
-			for i := 0; i < lenR; i++ {
-				_v := r.raw.Field(i).Addr()
-				_row.fieldLst = append(_row.fieldLst, _v)
-			}
-		}
-	}
-	return
-}
-
 func (r *Reader) NewRow() (_row *Row) {
 	_row.reader = r
 	var item reflect.Value
@@ -63,11 +51,35 @@ func (r *Reader) NewRow() (_row *Row) {
 	if item.Kind() == reflect.Struct {
 		lenR := item.NumField()
 		for i := 0; i < lenR; i++ {
-			_v := item.Field(i).Addr()
+			_v := item.Field(i)
 			_row.fieldLst = append(_row.fieldLst, _v)
 		}
 	} else {
 		_row.fieldLst = item
 	}
 	return
+}
+
+// get single item fields addr
+func (r *Row) GetReaderRootItemFieldsAddr() (v []reflect.Value) {
+	if r.reader.IsComplex {
+		if r.raw.Kind() == reflect.Struct {
+			lenR := r.raw.NumField()
+			for i := 0; i < lenR; i++ {
+				_v := r.raw.Field(i).Addr()
+				r.fieldLst = append(r.fieldLst, r.getFieldFromReflectStructField(_v))
+			}
+		}
+	}
+	return
+}
+
+func (r *Row) getFieldFromReflectStructField(v *reflect.StructField) (f *structField) {
+	if v.Tag == "" {
+		if r.reader.handle.IsSingleCol() {
+			f = r.reader.handle.GetCol().getFieldByName(v.Name)
+		}
+	} else {
+
+	}
 }
