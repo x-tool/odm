@@ -11,6 +11,7 @@ type odmStruct struct {
 	name            string
 	path            string
 	allName         string // name+path
+	parent          *structField
 	fields          structFieldLst
 	rootFields      structFieldLst
 	sourceType      *reflect.Type

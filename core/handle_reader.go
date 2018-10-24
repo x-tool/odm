@@ -7,6 +7,7 @@ import (
 )
 
 type Row struct {
+	reader       *Reader
 	raw          *reflect.Value
 	fieldAddrLst []*reflect.Value
 	fieldLst     structFieldLst
@@ -37,12 +38,12 @@ func (r *Reader) GetRawReflect() *reflect.Value {
 }
 
 // get single item fields addr
-func (r *Reader) GetReaderRootItemFieldsAddr() (v []reflect.Value) {
-	if r.IsComplex {
-		if item.Kind() == reflect.Struct {
-			lenR := item.NumField()
+func (r *Row) GetReaderRootItemFieldsAddr() (v []reflect.Value) {
+	if r.reader.IsComplex {
+		if r.raw.Kind() == reflect.Struct {
+			lenR := r.raw.NumField()
 			for i := 0; i < lenR; i++ {
-				_v := item.Field(i).Addr()
+				_v := r.raw.Field(i).Addr()
 				_row.fieldLst = append(_row.fieldLst, _v)
 			}
 		}
@@ -51,6 +52,7 @@ func (r *Reader) GetReaderRootItemFieldsAddr() (v []reflect.Value) {
 }
 
 func (r *Reader) NewRow() (_row *Row) {
+	_row.reader = r
 	var item reflect.Value
 	if r.IsComplex {
 		item = reflect.New(r.rawReflect.Type().Elem())
