@@ -10,7 +10,7 @@ type Database struct {
 	name    string
 	dialect Dialect // third module hook
 	config
-	states // database some state
+	states // database some state when start xodm
 	odmStructLst
 	mapStructs map[string]*odmStruct // use map to get structs by name, I think struct name should be unique where ever package, if not user should write whole pkgPath and name in one string to get one struct
 	ColLst
@@ -30,9 +30,9 @@ type history struct {
 	colNames []string
 }
 
-func NewDatabase(name string, c *client.Client, d Dialect) *Database {
+func NewDatabase(c *client.Client, d Dialect) *Database {
 	_d := new(Database)
-	_d.name = name
+	_d.name = c.Config.DatabaseName
 	_d.client = c
 	_d.dialect = d
 	_d.setHistory()

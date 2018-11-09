@@ -1,16 +1,15 @@
 package client
 
 type Client struct {
-	config ConnectConfig
+	Config ConnectConfig
 }
 
 func (c *Client) GetConnectConfig() *ConnectConfig {
-	return &c.config
+	return &c.Config
 }
 
 func NewClient(c ConnectConfig) *Client {
 	_o := new(Client)
-	_o.config = c
-	//_o.dialectConnect = dialect.NewDialect(c)
+	_o.Config = c
 	return _o
 }
