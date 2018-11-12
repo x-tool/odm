@@ -55,6 +55,7 @@ func (d *odmStruct) getFieldByDependLst(fieldName string, Lst []string) (_field 
 // "fieldName"
 // "path.fieldName"
 func (d *odmStruct) getFieldByString(str string) (f *structField, err error) {
+	for _,v:= range 
 	var sign = str[:1]
 	if sign == pathSplitStrs["mark"] {
 		f = d.getFieldByMark(str[1:])

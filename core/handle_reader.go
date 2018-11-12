@@ -8,7 +8,6 @@ import (
 
 type Row struct {
 	reader       *Reader
-	raw          *reflect.Value
 	fieldAddrLst []*reflect.Value
 	fieldLst     structFieldLst
 }
