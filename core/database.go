@@ -19,7 +19,7 @@ type Database struct {
 	mapCols   map[string]*Col // use map to get col by name
 	aliasFunc func(string) string
 	history   *history
-	hook      *Hook
+	Hook
 }
 
 type config struct {
@@ -40,7 +40,7 @@ func NewDatabase(c *client.Client, d Dialect) *Database {
 	_d.client = c
 	_d.dialect = d
 	_d.setHistory()
-	_d.hook = newHook(_d)
+	_d.Hook = newHook(_d)
 	return _d
 }
 

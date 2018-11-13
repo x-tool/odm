@@ -107,5 +107,3 @@ func makeInterfaceFields(d *odmStruct) (lst map[string]*structField) {
 	}
 	return
 }
-
-func getFieldLstByString(d *odmStruct)
