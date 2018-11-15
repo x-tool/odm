@@ -12,14 +12,14 @@ type dependLst []*structField
 
 var splitStructFromPath = "|"
 
-func (d *Database) getDependLstByStr(o *odmStruct, str string) (dLst dependLst, err error) {
-	for _, v := range d.hook.getFieldByStr {
-		l, err := v(o, str)
-		if len(l) != 0 {
-			return l, nil
-		}
-	}
-}
+// func (d *Database) getDependLstByStr(o *odmStruct, str string) (dLst dependLst, err error) {
+// 	for _, v := range d.hook.getFieldByStr {
+// 		l, err := v(o, str)
+// 		if len(l) != 0 {
+// 			return l, nil
+// 		}
+// 	}
+// }
 
 func (f *Database) getDependLstBy(o *odmStruct, str string) (dLst dependLst, err error) {
 	field, err := o.getFieldByString(str)
@@ -38,7 +38,7 @@ func (f *Database) getDependLstByPathStr(o *odmStruct, str string) (dLst dependL
 }
 
 func (f *Database) getDependLstByAllPathStr(str string) (dLst dependLst, err error) {
-	splitLst := strings.SplitN(str, pathSplitStrs["path"], 2)
+	splitLst := strings.SplitN(str, ".", 2)
 	targetStruct, err := f.getStructByName(splitLst[0])
 	if err != nil {
 		return
