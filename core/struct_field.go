@@ -111,6 +111,7 @@ func checkstructFieldisExtend(r *reflect.StructField) (b bool) {
 
 // lst /////////////////////////
 type structFieldLst []*structField
+type dependLst []*structField
 
 func (d *structFieldLst) addItem(f *structField) *structField {
 	f.id = len(*d)

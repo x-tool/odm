@@ -33,15 +33,11 @@ func newReader(i interface{}, h *Handle) (*Reader, error) {
 	return r, nil
 }
 
-func (r *Reader) GetRaw() interface{} {
-	return r.raw
+func (r *ReaderField) getFieldByStr (s string) {
+	r.reader.
 }
 
-func (r *Reader) GetRawReflect() *reflect.Value {
-	return &r.rawReflect
-}
-
-// if result raw value is complex type return new row ,
+// if result raw value is complex type return new row
 // if is single return raw
 func (r *Reader) Row() (_row *Row) {
 	_row.reader = r
