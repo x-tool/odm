@@ -19,22 +19,25 @@ type Reader struct {
 	IsComplex  bool
 }
 
+// result item type should be ptr
 func newReader(i interface{}, h *Handle) (*Reader, error) {
 	r := new(Reader)
 	r.raw = i
 	r.handle = h
-	r.rawReflect = reflect.ValueOf(i)
+	// if raw type is not ptr, can't white result in it, return error
+	rawValue := reflect.ValueOf(i)
 	if r.rawReflect.Kind() != reflect.Ptr {
 		return r, errors.New("Result type should be Ptr")
 	}
+	r.rawReflect = reflect.Indirect(rawValue)
 	if r.rawReflect.Kind() == reflect.Array || r.rawReflect.Kind() == reflect.Slice {
 		r.IsComplex = true
 	}
 	return r, nil
 }
 
-func (r *ReaderField) getFieldByStr (s string) {
-	r.reader.
+func (r *ReaderField) formatFields(s string) {
+	r.rawReflect
 }
 
 // if result raw value is complex type return new row
