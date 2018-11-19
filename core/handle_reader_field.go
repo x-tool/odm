@@ -9,9 +9,10 @@ import (
 )
 
 type ReaderField struct {
-	reader *Reader
-	name   string
-	dependLst
+	reader       *Reader
+	name         string
+	goDepend     dependLst
+	odmDepend    dependLst
 	complexValue map[int]string // slice id or map key
 }
 
@@ -34,7 +35,7 @@ func newReaderField(r *Reader, f reflect.StructField) (*ReaderField, error) {
 		if err != nil {
 			return field, errors.New("can't get struct from your register structs")
 		}
-		depend, complexs err:= field.formatField(_struct, v[ids[1]:])
+		depend, complexs, err := field.formatField(_struct, v[ids[1]:])
 		if err != nil {
 			return field, fmt.Errorf("can't get struct field from struct: %v", v[:ids[1]])
 		}
@@ -42,6 +43,6 @@ func newReaderField(r *Reader, f reflect.StructField) (*ReaderField, error) {
 	return field, nil
 }
 
-func (r *ReaderField) formatField(o *odmStruct, s string) (d dependLst, complexValue map[int]string, error) {
-	
+func (r *ReaderField) formatField(o *odmStruct, s string) (d dependLst, complexValue map[int]string, err error) {
+	return
 }
