@@ -2,6 +2,7 @@ package core
 
 import (
 	"errors"
+	"fmt"
 	"reflect"
 )
 
@@ -11,6 +12,35 @@ func (h *Handle) GetDBName() (s string, e error) {
 	} else {
 		return h.handleCols[0].col.db.name, nil
 	}
+}
+
+func (h *Handle) getStructByStr(s string) (o *odmStruct, err error) {
+	for k, v := range h.alias {
+		if s == k {
+			return v, nil
+		}
+	}
+	for k, v := range h.db.mapStructs {
+		if s == k {
+			return v, nil
+		}
+	}
+	return nil, fmt.Errorf("can't get struct use string: %v", s)
+}
+
+func (h *Handle) getColByStr(s string) (o *Col, err error) {
+	name := s
+	for k, v := range h.alias {
+		if s == k {
+			name = v.name
+		}
+	}
+	for k, v := range h.db.mapCols {
+		if name == k {
+			return v, nil
+		}
+	}
+	return nil, fmt.Errorf("can't get Col use string: %v", s)
 }
 
 func (h *Handle) addCol(c *Col, signs ...interface{}) {

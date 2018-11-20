@@ -11,7 +11,8 @@ const (
 
 // handle struct is hock for plugin
 type Handle struct {
-	db *Database
+	db    *Database
+	alias map[string]*odmStruct
 	handleType
 	handleCols
 	aimer

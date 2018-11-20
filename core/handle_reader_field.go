@@ -13,7 +13,7 @@ type ReaderField struct {
 	name         string
 	goDepend     dependLst
 	odmDepend    dependLst
-	complexValue map[int]string // slice id or map key
+	complexValue map[int]string // golang struct child slice id or map key
 }
 
 func newReaderField(r *Reader, f reflect.StructField) (*ReaderField, error) {
@@ -21,7 +21,9 @@ func newReaderField(r *Reader, f reflect.StructField) (*ReaderField, error) {
 		reader: r,
 		name:   f.Name,
 	}
-	var _allDepend dependLst
+	var goDepend dependLst
+	var odmDepend dependLst
+	var complexValue map[int]string
 	// format structFieldTag
 	tag := string(f.Tag)
 	odmLst := strings.Split(tag, "|")
@@ -35,14 +37,21 @@ func newReaderField(r *Reader, f reflect.StructField) (*ReaderField, error) {
 		if err != nil {
 			return field, errors.New("can't get struct from your register structs")
 		}
-		depend, complexs, err := field.formatField(_struct, v[ids[1]:])
+		goD, odmD, complexs, err := field.formatField(_struct, v[ids[1]:])
 		if err != nil {
 			return field, fmt.Errorf("can't get struct field from struct: %v", v[:ids[1]])
 		}
+		goDepend = append(goDepend, goD...)
+		odmDepend = append(odmDepend, odmD...)
+		len()
 	}
 	return field, nil
 }
 
-func (r *ReaderField) formatField(o *odmStruct, s string) (d dependLst, complexValue map[int]string, err error) {
+func (r *ReaderField) formatField(o *odmStruct, s string) (goD dependLst, odmD dependLst, complexValue map[int]string, err error) {
+	if s == "" {
+		return goD, odmD, complexValue, nil
+	}
+
 	return
 }

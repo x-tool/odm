@@ -14,6 +14,17 @@ func (d *Handle) callDocMode() {
 	callDocMode(d)
 }
 
+func (h *Handle) Alias(m map[string]string) *Handle {
+	for k, v := range m {
+		_odmStruct, err := h.db.getStructByName(v)
+		if err != nil {
+			h.Err = fmt.Errorf("can't get struct: %v from DB", v)
+		}
+		h.alias[k] = _odmStruct
+	}
+	return h
+}
+
 func (d *Handle) Insert(i interface{}) (err error) {
 	value := reflect.Indirect(reflect.ValueOf(i))
 	d.setColbyValue(&value)

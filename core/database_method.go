@@ -55,6 +55,11 @@ func (d *Database) RegisterStructs(c ...interface{}) {
 		go d.RegisterStruct(v)
 	}
 	rigisterStructs.Wait()
+	// set struct id
+	_len := len(d.odmStructLst)
+	for i := 0; i < _len; i++ {
+		d.odmStructLst[i].id = i + 1
+	}
 }
 
 func (d *Database) GetCol(i interface{}) *Col {
