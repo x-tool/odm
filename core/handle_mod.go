@@ -19,7 +19,7 @@ var DocModeMethodMap = map[handleType]string{
 
 func callDocMode(h *Handle) {
 	for _, v := range h.handleCols {
-		field := v.col.doc.getDocMode()
+		field := v.col.getDocMode()
 		if field != nil {
 			var value reflect.Value
 			switch h.handleType {
