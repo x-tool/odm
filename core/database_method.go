@@ -79,7 +79,7 @@ func (d *Database) RegisterCol(c interface{}) {
 	_col := newCol(d, c)
 	d.ColLst = append(d.ColLst, _col)
 	d.mapCols[_col.Name()] = _col
-	d.RegisterStruct(_col.doc.odmStruct)
+	d.RegisterStruct(_col.odmStruct)
 	rigisterCols.Done()
 }
 
