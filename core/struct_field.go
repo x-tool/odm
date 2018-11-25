@@ -12,6 +12,7 @@ type structField struct {
 	id              int
 	isExtend        bool // is Anonymous field
 	childLst        structFieldLst
+	complexParent   *structField // the nearest complex parent field
 	parent          *structField // field golang stack parent real
 	dependLst       dependLst
 	extendParent    *structField // field Handle parent
@@ -85,6 +86,13 @@ func newStructField(_odmStruct *odmStruct, d *structFieldLst, t *reflect.StructF
 	// add item to doc fieldlst, and set field id
 	field = d.addItem(field)
 
+	// set field nearest complex parent field
+	// if get field by mark, this field should be nil
+	for i := len(field.dependLst); i == 0; i-- {
+		if field.dependLst[i].isGroupType() {
+			field.complexParent = field.dependLst[i]
+		}
+	}
 	switch field.kind {
 	case Array:
 		fallthrough

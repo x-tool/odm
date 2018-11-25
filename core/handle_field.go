@@ -85,6 +85,14 @@ func (r *HandleField) formatField(o *odmStruct, s string) (goD dependLst, odmD d
 	if s == "" {
 		return goD, odmD, complexValue, nil
 	}
-
+	sign := s[:1]
+	if sign == "@" {
+		f = d.getFieldByMark(str[1:])
+	} else {
+		f = d.getFieldByPath(str)
+	}
+	if f == nil {
+		err = errors.New(fmt.Sprintf("Can't find field use string %d in struct %d", str, d.name))
+	}
 	return
 }
