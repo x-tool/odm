@@ -8,22 +8,39 @@ import (
 	"strings"
 )
 
-type ReaderField struct {
-	reader       *Reader
-	name         string
-	goDepend     dependLst
-	odmDepend    dependLst
-	complexValue map[int]string // golang struct child slice id or map key
+type HandleField struct {
+	reader        *Reader
+	name          string
+	goDepend      dependLst
+	odmDepend     dependLst
+	complexValues // golang struct child slice id or map key
 }
 
-func newReaderField(r *Reader, f reflect.StructField) (field *ReaderField, err error) {
-	field = &ReaderField{
+type complexValue struct {
+	structId int
+	fieldId  int
+	value    string
+}
+
+type complexValues []complexValue
+
+func (c complexValues) getValue(id int, fieldId int) string {
+	for _, v := range c {
+		if id == v.structId && fieldId == v.fieldId {
+			return v.value
+		}
+	}
+	return ""
+}
+
+func newHandleField(r *Reader, f reflect.StructField) (field *HandleField, err error) {
+	field = &HandleField{
 		reader: r,
 		name:   f.Name,
 	}
 	var goDepend dependLst
 	var odmDepend dependLst
-	var complexValue map[int]string
+	var complexValues []complexValue
 	// format structFieldTag
 	tag := string(f.Tag)
 	odmLst := strings.Split(tag, "|")
@@ -56,15 +73,15 @@ func newReaderField(r *Reader, f reflect.StructField) (field *ReaderField, err e
 		}
 		goDepend = append(goDepend, goD...)
 		odmDepend = append(odmDepend, odmD...)
-		complexValue = append(complexValue, complexs...)
+		complexValues = append(complexValues, complexs...)
 	}
 	field.goDepend = goDepend
 	field.odmDepend = odmDepend
-	field.complexValue = complexValue
+	field.complexValues = complexValues
 	return field, nil
 }
 
-func (r *ReaderField) formatField(o *odmStruct, s string) (goD dependLst, odmD dependLst, complexValue map[int]string, err error) {
+func (r *HandleField) formatField(o *odmStruct, s string) (goD dependLst, odmD dependLst, complexValue []complexValue, err error) {
 	if s == "" {
 		return goD, odmD, complexValue, nil
 	}

@@ -1,7 +1,6 @@
 package core
 
 import (
-	"errors"
 	"reflect"
 )
 
@@ -19,23 +18,6 @@ func (c *Col) findDocModeField() (field *structField) {
 
 func (c *Col) getDocMode() *structField {
 	return c.mode
-}
-
-func (c *Col) GetRootValues(instance *reflect.Value) (RootValues []*reflect.Value, err error) {
-	name := allName(instance.Type())
-	if name != c.odmStruct.allName {
-		err = errors.New("Should use col type to get values")
-		return
-	}
-	for _, v := range c.GetRootFields() {
-		value, _err := v.GetValueFromRootValue(instance)
-		if _err != nil {
-			err = _err
-			return
-		}
-		RootValues = append(RootValues, value)
-	}
-	return
 }
 
 // GetColName get interface name

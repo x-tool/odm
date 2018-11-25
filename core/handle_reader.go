@@ -15,7 +15,7 @@ type Reader struct {
 	handle       *Handle
 	raw          interface{}
 	rawReflect   reflect.Value
-	itemFieldLst []*ReaderField // result item one row field list
+	itemFieldLst []*HandleField // result item one row field list
 	IsComplex    bool
 }
 
@@ -51,7 +51,7 @@ func (r *Reader) formatFields() error {
 	itemFieldLen := itemType.NumField()
 	for i := 0; i < itemFieldLen; i++ {
 		fieldStruct := itemType.Field(i)
-		readField, err := newReaderField(r, fieldStruct)
+		readField, err := newHandleField(r, fieldStruct)
 		if err != nil {
 			return err
 		}

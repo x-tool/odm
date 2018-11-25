@@ -3,7 +3,6 @@ package core
 import (
 	"errors"
 	"fmt"
-	"reflect"
 	"strings"
 )
 
@@ -69,23 +68,6 @@ func (d *odmStruct) getFieldByString(str string) (f *structField, err error) {
 
 func (d *odmStruct) GetRootFields() structFieldLst {
 	return d.rootFields
-}
-
-// *********
-func (d *odmStruct) GetFieldsValueFromRootValue(fields structFieldLst, r *reflect.Value) (valueLst []*reflect.Value, err error) {
-	for _, v := range fields {
-		field, _err := v.GetValueFromRootValue(r)
-		if _err != nil {
-			err = _err
-			return
-		}
-		valueLst = append(valueLst, field)
-	}
-	return
-}
-
-func (d *odmStruct) GetRootFieldsValueFromRootValue(r *reflect.Value) (ValueLst []*reflect.Value, err error) {
-	return d.GetFieldsValueFromRootValue(d.GetRootFields(), r)
 }
 
 func (d *odmStruct) getExtendFields() (lst structFieldLst) {
