@@ -34,6 +34,7 @@ func newOdmStruct(i interface{}) (_odmStruct *odmStruct) {
 		sourceType: &odmStructSourceT,
 	}
 	fields := newstructFieldLst(_odmStruct, odmStructSourceT)
+	setExtendChild(*fields)
 	_odmStruct.fields = *fields
 	_odmStruct.fieldMarkMap = makestructFieldLstMarkMap(_odmStruct)
 	_odmStruct.fieldNameMap = makestructFieldLstNameMap(_odmStruct)
@@ -107,4 +108,22 @@ func makeInterfaceFields(d *odmStruct) (lst map[string]*structField) {
 
 	}
 	return
+}
+
+// can't format extendChild value when new fieldLst
+// so use this function format all field when fields allready
+func setExtendChild(lst structFieldLst) {
+	for _, v := range lst {
+		var fieldLst structFieldLst
+		for _, v2 := range lst {
+			if v.id == v2.id {
+				continue
+			} else {
+				if v2.extendParent.id == v.id {
+					fieldLst = append(fieldLst, v2.extendParent)
+				}
+			}
+		}
+		v.extendChildLst = fieldLst
+	}
 }

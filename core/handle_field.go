@@ -67,7 +67,7 @@ func newHandleField(r *Reader, f reflect.StructField) (field *HandleField, err e
 			}
 		}
 
-		f, complexs, err := field.formatField(_struct, fieldPath)
+		f, complexs, err := field.formatField(_struct, fieldPath, i == 0)
 		if err != nil {
 			return field, fmt.Errorf("can't get struct field from struct: %v", structName)
 		}
@@ -81,7 +81,7 @@ func newHandleField(r *Reader, f reflect.StructField) (field *HandleField, err e
 	return field, nil
 }
 
-func (r *HandleField) formatField(o *odmStruct, s string) (field *structField, complexValue []complexValue, err error) {
+func (r *HandleField) formatField(o *odmStruct, s string, isFirst bool) (field *structField, complexValues []complexValue, err error) {
 	if s == "" {
 		err = fmt.Errorf("can't get field use ''")
 		return
@@ -98,10 +98,75 @@ func (r *HandleField) formatField(o *odmStruct, s string) (field *structField, c
 			err = fmt.Errorf("can't get field by tag use %d", signV)
 			return
 		}
-	case ".":
-
 	default:
-		err = fmt.Errorf("Can't find field use string %d in struct %d", signV, o.name)
+		// mix first split path and orthers path
+		// if is not first split, path string wthiout odmstruct name should use "." at first
+		if !isFirst && sign != "." {
+			err = fmt.Errorf("Can't find field use string %d in struct %d", signV, o.name)
+			return
+		}
+		var path string
+		if isFirst {
+			path = s
+		} else {
+			path = signV
+		}
+
+		pathLst := strings.Split(path, ".")
+		// judge get field by name or by path
+		if len(pathLst) == 1 {
+			fields := o.getFieldByName(pathLst[0])
+			switch len(fields) {
+			case 0:
+				err = fmt.Errorf("Can't find field use string %d in struct %d", signV, o.name)
+				return
+			case 1:
+				field = fields[0]
+				if field == nil || field.complexParent != nil {
+					err = fmt.Errorf("can't get field by tag use %d", signV)
+					return
+				}
+			default:
+				err = fmt.Errorf("Get to many field use string %d in struct %d", signV, o.name)
+				return
+			}
+		} else {
+			fieldLst := o.rootFields
+			var complexParent *structField
+			lenPath := len(pathLst)
+			for i, v := range pathLst {
+				// if parent is map or slice ,this value is key of parent kind
+				if complexParent != nil {
+					complexV := complexValue{
+						structId: o.id,
+						fieldId:  complexParent.id,
+						value:    v,
+					}
+					complexValues = append(complexValues, complexV)
+					complexParent = nil
+					continue
+				}
+				// get field by name
+				var checkItem *structField
+				for _, fieldLstItem := range fieldLst {
+					if fieldLstItem.name == v {
+						checkItem = fieldLstItem
+						break
+					}
+				}
+				if checkItem == nil {
+					err = fmt.Errorf("Can't get field use string '%d' in path %d in struct %d", v, s, o.name)
+					return
+				}
+				if checkItem.isGroupType() {
+					complexParent = checkItem
+				}
+				fieldLst = checkItem.extendChildLst
+				if i == lenPath-1 {
+					field = checkItem
+				}
+			}
+		}
 	}
 	return
 }

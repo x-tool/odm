@@ -5,19 +5,22 @@ import (
 )
 
 type structField struct {
-	odmStruct       *odmStruct
-	name            string
-	sourceType      reflect.Type
-	kind            Kind
-	id              int
-	isExtend        bool // is Anonymous field
-	childLst        structFieldLst
-	complexParent   *structField // the nearest complex parent field
-	parent          *structField // field golang stack parent real
-	dependLst       dependLst
+	odmStruct  *odmStruct
+	name       string
+	sourceType reflect.Type
+	kind       Kind
+	id         int
+	isExtend   bool // is Anonymous field
+	tag        *odmTag
+	// fields relation with golang struct
+	childLst      structFieldLst
+	complexParent *structField // the nearest complex parent field
+	parent        *structField // field golang stack parent real
+	dependLst     dependLst
+	// fields relastion with logic struct
+	extendChildLst  structFieldLst
 	extendParent    *structField // field Handle parent
 	extendDependLst dependLst
-	tag             *odmTag
 }
 
 func (d *structField) Name() string {
