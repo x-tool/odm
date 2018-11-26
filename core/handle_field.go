@@ -67,12 +67,12 @@ func newHandleField(r *Reader, f reflect.StructField) (field *HandleField, err e
 			}
 		}
 
-		goD, odmD, complexs, err := field.formatField(_struct, fieldPath)
+		f, complexs, err := field.formatField(_struct, fieldPath)
 		if err != nil {
 			return field, fmt.Errorf("can't get struct field from struct: %v", structName)
 		}
-		goDepend = append(goDepend, goD...)
-		odmDepend = append(odmDepend, odmD...)
+		goDepend = append(goDepend, f.dependLst...)
+		odmDepend = append(odmDepend, f.extendDependLst...)
 		complexValues = append(complexValues, complexs...)
 	}
 	field.goDepend = goDepend
@@ -81,18 +81,27 @@ func newHandleField(r *Reader, f reflect.StructField) (field *HandleField, err e
 	return field, nil
 }
 
-func (r *HandleField) formatField(o *odmStruct, s string) (goD dependLst, odmD dependLst, complexValue []complexValue, err error) {
+func (r *HandleField) formatField(o *odmStruct, s string) (field *structField, complexValue []complexValue, err error) {
 	if s == "" {
-		return goD, odmD, complexValue, nil
+		err = fmt.Errorf("can't get field use ''")
+		return
 	}
 	sign := s[:1]
-	if sign == "@" {
-		f = d.getFieldByMark(str[1:])
-	} else {
-		f = d.getFieldByPath(str)
-	}
-	if f == nil {
-		err = errors.New(fmt.Sprintf("Can't find field use string %d in struct %d", str, d.name))
+	signV := s[1:]
+	// two kind of string to get field
+	// odmstruct@mark
+	// odmstruct.path
+	switch sign {
+	case "@":
+		field = o.getFieldByMark(signV)
+		if field == nil || field.complexParent != nil {
+			err = fmt.Errorf("can't get field by tag use %d", signV)
+			return
+		}
+	case ".":
+
+	default:
+		err = fmt.Errorf("Can't find field use string %d in struct %d", signV, o.name)
 	}
 	return
 }
