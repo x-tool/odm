@@ -45,7 +45,7 @@ func newHandleField(r *Reader, f reflect.StructField) (field *HandleField, err e
 	tag := string(f.Tag)
 	odmLst := strings.Split(tag, "|")
 	for i, v := range odmLst {
-		reg := regexp.MustCompile(`[]+`)
+		reg := regexp.MustCompile(`\w`)
 		ids := reg.FindStringIndex(v)
 		structName := v[:ids[0]]
 		fieldPath := v[:ids[1]]
@@ -95,14 +95,14 @@ func (r *HandleField) formatField(o *odmStruct, s string, isFirst bool) (field *
 	case "@":
 		field = o.getFieldByMark(signV)
 		if field == nil || field.complexParent != nil {
-			err = fmt.Errorf("can't get field by tag use %d", signV)
+			err = fmt.Errorf("can't get field by tag use %v", signV)
 			return
 		}
 	default:
 		// mix first split path and orthers path
 		// if is not first split, path string wthiout odmstruct name should use "." at first
 		if !isFirst && sign != "." {
-			err = fmt.Errorf("Can't find field use string %d in struct %d", signV, o.name)
+			err = fmt.Errorf("Can't find field use string %v in struct %v", signV, o.name)
 			return
 		}
 		var path string
@@ -118,16 +118,16 @@ func (r *HandleField) formatField(o *odmStruct, s string, isFirst bool) (field *
 			fields := o.getFieldByName(pathLst[0])
 			switch len(fields) {
 			case 0:
-				err = fmt.Errorf("Can't find field use string %d in struct %d", signV, o.name)
+				err = fmt.Errorf("Can't find field use string %v in struct %v", signV, o.name)
 				return
 			case 1:
 				field = fields[0]
 				if field == nil || field.complexParent != nil {
-					err = fmt.Errorf("can't get field by tag use %d", signV)
+					err = fmt.Errorf("can't get field by tag use %v", signV)
 					return
 				}
 			default:
-				err = fmt.Errorf("Get to many field use string %d in struct %d", signV, o.name)
+				err = fmt.Errorf("Get to many field use string %v in struct %v", signV, o.name)
 				return
 			}
 		} else {
@@ -155,7 +155,7 @@ func (r *HandleField) formatField(o *odmStruct, s string, isFirst bool) (field *
 					}
 				}
 				if checkItem == nil {
-					err = fmt.Errorf("Can't get field use string '%d' in path %d in struct %d", v, s, o.name)
+					err = fmt.Errorf("Can't get field use string '%v' in path %v in struct %v", v, s, o.name)
 					return
 				}
 				if checkItem.isGroupType() {
