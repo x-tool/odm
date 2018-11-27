@@ -170,3 +170,6 @@ func (r *HandleField) formatField(o *odmStruct, s string, isFirst bool) (field *
 	}
 	return
 }
+
+// handleField List
+type HandleFieldLst []*HandleField
