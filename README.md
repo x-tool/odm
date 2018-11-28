@@ -15,7 +15,7 @@ testInsert.Name = "haha,I get"
 _, err := db.Insert(testInsert)
 ```
 ## Percentage of progress
-45%
+65%
 ## Features
 
 * JSON support, You can get field in struct from database simple.
@@ -24,7 +24,7 @@ _, err := db.Insert(testInsert)
 
 ## Support database
 
-xodm only support postgresql now, it may support orther sql future.
+xodm only support postgresql now, it may support orther database future.
 
 * postgresql -- github.com/jackc/pgx
 

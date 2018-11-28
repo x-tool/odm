@@ -10,8 +10,8 @@ type writter struct {
 }
 
 type writeItem struct {
-	HandleFieldLst
-	value interface{}
+	dependLstToRoot dependLst
+	value           interface{}
 }
 
 func newWritter(h *Handle) *writter {
