@@ -9,7 +9,7 @@ import (
 )
 
 type HandleField struct {
-	reader        *Reader
+	handle        *Handle
 	name          string
 	goDepend      dependLst
 	odmDepend     dependLst
@@ -33,9 +33,9 @@ func (c complexValues) getValue(id int, fieldId int) string {
 	return ""
 }
 
-func newHandleField(r *Reader, f reflect.StructField) (field *HandleField, err error) {
+func newHandleField(h *Handle, f reflect.StructField) (field *HandleField, err error) {
 	field = &HandleField{
-		reader: r,
+		handle: h,
 		name:   f.Name,
 	}
 	var goDepend dependLst
@@ -55,13 +55,13 @@ func newHandleField(r *Reader, f reflect.StructField) (field *HandleField, err e
 		var _struct *odmStruct
 		// first split is field from col, other field from doc
 		if i == 0 {
-			_col, err := r.handle.getColByStr(structName)
+			_col, err := h.getColByStr(structName)
 			if err != nil {
 				return field, fmt.Errorf("can't get Col from your register structs")
 			}
 			_struct = &_col.odmStruct
 		} else {
-			_struct, err = r.handle.getStructByStr(structName)
+			_struct, err = h.getStructByStr(structName)
 			if err != nil {
 				return field, errors.New("can't get struct from your register structs")
 			}
