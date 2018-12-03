@@ -12,7 +12,7 @@ const (
 // handle struct is hock for plugin
 type Handle struct {
 	db    *Database
-	alias map[string]*odmStruct
+	alias map[string]*odmStruct // register struct alias,not col alias
 	handleType
 	handleCols
 	aimer
@@ -32,6 +32,21 @@ type handleCol struct {
 	sign string // alias || col.name
 	col  *Col
 }
+
+// if new handleCol with alias, could use alias to get field
+func newHandleCol(c *Col, alias ...string) *handleCol {
+	var name string
+	if len(alias) != 0 {
+		name = alias[0]
+	} else {
+		name = c.Name()
+	}
+	return &handleCol{
+		sign: name,
+		col:  c,
+	}
+}
+
 type handleCols []*handleCol
 
 func (hLst *handleCols) add(h *handleCol) {
