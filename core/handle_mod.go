@@ -24,15 +24,13 @@ func callDocMode(h *Handle) {
 			var value reflect.Value
 			switch h.handleType {
 			case InsertData:
-				// _value, _ := field.GetValueFromRootValue(&h.writter.rawValue)
-				// value = *_value
+				value = field.newValue()
 			case UpdateData:
 				value = field.newValue()
 
 			}
-			valuePtr := value.Addr()
-			method := valuePtr.MethodByName(DocModeMethodMap[h.handleType])
-			method.Call(nil)
+			method := value.MethodByName(DocModeMethodMap[h.handleType])
+			method.Call(make([]reflect.Value, 0))
 		}
 	}
 }
