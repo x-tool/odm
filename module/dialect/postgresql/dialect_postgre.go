@@ -158,12 +158,12 @@ func (d *dialectpostgre) Insert(h *core.Handle) (err error) {
 	var valueLst []string
 	_col := h.GetCol()
 	fields := _col.GetRootFields()
-	_valueLst, err := _col.GetRootFieldsValueFromRootValue(h.GetWritterValue())
+	_valueLst := _col.GetRootValues(h.GetWritterValue())
 	if err != nil {
 		return
 	}
 	for i := 0; i < len(fields); i++ {
-		valueLst = append(valueLst, valueToString(fields[i].Kind(), _valueLst[i]))
+		valueLst = append(valueLst, valueToString(fields[i].Kind(), &_valueLst[i]))
 	}
 	valueLstStr := strings.Join(valueLst, ",")
 	sql := "INSERT INTO $colName VALUES ($valueLst) RETURNING *"
@@ -290,7 +290,7 @@ func (d *dialectpostgre) Open(sql string, results interface{}) (err error) {
 	}
 }
 
-func (d *dialectpostgre) OpenWithHandle(sql string, Handle *core.Handle) (err error) {
+func (d *dialectpostgre) OpenWithHandle(sql string, h *core.Handle) (err error) {
 	_conn, err := d.newConn()
 	if err != nil {
 		return err
@@ -300,30 +300,20 @@ func (d *dialectpostgre) OpenWithHandle(sql string, Handle *core.Handle) (err er
 	rows, err := pgConn.Query(sql)
 	defer pgConn.Close()
 
-	resultV := Handle.Reader.GetRawReflect()
-	resultT := resultV.Type()
-
-	var resultHandle = func() []interface{} {
-		resultItemV := Handle.Reader.NewResultItem()
-		var resultSlicePtr []interface{}
-		for _, v := range Handle.Reader.GetResultRootItemFieldAddr(resultItemV) {
-			resultSlicePtr = append(resultSlicePtr, (v).Interface())
-		}
-		return resultSlicePtr
-	}
-
-	if resultT.Kind() == reflect.Slice {
+	if h.Reader.IsComplex() {
 		for rows.Next() {
-			resultSlicePtr := resultHandle()
-			err = rows.Scan(resultSlicePtr...)
-			resultV.Set(reflect.Append(resultV, *resultItemV))
+			err = rows.Scan(h.Reader.Row().Addrs()...)
 			if err != nil {
-				break
+				return err
 			}
 		}
-		return err
 	} else {
-		return nil
+		for rows.Next() {
+			err = rows.Scan(h.Reader.Row().Addrs()...)
+			if err != nil {
+				return err
+			}
+		}
 	}
-
+	return err
 }

@@ -37,5 +37,5 @@ func (c *ODMClient) Database(d ...core.Dialect) *core.Database {
 	}
 
 	dialect.Init(c.sourceClient)
-	return core.NewDatabase(config.DatabaseName, c.sourceClient, dialect)
+	return core.NewDatabase(c.sourceClient, dialect)
 }

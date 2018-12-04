@@ -16,7 +16,7 @@ type Reader struct {
 	raw          interface{}
 	rawReflect   reflect.Value
 	itemFieldLst []*HandleField // result item one row field list
-	IsComplex    bool
+	isComplex    bool
 }
 
 // result item type should be ptr
@@ -32,7 +32,7 @@ func newReader(i interface{}, h *Handle) (*Reader, error) {
 	}
 	r.rawReflect = reflect.Indirect(rawValue)
 	if r.rawReflect.Kind() == reflect.Array || r.rawReflect.Kind() == reflect.Slice {
-		r.IsComplex = true
+		r.isComplex = true
 	}
 	if r.rawReflect.Elem().Kind() != reflect.Struct {
 		return r, errors.New("Result indirect type should be Struct")
@@ -41,9 +41,13 @@ func newReader(i interface{}, h *Handle) (*Reader, error) {
 	return r, err
 }
 
+func (r *Reader) IsComplex() bool {
+	return r.isComplex
+}
+
 func (r *Reader) formatFields() error {
 	var itemType reflect.Type
-	if r.IsComplex {
+	if r.isComplex {
 		itemType = r.rawReflect.Elem().Type()
 	} else {
 		itemType = r.rawReflect.Type()
@@ -65,7 +69,7 @@ func (r *Reader) formatFields() error {
 func (r *Reader) Row() (_row *Row) {
 	_row.reader = r
 	var item reflect.Value
-	if r.IsComplex {
+	if r.isComplex {
 		item = reflect.New(r.rawReflect.Elem().Type())
 		_raw := reflect.Indirect(r.rawReflect)
 		if _raw.CanSet() {
@@ -84,6 +88,13 @@ func (r *Reader) Row() (_row *Row) {
 		}
 	} else {
 		_row.fieldAddrLst = append(_row.fieldAddrLst, item.Addr())
+	}
+	return
+}
+
+func (r *Row) Addrs() (result []interface{}) {
+	for _, v := range r.fieldAddrLst {
+		result = append(result, v.Interface())
 	}
 	return
 }
