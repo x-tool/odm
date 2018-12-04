@@ -46,7 +46,7 @@ func (d *Database) RegisterStruct(c interface{}) {
 		d.mapStructs[_struct.name] = _struct
 	}
 	d.odmStructLst = append(d.odmStructLst, _struct)
-	rigisterCols.Done()
+	rigisterStructs.Done()
 }
 
 func (d *Database) RegisterStructs(c ...interface{}) {
@@ -79,6 +79,7 @@ func (d *Database) RegisterCol(c interface{}) {
 	_col := newCol(d, c)
 	d.ColLst = append(d.ColLst, _col)
 	d.mapCols[_col.Name()] = _col
+	rigisterStructs.Add(1)
 	d.RegisterStruct(_col.odmStruct)
 	rigisterCols.Done()
 }
