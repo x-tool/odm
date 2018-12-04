@@ -23,6 +23,7 @@ type odmTag struct {
 
 func newTag(s string) *odmTag {
 	_o := &odmTag{}
+	_o.lst = make(map[string]string)
 	_s := strings.TrimSpace(s)
 	_o.sourceTag = _s
 	lst := strings.Split(_s, tagSeparator)

@@ -39,6 +39,8 @@ func NewDatabase(c *client.Client, d Dialect) *Database {
 	_d.name = c.Config.DatabaseName
 	_d.client = c
 	_d.dialect = d
+	_d.mapStructs = make(map[string]*odmStruct)
+	_d.mapCols = make(map[string]*Col)
 	_d.setHistory()
 	_d.Hook = newHook(_d)
 	return _d

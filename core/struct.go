@@ -119,7 +119,7 @@ func setExtendChild(lst structFieldLst) {
 			if v.id == v2.id {
 				continue
 			} else {
-				if v2.extendParent.id == v.id {
+				if v2.extendParent != nil && v2.extendParent.id == v.id {
 					fieldLst = append(fieldLst, v2.extendParent)
 				}
 			}

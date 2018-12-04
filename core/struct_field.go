@@ -91,9 +91,9 @@ func newStructField(_odmStruct *odmStruct, d *structFieldLst, t *reflect.StructF
 
 	// set field nearest complex parent field
 	// if get field by mark, this field should be nil
-	for i := len(field.dependLst); i == 0; i-- {
-		if field.dependLst[i].isGroupType() {
-			field.complexParent = field.dependLst[i]
+	for i := len(field.dependLst); i > 0; i-- {
+		if field.dependLst[i-1].isGroupType() {
+			field.complexParent = field.dependLst[i-1]
 		}
 	}
 	switch field.kind {
