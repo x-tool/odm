@@ -35,34 +35,28 @@ func kindToString(k core.Kind) (s string) {
 }
 
 func valueToString(kind core.Kind, value *reflect.Value) (str string) {
-	_value := *value
 	// postgre type handle
 	switch kind {
 	case core.Time:
-		t := value.Interface().(time.Time)
-		if t.IsZero() {
-			str = ""
+		var t time.Time
+		if !value.IsValid() {
+			_t := new(time.Time)
+			t = *_t
 		} else {
-			str = t.Format("2006-01-02 15:04:05")
+			t = value.Interface().(time.Time)
 		}
+		str = t.Format("2006-01-02 15:04:05")
 
 	// default use core default process mode
 	default:
 		str = core.ValueToString(value)
 	}
-
-	// format Strings
-	switch _value.Kind() {
-	case reflect.Int:
-		fallthrough
-	case reflect.Int8:
-		fallthrough
-	case reflect.Int16:
-		fallthrough
-	case reflect.Int32:
-		fallthrough
-	case reflect.Int64:
-	default:
+	if kind == core.Int {
+		if str == "" {
+			str = "0"
+		}
+		str = str
+	} else {
 		str = "'" + str + "'"
 	}
 	return

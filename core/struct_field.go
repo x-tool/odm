@@ -14,7 +14,7 @@ type structField struct {
 	tag        *odmTag
 	// fields relation with golang struct
 	childLst      structFieldLst
-	complexParent *structField // the nearest complex parent field
+	complexParent *structField // the nearest complex parent field, use for check field path quick
 	parent        *structField // field golang stack parent real
 	dependLst     dependLst    // depend chain, include self
 	// fields relastion with logic struct
@@ -67,8 +67,14 @@ func newStructField(_odmStruct *odmStruct, d *structFieldLst, t *reflect.StructF
 		tag:             newTag(tag),
 	}
 
-	// add parent childs
-	// if field is root field parent == nil, can't use parent method
+	// set extendparent, parent extendChildLst
+	field.extendParent = getExtendParent(d, field)
+	if field.extendParent != nil {
+		field.extendParent.extendChildLst = append(field.extendParent.extendChildLst, field)
+	}
+
+	// set dependLst, extendDependLst, parent childLst
+	// root field's parent is nil
 	if parent != nil {
 		field.dependLst = append(parent.dependLst, parent)
 		if isExtend {
@@ -76,28 +82,25 @@ func newStructField(_odmStruct *odmStruct, d *structFieldLst, t *reflect.StructF
 		} else {
 			field.extendDependLst = append(parent.extendDependLst, parent)
 		}
-		if !kind.isGroupType() {
-			field.dependLst = append(field.dependLst, field)
-			field.extendDependLst = append(field.extendDependLst, field)
-		}
-		if parent.isGroupType() {
-			parent.childLst = append(parent.childLst, field)
-		}
-	} else {
-		
-	}
-	// set extendparent
-	field.extendParent = getExtendParent(d, field)
-	// add item to doc fieldlst, and set field id
-	field = d.addItem(field)
+		parent.childLst = append(parent.childLst, field)
 
-	// set field nearest complex parent field
+	} else {
+		field.dependLst = append(field.dependLst, field)
+		field.extendDependLst = append(field.extendDependLst, field)
+	}
+
+	// set complexParent
 	// if get field by mark, this field should be nil
 	for i := len(field.dependLst); i > 0; i-- {
 		if field.dependLst[i-1].isGroupType() {
 			field.complexParent = field.dependLst[i-1]
 		}
 	}
+
+	// add item to fieldlst, and set field id
+	field = d.addItem(field)
+
+	// group type range filed's child
 	switch field.kind {
 	case Array:
 		fallthrough

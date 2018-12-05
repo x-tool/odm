@@ -1,6 +1,7 @@
 package odm
 
 import (
+	"log"
 	"testing"
 )
 
@@ -42,7 +43,7 @@ func Test_connection(t *testing.T) {
 	// db.Query()
 	// col := db.GetCol(new(myDoc))
 	// _, err := col.data(testdata)
-	// log.Print(testdata)
+	log.Print(errInsert)
 	// col.Key(testdata.Key).Delete()
 	t.Log(errInsert)
 }
