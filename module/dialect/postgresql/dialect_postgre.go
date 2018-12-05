@@ -39,7 +39,13 @@ func valueToString(kind core.Kind, value *reflect.Value) (str string) {
 	// postgre type handle
 	switch kind {
 	case core.Time:
-		str = value.Interface().(time.Time).Format("2006-01-02 15:04:05")
+		t := value.Interface().(time.Time)
+		if t.IsZero() {
+			str = ""
+		} else {
+			str = t.Format("2006-01-02 15:04:05")
+		}
+
 	// default use core default process mode
 	default:
 		str = core.ValueToString(value)

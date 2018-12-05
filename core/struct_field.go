@@ -83,6 +83,8 @@ func newStructField(_odmStruct *odmStruct, d *structFieldLst, t *reflect.StructF
 		if parent.isGroupType() {
 			parent.childLst = append(parent.childLst, field)
 		}
+	} else {
+		
 	}
 	// set extendparent
 	field.extendParent = getExtendParent(d, field)
