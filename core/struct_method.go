@@ -30,7 +30,6 @@ func (d *odmStruct) GetRootValues(rootValue *reflect.Value) (result []reflect.Va
 		for _, _v := range v.dependLst {
 			value = value.FieldByName(_v.name)
 		}
-		value = value.FieldByName(v.name)
 		result = append(result, value)
 	}
 	return

@@ -5,9 +5,9 @@ import (
 )
 
 type DocMode interface {
-	Create(h *Handle)
-	Update(h *Handle)
-	Delete(h *Handle)
+	Create()
+	Update()
+	Delete()
 	Name() string
 }
 

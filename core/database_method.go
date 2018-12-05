@@ -62,14 +62,20 @@ func (d *Database) RegisterStructs(c ...interface{}) {
 	}
 }
 
-func (d *Database) GetCol(i interface{}) *Col {
+func (d *Database) GetCol(i interface{}) (c *Col, err error) {
 	var name string
-	if v, ok := i.(string); !ok {
+
+	if v, ok := i.(string); ok {
 		name = string(v)
 	} else {
 		name = reflect.TypeOf(i).Name()
 	}
-	return d.mapCols[name]
+	c = d.mapCols[name]
+
+	if c == nil {
+		err = fmt.Errorf("can't get Col By Name %v", name)
+	}
+	return
 }
 
 var rigisterCols sync.WaitGroup

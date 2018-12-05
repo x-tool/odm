@@ -34,7 +34,6 @@ func (d *Handle) Insert(i interface{}) (err error) {
 	}
 	d.writter = *newWritter(d)
 	d.writter.setWritterValue(i)
-	fmt.Println("emmmm")
 	return d.Exec()
 }
 

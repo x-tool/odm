@@ -16,11 +16,11 @@ type structField struct {
 	childLst      structFieldLst
 	complexParent *structField // the nearest complex parent field
 	parent        *structField // field golang stack parent real
-	dependLst     dependLst
+	dependLst     dependLst    // depend chain, include self
 	// fields relastion with logic struct
 	extendChildLst  structFieldLst
 	extendParent    *structField // field Handle parent
-	extendDependLst dependLst
+	extendDependLst dependLst    // depend chain, include self
 }
 
 func (d *structField) Name() string {

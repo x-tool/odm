@@ -38,7 +38,11 @@ func (w *writter) setWritterValue(i interface{}) {
 		item = w.rawValue.Index(0)
 	}
 	itemType := item.Type()
-	_handleCol := newHandleCol(w.handle.db.GetCol(itemType.Name()))
+	col, err := w.handle.db.GetCol(itemType.Name())
+	if err != nil {
+		w.handle.Err = err
+	}
+	_handleCol := newHandleCol(col)
 	w.handle.handleCols.add(_handleCol)
 }
 

@@ -16,16 +16,16 @@ type NormalCol struct {
 	State       int
 }
 
-func (n *NormalCol) Create(h *Handle) {
+func (n *NormalCol) Create() {
 	n.Key = tool.NewUniqueId()
 	n.CreatedTime = time.Now()
 }
 
-func (n *NormalCol) Update(h *Handle) {
+func (n *NormalCol) Update() {
 	n.UpdateTime = time.Now()
 }
 
-func (n *NormalCol) Delete(h *Handle) {
+func (n *NormalCol) Delete() {
 	n.DeleteTime = time.Now()
 }
 
