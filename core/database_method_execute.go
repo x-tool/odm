@@ -5,6 +5,11 @@ func (d *Database) Insert(i interface{}) (err error) {
 	return handle.Insert(i)
 }
 
+func (d *Database) Delete(i interface{}) (err error) {
+	handle := newHandle(d)
+	return handle.Delete(i)
+}
+
 func (d *Database) Get(i interface{}) (err error) {
 	return
 }
@@ -14,11 +19,13 @@ func (d *Database) Exec() (err error) {
 }
 
 func (d *Database) Key(s string) (h *Handle) {
-	return
+	handle := newHandle(d)
+	return handle.Key(s)
 }
 
-func (d *Database) Where(s string) (h *Handle) {
-	return
+func (d *Database) Where(s string, iLst ...interface{}) (h *Handle) {
+	handle := newHandle(d)
+	return handle.Where(s, iLst)
 }
 
 func (d *Database) Desc(s string, isSmallFirst bool) (h *Handle) {

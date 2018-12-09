@@ -41,13 +41,13 @@ func (d *Handle) Update(i interface{}) (err error) {
 	return
 }
 
-func (d *Handle) Delete(err error) {
+func (d *Handle) Delete(i interface{}) (err error) {
 	// if d.Col.doc.getDeleteFieldName() != "" {
 	// 	err = d.DB.Dialect.Update(d)
 	// } else {
 	// 	err = d.DB.Dialect.Delete(d)
 	// }
-	// return
+	return
 }
 
 func (d *Handle) Get(i interface{}) (err error) {

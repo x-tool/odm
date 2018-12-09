@@ -5,9 +5,9 @@ import (
 )
 
 type DocMode interface {
-	Create()
-	Update()
-	Delete()
+	Create(h *Handle)
+	Update(h *Handle)
+	Delete(h *Handle)
 	Name() string
 }
 
@@ -30,7 +30,7 @@ func callDocMode(h *Handle) {
 
 			}
 			method := value.MethodByName(DocModeMethodMap[h.handleType])
-			method.Call(make([]reflect.Value, 0))
+			method.Call([]reflect.Value{reflect.ValueOf(h)})
 		}
 	}
 }

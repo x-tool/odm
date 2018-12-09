@@ -36,10 +36,10 @@ func Test_connection(t *testing.T) {
 	db.SyncCols()
 
 	testdata := new(myDoc)
-	testdata.Name = "haha,I get"
+	testdata.Name = "LiLei"
 	testdata.Id = 1
 
-	errInsert := db.Insert(testdata)
+	errInsert := db.Delete(testdata).Where("name = LiLei")
 	// db.Query()
 	// col := db.GetCol(new(myDoc))
 	// _, err := col.data(testdata)

@@ -52,22 +52,14 @@ func newHandleField(h *Handle, f reflect.StructField) (field *HandleField, err e
 		if len(ids) == 0 || (i != 0 && ids[0] != 0) {
 			return field, fmt.Errorf("can't get struct name from %v's tag", f.Name)
 		}
-		var _struct *odmStruct
-		// first split is field from col, other field from doc
+		var f *structField
+		var complex []complexValue
 		if i == 0 {
-			_col, err := h.getColByStr(structName)
-			if err != nil {
-				return field, fmt.Errorf("can't get Col from your register structs")
-			}
-			_struct = &_col.odmStruct
+			f, complexs, err := field.formatField(structName, fieldPath)
 		} else {
-			_struct, err = h.getStructByStr(structName)
-			if err != nil {
-				return field, errors.New("can't get struct from your register structs")
-			}
+			f, complexs, err := field.formatFieldWithStructName(fieldPath)
 		}
 
-		f, complexs, err := field.formatField(_struct, fieldPath, i == 0)
 		if err != nil {
 			return field, fmt.Errorf("can't get struct field from struct: %v", structName)
 		}
@@ -79,6 +71,26 @@ func newHandleField(h *Handle, f reflect.StructField) (field *HandleField, err e
 	field.odmDepend = odmDepend
 	field.complexValues = complexValues
 	return field, nil
+}
+
+func (r *HandleField) formatFieldWithStructName(s string) (field *structField, complexValues []complexValue, err error) {
+	var _struct *odmStruct
+	reg := regexp.MustCompile(`\w`)
+	ids := reg.FindStringIndex(s)
+	structName := s[:ids[0]]
+	fieldPath := s[:ids[1]]
+	_col, err := h.getColByStr(structName)
+	if err != nil {
+		return nil, field, fmt.Errorf("can't get Col from your register structs")
+	}
+	_struct = &_col.odmStruct
+	} else {
+		_struct, err = h.getStructByStr(structName)
+		if err != nil {
+			return nil, field, errors.New("can't get struct from your register structs")
+		}
+	}
+	return
 }
 
 func (r *HandleField) formatField(o *odmStruct, s string, isFirst bool) (field *structField, complexValues []complexValue, err error) {
