@@ -14,7 +14,7 @@ type Handle struct {
 	db    *Database
 	alias map[string]*odmStruct // register struct alias,not col alias
 	handleType
-	handleCols
+	handleCols // colLst with alias name
 	aimer
 	writter
 	Reader
@@ -52,4 +52,8 @@ type handleCols []*handleCol
 func (hLst *handleCols) add(h *handleCol) {
 	l := *hLst
 	l = append(l, h)
+}
+
+func (h handleCols) isSingleCol() bool {
+	return len(h) == 1
 }

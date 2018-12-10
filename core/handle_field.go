@@ -11,28 +11,19 @@ import (
 type HandleField struct {
 	handle        *Handle
 	name          string
-	goDepend      dependLst
-	odmDepend     dependLst
-	complexValues // golang struct child slice id or map key
+	col           *Col
+	depend        dependLst
+	complexValues map[int]string //  slice id or map key
 }
 
-type complexValue struct {
-	structId int
-	fieldId  int
-	value    string
+func (c HandleField) getValue(id int) string {
+	return c.complexValues[id]
 }
 
-type complexValues []complexValue
-
-func (c complexValues) getValue(id int, fieldId int) string {
-	for _, v := range c {
-		if id == v.structId && fieldId == v.fieldId {
-			return v.value
-		}
-	}
-	return ""
-}
-
+// if handle by only one col
+// path|structname.path|......
+// else
+// colname.path|......
 func newHandleField(h *Handle, f reflect.StructField) (field *HandleField, err error) {
 	field = &HandleField{
 		handle: h,
@@ -40,31 +31,47 @@ func newHandleField(h *Handle, f reflect.StructField) (field *HandleField, err e
 	}
 	var goDepend dependLst
 	var odmDepend dependLst
-	var complexValues []complexValue
+	var complexValues = make(map[int]string)
 	// format structFieldTag
 	tag := string(f.Tag)
 	odmLst := strings.Split(tag, "|")
+	splitStructReg := regexp.MustCompile(`\w`)
 	for i, v := range odmLst {
-		reg := regexp.MustCompile(`\w`)
-		ids := reg.FindStringIndex(v)
-		structName := v[:ids[0]]
-		fieldPath := v[:ids[1]]
-		if len(ids) == 0 || (i != 0 && ids[0] != 0) {
-			return field, fmt.Errorf("can't get struct name from %v's tag", f.Name)
-		}
+		var structName string
+		var fieldPath string
 		var f *structField
-		var complex []complexValue
+		var complex map[int]string
 		if i == 0 {
-			f, complexs, err := field.formatField(structName, fieldPath)
-		} else {
-			f, complexs, err := field.formatFieldWithStructName(fieldPath)
-		}
+			var col *Col
+			if h.isSingleCol() {
+				col = h.GetCol()
+				field.col = col
+				structName = col.name
+				fieldPath = v
+			} else {
+				regId := splitStructReg.FindStringIndex(v)
+				structName = v[:regId[0]]
+				fieldPath = v[regId[0]:]
+				col, err = h.getColByStr(structName)
+				field.col = col
+				if len(regId) == 0 || err != nil {
+					return field, fmt.Errorf("can't get col name from %v's tag", f.Name)
+				}
 
+			}
+		} else {
+			regId := splitStructReg.FindStringIndex(v)
+			structName = v[:regId[0]]
+			fieldPath = v[regId[0]:]
+			if len(regId) == 0 || regId[0] == 0 {
+				return field, fmt.Errorf("can't get struct name from %v's tag", f.Name)
+			}
+		}
+		f, complexs, err := field.formatField(structName, fieldPath)
 		if err != nil {
 			return field, fmt.Errorf("can't get struct field from struct: %v", structName)
 		}
 		goDepend = append(goDepend, f.dependLst...)
-		odmDepend = append(odmDepend, f.extendDependLst...)
 		complexValues = append(complexValues, complexs...)
 	}
 	field.goDepend = goDepend
@@ -82,9 +89,9 @@ func (r *HandleField) formatFieldWithStructName(s string) (field *structField, c
 	_col, err := h.getColByStr(structName)
 	if err != nil {
 		return nil, field, fmt.Errorf("can't get Col from your register structs")
-	}
-	_struct = &_col.odmStruct
 	} else {
+		// _struct = &_col.odmStruct
+		// } else {
 		_struct, err = h.getStructByStr(structName)
 		if err != nil {
 			return nil, field, errors.New("can't get struct from your register structs")
@@ -93,7 +100,7 @@ func (r *HandleField) formatFieldWithStructName(s string) (field *structField, c
 	return
 }
 
-func (r *HandleField) formatField(o *odmStruct, s string, isFirst bool) (field *structField, complexValues []complexValue, err error) {
+func (r *HandleField) formatField(o *odmStruct, s string) (field *structField, complexValues []complexValue, err error) {
 	if s == "" {
 		err = fmt.Errorf("can't get field use ''")
 		return
