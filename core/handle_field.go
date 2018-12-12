@@ -41,6 +41,8 @@ func newHandleField(h *Handle, f reflect.StructField) (field *HandleField, err e
 		var fieldPath string
 		var f *structField
 		var complex map[int]string
+		// first path for col
+		// other for struct
 		if i == 0 {
 			var col *Col
 			if h.isSingleCol() {
