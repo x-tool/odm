@@ -13,7 +13,7 @@ type HandleField struct {
 	name          string
 	col           *Col
 	depend        dependLst
-	complexValues map[int]string //  slice id or map key
+	complexValues []string //  slice id or map key,if child field is not complex type add nil
 }
 
 func (c HandleField) getValue(id int) string {
@@ -30,8 +30,7 @@ func newHandleField(h *Handle, f reflect.StructField) (field *HandleField, err e
 		name:   f.Name,
 	}
 	var goDepend dependLst
-	var odmDepend dependLst
-	var complexValues = make(map[int]string)
+	var complexValues []string
 	// format structFieldTag
 	tag := string(f.Tag)
 	odmLst := strings.Split(tag, "|")
@@ -40,7 +39,7 @@ func newHandleField(h *Handle, f reflect.StructField) (field *HandleField, err e
 		var structName string
 		var fieldPath string
 		var f *structField
-		var complex map[int]string
+		var complexs []string
 		// first path for col
 		// other for struct
 		if i == 0 {
@@ -61,48 +60,37 @@ func newHandleField(h *Handle, f reflect.StructField) (field *HandleField, err e
 				}
 
 			}
+			f, complexs, err = field.formatField(&col.odmStruct, fieldPath)
 		} else {
-			regId := splitStructReg.FindStringIndex(v)
-			structName = v[:regId[0]]
-			fieldPath = v[regId[0]:]
-			if len(regId) == 0 || regId[0] == 0 {
-				return field, fmt.Errorf("can't get struct name from %v's tag", f.Name)
-			}
+			f, complexs, err = field.formatFieldWithStructName(v)
 		}
-		f, complexs, err := field.formatField(structName, fieldPath)
+
 		if err != nil {
 			return field, fmt.Errorf("can't get struct field from struct: %v", structName)
 		}
 		goDepend = append(goDepend, f.dependLst...)
 		complexValues = append(complexValues, complexs...)
 	}
-	field.goDepend = goDepend
-	field.odmDepend = odmDepend
+	field.depend = goDepend
 	field.complexValues = complexValues
 	return field, nil
 }
 
-func (r *HandleField) formatFieldWithStructName(s string) (field *structField, complexValues []complexValue, err error) {
+func (h *HandleField) formatFieldWithStructName(s string) (field *structField, complexValues []string, err error) {
 	var _struct *odmStruct
 	reg := regexp.MustCompile(`\w`)
 	ids := reg.FindStringIndex(s)
 	structName := s[:ids[0]]
 	fieldPath := s[:ids[1]]
-	_col, err := h.getColByStr(structName)
+	_struct, err = h.handle.getStructByStr(structName)
 	if err != nil {
-		return nil, field, fmt.Errorf("can't get Col from your register structs")
-	} else {
-		// _struct = &_col.odmStruct
-		// } else {
-		_struct, err = h.getStructByStr(structName)
-		if err != nil {
-			return nil, field, errors.New("can't get struct from your register structs")
-		}
+		return nil, nil, errors.New("can't get struct from your register structs")
 	}
-	return
+
+	return h.formatField(_struct, fieldPath)
 }
 
-func (r *HandleField) formatField(o *odmStruct, s string) (field *structField, complexValues []complexValue, err error) {
+func (r *HandleField) formatField(o *odmStruct, s string) (field *structField, complexValues []string, err error) {
 	if s == "" {
 		err = fmt.Errorf("can't get field use ''")
 		return
@@ -122,16 +110,12 @@ func (r *HandleField) formatField(o *odmStruct, s string) (field *structField, c
 	default:
 		// mix first split path and orthers path
 		// if is not first split, path string wthiout odmstruct name should use "." at first
-		if !isFirst && sign != "." {
+		if sign != "." {
 			err = fmt.Errorf("Can't find field use string %v in struct %v", signV, o.name)
 			return
 		}
 		var path string
-		if isFirst {
-			path = s
-		} else {
-			path = signV
-		}
+		path = signV
 
 		pathLst := strings.Split(path, ".")
 		// judge get field by name or by path
@@ -158,12 +142,7 @@ func (r *HandleField) formatField(o *odmStruct, s string) (field *structField, c
 			for i, v := range pathLst {
 				// if parent is map or slice ,this value is key of parent kind
 				if complexParent != nil {
-					complexV := complexValue{
-						structId: o.id,
-						fieldId:  complexParent.id,
-						value:    v,
-					}
-					complexValues = append(complexValues, complexV)
+					complexValues[i] = v
 					complexParent = nil
 					continue
 				}
