@@ -8,13 +8,13 @@ import (
 
 type ValueLst []*Value
 type Value struct {
-	field    *structField
+	field    *StructField
 	value    *reflect.Value
 	hasValue bool
 	zero     bool
 }
 
-func newValue(v interface{}, field *structField) (o *Value) {
+func newValue(v interface{}, field *StructField) (o *Value) {
 	_v := reflect.ValueOf(v)
 	o = &Value{
 		field: field,
@@ -27,7 +27,7 @@ func (v *Value) toString() (s string) {
 	return tool.ReflectValueToString(v.value)
 }
 
-func newValueByReflect(v *reflect.Value, field *structField) (o *Value) {
+func newValueByReflect(v *reflect.Value, field *StructField) (o *Value) {
 	o = &Value{
 		field: field,
 		value: v,

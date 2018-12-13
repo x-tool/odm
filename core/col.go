@@ -4,7 +4,7 @@ type Col struct {
 	db    *Database
 	name  string
 	alias string // name to database
-	mode  *structField
+	mode  *StructField
 	odmStruct
 }
 

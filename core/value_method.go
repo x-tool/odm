@@ -6,7 +6,7 @@ import (
 	"github.com/x-tool/tool"
 )
 
-// func (v *Value) Field() *structField {
+// func (v *Value) Field() *StructField {
 // 	return v.field
 // }
 

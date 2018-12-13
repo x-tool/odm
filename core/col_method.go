@@ -4,7 +4,7 @@ import (
 	"reflect"
 )
 
-func (c *Col) findDocModeField() (field *structField) {
+func (c *Col) findDocModeField() (field *StructField) {
 	for _, v := range c.getExtendFields() {
 		_value := reflect.New(v.sourceType)
 		_, ok := _value.Interface().(DocMode)
@@ -16,7 +16,7 @@ func (c *Col) findDocModeField() (field *structField) {
 	return
 }
 
-func (c *Col) getDocMode() *structField {
+func (c *Col) getDocMode() *StructField {
 	return c.mode
 }
 

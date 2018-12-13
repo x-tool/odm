@@ -3,14 +3,12 @@ package core
 import (
 	"errors"
 	"fmt"
-	"reflect"
 	"regexp"
 	"strings"
 )
 
 type HandleField struct {
 	handle        *Handle
-	name          string
 	col           *Col
 	depend        dependLst
 	complexValues []string //  slice id or map key,if child field is not complex type add nil
@@ -24,21 +22,19 @@ func (c HandleField) getValue(id int) string {
 // path|structname.path|......
 // else
 // colname.path|......
-func newHandleField(h *Handle, f reflect.StructField) (field *HandleField, err error) {
+func newHandleField(h *Handle, s string) (field *HandleField, err error) {
 	field = &HandleField{
 		handle: h,
-		name:   f.Name,
 	}
 	var goDepend dependLst
 	var complexValues []string
-	// format structFieldTag
-	tag := string(f.Tag)
-	odmLst := strings.Split(tag, "|")
+	// format StructFieldTag
+	odmLst := strings.Split(s, "|")
 	splitStructReg := regexp.MustCompile(`\w`)
 	for i, v := range odmLst {
 		var structName string
 		var fieldPath string
-		var f *structField
+		var f *StructField
 		var complexs []string
 		// first path for col
 		// other for struct
@@ -76,7 +72,7 @@ func newHandleField(h *Handle, f reflect.StructField) (field *HandleField, err e
 	return field, nil
 }
 
-func (h *HandleField) formatFieldWithStructName(s string) (field *structField, complexValues []string, err error) {
+func (h *HandleField) formatFieldWithStructName(s string) (field *StructField, complexValues []string, err error) {
 	var _struct *odmStruct
 	reg := regexp.MustCompile(`\w`)
 	ids := reg.FindStringIndex(s)
@@ -90,7 +86,7 @@ func (h *HandleField) formatFieldWithStructName(s string) (field *structField, c
 	return h.formatField(_struct, fieldPath)
 }
 
-func (r *HandleField) formatField(o *odmStruct, s string) (field *structField, complexValues []string, err error) {
+func (r *HandleField) formatField(o *odmStruct, s string) (field *StructField, complexValues []string, err error) {
 	if s == "" {
 		err = fmt.Errorf("can't get field use ''")
 		return
@@ -137,7 +133,7 @@ func (r *HandleField) formatField(o *odmStruct, s string) (field *structField, c
 			}
 		} else {
 			fieldLst := o.rootFields
-			var complexParent *structField
+			var complexParent *StructField
 			lenPath := len(pathLst)
 			for i, v := range pathLst {
 				// if parent is map or slice ,this value is key of parent kind
@@ -147,7 +143,7 @@ func (r *HandleField) formatField(o *odmStruct, s string) (field *structField, c
 					continue
 				}
 				// get field by name
-				var checkItem *structField
+				var checkItem *StructField
 				for _, fieldLstItem := range fieldLst {
 					if fieldLstItem.name == v {
 						checkItem = fieldLstItem

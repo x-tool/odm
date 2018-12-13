@@ -9,7 +9,7 @@ import (
 
 type writter struct {
 	handle    *Handle
-	setLst    []*writeItem
+	setLst    []*writeItem // use for update or insert some filed
 	raw       interface{}
 	rawValue  reflect.Value
 	isComplex bool
@@ -26,6 +26,8 @@ func newWritter(h *Handle) *writter {
 	}
 	return w
 }
+
+//////////// for insert value
 
 // insert value method
 func (w *writter) setWritterValue(i interface{}) {
@@ -46,15 +48,20 @@ func (w *writter) setWritterValue(i interface{}) {
 	w.handle.handleCols.add(_handleCol)
 }
 
+// get insert value
 func (w *writter) GetWritterValue() *reflect.Value {
 	return &w.rawValue
 }
-func (w *writter) IsComplex() bool {
+
+func (w *writter) IsComplexWritter() bool {
 	return w.isComplex
 }
 
+/////////// for update value
+
+// add write field
 func (w *writter) add(f reflect.StructField, value interface{}) error {
-	field, err := newHandleField(w.handle, f)
+	field, err := newHandleField(w.handle, string(f.Tag))
 	if err != nil {
 		return fmt.Errorf("can't get Field: %v use tag %v", f.Name, f.Tag)
 	}

@@ -38,8 +38,8 @@ func Test_connection(t *testing.T) {
 	testdata := new(myDoc)
 	testdata.Name = "LiLei"
 	testdata.Id = 1
-
-	errInsert := db.Delete(testdata).Where("name = LiLei")
+	errInsert := db.Insert(testdata)
+	// errInsert := db.Delete(testdata).Where("name = LiLei")
 	// db.Query()
 	// col := db.GetCol(new(myDoc))
 	// _, err := col.data(testdata)

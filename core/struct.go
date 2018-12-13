@@ -12,13 +12,13 @@ type odmStruct struct {
 	name            string
 	path            string
 	allName         string // name+path
-	parent          *structField
-	fields          structFieldLst
-	rootFields      structFieldLst
+	parent          *StructField
+	fields          StructFieldLst
+	rootFields      StructFieldLst
 	sourceType      *reflect.Type
-	interfaceFields map[string]*structField
-	fieldMarkMap    map[string]*structField
-	fieldNameMap    map[string]structFieldLst
+	interfaceFields map[string]*StructField
+	fieldMarkMap    map[string]*StructField
+	fieldNameMap    map[string]StructFieldLst
 }
 type odmStructLst []*odmStruct
 
@@ -33,23 +33,23 @@ func newOdmStruct(i interface{}) (_odmStruct *odmStruct) {
 		allName:    allName(odmStructSourceT),
 		sourceType: &odmStructSourceT,
 	}
-	fields := newstructFieldLst(_odmStruct, odmStructSourceT)
+	fields := newStructFieldLst(_odmStruct, odmStructSourceT)
 	_odmStruct.fields = *fields
-	_odmStruct.fieldMarkMap = makestructFieldLstMarkMap(_odmStruct)
-	_odmStruct.fieldNameMap = makestructFieldLstNameMap(_odmStruct)
+	_odmStruct.fieldMarkMap = makeStructFieldLstMarkMap(_odmStruct)
+	_odmStruct.fieldNameMap = makeStructFieldLstNameMap(_odmStruct)
 	_odmStruct.rootFields = makerootFieldNameMap(_odmStruct)
 	_odmStruct.interfaceFields = makeInterfaceFields(_odmStruct)
 	return
 }
 
-func newstructFieldLst(d *odmStruct, odmStructSourceT reflect.Type) *structFieldLst {
-	var lst structFieldLst
+func newStructFieldLst(d *odmStruct, odmStructSourceT reflect.Type) *StructFieldLst {
+	var lst StructFieldLst
 	if odmStructSourceT.Kind() == reflect.Struct {
 		cont := odmStructSourceT.NumField()
 		for i := 0; i < cont; i++ {
 			field := odmStructSourceT.Field(i)
 			// addFieldsLock.Add(1)
-			// go newstructFieldLst(d, &lst, &field, nil)
+			// go newStructFieldLst(d, &lst, &field, nil)
 			newStructField(d, &lst, &field, nil)
 		}
 		// check Fields Name, Can't both same name in one Col
@@ -61,7 +61,7 @@ func newstructFieldLst(d *odmStruct, odmStructSourceT reflect.Type) *structField
 	return &lst
 }
 
-func makestructFieldLstMarkMap(d *odmStruct) (m map[string]*structField) {
+func makeStructFieldLstMarkMap(d *odmStruct) (m map[string]*StructField) {
 	_d := d.fields
 	for _, v := range _d {
 		tagPtr := v.tag.mark
@@ -72,14 +72,14 @@ func makestructFieldLstMarkMap(d *odmStruct) (m map[string]*structField) {
 	return m
 }
 
-func makestructFieldLstNameMap(d *odmStruct) map[string]structFieldLst {
+func makeStructFieldLstNameMap(d *odmStruct) map[string]StructFieldLst {
 	_d := d.fields
-	var _map = make(map[string]structFieldLst)
+	var _map = make(map[string]StructFieldLst)
 	for _, v := range _d {
 		name := v.Name()
 		// new m[name]
 		if _, ok := _map[name]; !ok {
-			var temp structFieldLst
+			var temp StructFieldLst
 			_map[name] = temp
 		}
 		_map[name] = append(_map[name], v)
@@ -87,7 +87,7 @@ func makestructFieldLstNameMap(d *odmStruct) map[string]structFieldLst {
 	return _map
 }
 
-func makerootFieldNameMap(d *odmStruct) (lst []*structField) {
+func makerootFieldNameMap(d *odmStruct) (lst []*StructField) {
 	_d := d.fields
 	for _, v := range _d {
 		if v.extendParent == nil && v.IsExtend() == false {
@@ -97,7 +97,7 @@ func makerootFieldNameMap(d *odmStruct) (lst []*structField) {
 	return
 }
 
-func makeInterfaceFields(d *odmStruct) (lst map[string]*structField) {
+func makeInterfaceFields(d *odmStruct) (lst map[string]*StructField) {
 	for _, v := range d.fields {
 		if _, ok := lst[v.name]; !ok {
 			if v.Kind() == Interface {

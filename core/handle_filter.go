@@ -32,7 +32,7 @@ package core
 // )
 
 // type filterItem struct {
-// 	target       *structField
+// 	target       *StructField
 // 	compare      filterCompare
 // 	value        interface{}
 // 	connect      filterJoin

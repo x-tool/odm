@@ -55,7 +55,7 @@ func (r *Reader) formatFields() error {
 	itemFieldLen := itemType.NumField()
 	for i := 0; i < itemFieldLen; i++ {
 		fieldStruct := itemType.Field(i)
-		readField, err := newHandleField(r.handle, fieldStruct)
+		readField, err := newHandleField(r.handle, string(fieldStruct.Tag))
 		if err != nil {
 			return err
 		}

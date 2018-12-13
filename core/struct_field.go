@@ -4,7 +4,7 @@ import (
 	"reflect"
 )
 
-type structField struct {
+type StructField struct {
 	odmStruct  *odmStruct
 	name       string
 	sourceType reflect.Type
@@ -13,49 +13,49 @@ type structField struct {
 	isExtend   bool // is Anonymous field
 	tag        *odmTag
 	// fields relation with golang struct
-	childLst      structFieldLst
-	complexParent *structField // the nearest complex parent field, use for check field path quick
-	parent        *structField // field golang stack parent real
+	childLst      StructFieldLst
+	complexParent *StructField // the nearest complex parent field, use for check field path quick
+	parent        *StructField // field golang stack parent real
 	dependLst     dependLst    // depend chain, include self
 	// fields relastion with logic struct
-	extendChildLst  structFieldLst
-	extendParent    *structField // field Handle parent
+	extendChildLst  StructFieldLst
+	extendParent    *StructField // field Handle parent
 	extendDependLst dependLst    // depend chain, include self
 }
 
-func (d *structField) Name() string {
+func (d *StructField) Name() string {
 	return d.name
 }
 
-func (d *structField) ID() int {
+func (d *StructField) ID() int {
 	return d.id
 }
 
-func (d *structField) Kind() Kind {
+func (d *StructField) Kind() Kind {
 	return d.kind
 }
-func (d *structField) IsExtend() bool {
+func (d *StructField) IsExtend() bool {
 	return d.isExtend
 }
 
-func (d *structField) isSingleType() (b bool) {
+func (d *StructField) isSingleType() (b bool) {
 	return !d.kind.isGroupType()
 }
 
-func (d *structField) isGroupType() (b bool) {
+func (d *StructField) isGroupType() (b bool) {
 	return d.kind.isGroupType()
 }
 
-func newStructField(_odmStruct *odmStruct, d *structFieldLst, t *reflect.StructField, parent *structField) {
+func newStructField(_odmStruct *odmStruct, d *StructFieldLst, t *reflect.StructField, parent *StructField) {
 	fieldType := *t
 	reflectType := fieldType.Type
 	tag := fieldType.Tag.Get(tagName)
 	kind := reflectToKind(&reflectType)
-	isExtend := checkstructFieldisExtend(t)
+	isExtend := checkStructFieldisExtend(t)
 	var _dependLst dependLst
 	var _extendDependLst dependLst
 
-	field := &structField{
+	field := &StructField{
 		odmStruct:       _odmStruct,
 		name:            t.Name,
 		sourceType:      reflectType,
@@ -121,21 +121,21 @@ func newStructField(_odmStruct *odmStruct, d *structFieldLst, t *reflect.StructF
 	}
 }
 
-func checkstructFieldisExtend(r *reflect.StructField) (b bool) {
+func checkStructFieldisExtend(r *reflect.StructField) (b bool) {
 	return r.Anonymous
 }
 
 // lst /////////////////////////
-type structFieldLst []*structField
-type dependLst []*structField
+type StructFieldLst []*StructField
+type dependLst []*StructField
 
-func (d *structFieldLst) addItem(f *structField) *structField {
+func (d *StructFieldLst) addItem(f *StructField) *StructField {
 	f.id = len(*d)
 	*d = append(*d, f)
 	return f
 }
 
-func (d *structFieldLst) getFieldsByName(name string) (o structFieldLst) {
+func (d *StructFieldLst) getFieldsByName(name string) (o StructFieldLst) {
 	for _, v := range *d {
 		if v.Name() == name {
 			o = append(o, v)
@@ -144,7 +144,7 @@ func (d *structFieldLst) getFieldsByName(name string) (o structFieldLst) {
 	return
 }
 
-func (d *structFieldLst) getExtendFieldLst() (rd structFieldLst) {
+func (d *StructFieldLst) getExtendFieldLst() (rd StructFieldLst) {
 	for _, v := range *d {
 		if v.IsExtend() {
 			rd = append(rd, v)
@@ -153,7 +153,7 @@ func (d *structFieldLst) getExtendFieldLst() (rd structFieldLst) {
 	return
 }
 
-func (d *structFieldLst) getSingleTypeFieldLst() (rd structFieldLst) {
+func (d *StructFieldLst) getSingleTypeFieldLst() (rd StructFieldLst) {
 	for _, v := range *d {
 		if v.isSingleType() {
 			rd = append(rd, v)
@@ -161,7 +161,7 @@ func (d *structFieldLst) getSingleTypeFieldLst() (rd structFieldLst) {
 	}
 	return
 }
-func (d *structFieldLst) getGroupTypeFieldLst() (rd structFieldLst) {
+func (d *StructFieldLst) getGroupTypeFieldLst() (rd StructFieldLst) {
 	for _, v := range *d {
 		if v.isGroupType() {
 			rd = append(rd, v)
@@ -170,7 +170,7 @@ func (d *structFieldLst) getGroupTypeFieldLst() (rd structFieldLst) {
 	return
 }
 
-func getExtendParent(d *structFieldLst, field *structField) (f *structField) {
+func getExtendParent(d *StructFieldLst, field *StructField) (f *StructField) {
 	if field.parent == nil {
 		f = nil
 	} else {

@@ -14,7 +14,7 @@ const (
 )
 
 type whereItem struct {
-	f *structField
+	f *StructField
 	relation
 	values []interface{}
 }
