@@ -17,6 +17,7 @@ var (
 type odmTag struct {
 	sourceTag string
 	mark      string // find docfield quick by custom string
+	allowNull bool
 	path      string // odmPath
 	lst       map[string]string
 }
@@ -54,4 +55,8 @@ func newTag(s string) *odmTag {
 		_o.lst[name] = value
 	}
 	return _o
+}
+
+func (t *odmTag) AllowNull() bool {
+	return t.allowNull
 }

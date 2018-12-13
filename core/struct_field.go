@@ -11,7 +11,7 @@ type StructField struct {
 	kind       Kind
 	id         int
 	isExtend   bool // is Anonymous field
-	tag        *odmTag
+	odmTag
 	// fields relation with golang struct
 	childLst      StructFieldLst
 	complexParent *StructField // the nearest complex parent field, use for check field path quick
@@ -64,7 +64,7 @@ func newStructField(_odmStruct *odmStruct, d *StructFieldLst, t *reflect.StructF
 		isExtend:        isExtend,
 		dependLst:       _dependLst,
 		extendDependLst: _extendDependLst,
-		tag:             newTag(tag),
+		odmTag:          *newTag(tag),
 	}
 
 	// set extendparent, parent extendChildLst

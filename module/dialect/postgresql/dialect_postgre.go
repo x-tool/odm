@@ -34,13 +34,17 @@ func kindToString(k core.Kind) (s string) {
 	return typeMap[k]
 }
 
-func valueToString(field core.StructField, value *reflect.Value) (str string) {
-	var kind = field.Kind
+func valueToString(field *core.StructField, value *reflect.Value) (str string) {
+	var isZero = !value.IsValid()
+	if field.AllowNull() && isZero {
+		return "null"
+	}
+	var kind = field.Kind()
 	// postgre type handle
 	switch kind {
 	case core.Time:
 		var t time.Time
-		if !value.IsValid() {
+		if isZero {
 			_t := new(time.Time)
 			t = *_t
 		} else {

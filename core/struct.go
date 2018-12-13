@@ -64,7 +64,7 @@ func newStructFieldLst(d *odmStruct, odmStructSourceT reflect.Type) *StructField
 func makeStructFieldLstMarkMap(d *odmStruct) (m map[string]*StructField) {
 	_d := d.fields
 	for _, v := range _d {
-		tagPtr := v.tag.mark
+		tagPtr := v.odmTag.mark
 		if tagPtr != "" {
 			m[tagPtr] = v
 		}
