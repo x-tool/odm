@@ -1,6 +1,7 @@
 package core
 
 import (
+	"fmt"
 	"strings"
 )
 
@@ -8,7 +9,7 @@ import (
 var (
 	tagName          = "xodm"
 	tagItemSeparator = ":" // Ex: xodm:"name:value"
-	tagSeparator     = ";" // Ex: xodm:"name1:value1;name2:value2"
+	tagSeparator     = " " // Ex: xodm:"name1:value1;name2:value2"
 	tagMark          = "@" // Ex: xodm:"@mark"
 )
 
@@ -16,7 +17,7 @@ var (
 type odmTag struct {
 	sourceTag string
 	mark      string // find docfield quick by custom string
-	allowNull bool
+	notNull   bool
 	lst       map[string]string
 }
 
@@ -25,9 +26,11 @@ func newTag(s string) *odmTag {
 	_o.lst = make(map[string]string)
 	_s := strings.TrimSpace(s)
 	_o.sourceTag = _s
-	_o.allowNull = true
 	lst := strings.Split(_s, tagSeparator)
 	for _, v := range lst {
+		if v == "" {
+			continue
+		}
 		fieldLst := strings.Split(v, tagItemSeparator)
 		fieldLstLen := len(fieldLst)
 		var name string
@@ -38,28 +41,33 @@ func newTag(s string) *odmTag {
 			switch {
 			// notnull
 			case _str == "notnull":
-				_o.allowNull = false
-				name = "notnull"
-				value = ""
+				_o.notNull = true
 				// @xxx
 			case strings.Index(_str, tagMark) == 0:
 				_o.mark = string([]rune(fieldLst[0])[1:])
-				name = tagMark
-				value = _o.mark
 			}
-		} else if fieldLstLen == 2 {
-			name := strings.TrimSpace(fieldLst[0])
-			value := strings.TrimSpace(fieldLst[1])
-			switch name {
-			case tagMark:
-				_o.mark = value
-			}
+			continue
 		}
+		name = strings.TrimSpace(fieldLst[0])
+		value = strings.TrimSpace(fieldLst[1])
 		_o.lst[name] = value
 	}
 	return _o
 }
 
-func (t *odmTag) AllowNull() bool {
-	return t.allowNull
+func (t *odmTag) NotNull() bool {
+	return t.notNull
+}
+
+func (t *odmTag) DefaultValue() (hasDefault bool, value string) {
+	fmt.Print(t.lst)
+	if v, ok := t.lst["default"]; ok {
+		return true, v
+	}
+	return false, ""
+}
+
+func (t *odmTag) Lst() map[string]string {
+	fmt.Print(t.lst)
+	return t.lst
 }

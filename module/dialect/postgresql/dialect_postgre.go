@@ -36,7 +36,7 @@ func kindToString(k core.Kind) (s string) {
 
 func valueToString(field *core.StructField, value *reflect.Value) (str string) {
 	var isZero = !value.IsValid()
-	if field.AllowNull() && isZero {
+	if !field.NotNull() && isZero {
 		return "null"
 	}
 	var kind = field.Kind()
@@ -129,21 +129,34 @@ func (d *dialectpostgre) GetColNames() (ColNames []string, err error) {
 
 func (d *dialectpostgre) SyncCols(colLst core.ColLst) {
 	var syncLock sync.WaitGroup
-	for _, v := range colLst {
+	for _, col := range colLst {
 		syncLock.Add(1)
 		go func(*core.Col) {
 			defer syncLock.Done()
 			var sql string
 			var colFields string
-			colName := v.Name()
-			fieldLst := v.GetRootFields()
+			colName := col.Name()
+			fieldLst := col.GetRootFields()
 			var fieldStringLst []string
 			//output field name and typestr in colFields
-			for _, _v := range fieldLst {
-				fieldKind := kindToString(_v.Kind())
-				name := _v.Name()
-				fieldStringLst = append(fieldStringLst, name+" "+fieldKind)
+			for _, field := range fieldLst {
+				fieldKind := kindToString(field.Kind())
+				name := field.Name()
+				// add field's constraints
+				var constraints string
+				if field.NotNull() {
+					constraints = "NOT NULL"
+				}
+				// ***** if use 'if else' at here. field map become map[],can't get value if default has value,why???
+				has, defaultValue := field.DefaultValue()
+				if has {
+					reflectV := reflect.ValueOf(defaultValue)
+					constraints = fmt.Sprintf("%v Default %v", constraints, valueToString(field, &reflectV))
+				}
+
+				fieldStringLst = append(fieldStringLst, fmt.Sprintf("%v %v %v", name, fieldKind, constraints))
 			}
+
 			colFields = tool.JoinStringWithComma(fieldStringLst)
 			// make sql
 			sql = fmt.Sprintf("CREATE TABLE %s ( %s ) ", colName, colFields)
@@ -151,7 +164,7 @@ func (d *dialectpostgre) SyncCols(colLst core.ColLst) {
 			if err != nil {
 				tool.Panic("DB", err)
 			}
-		}(v)
+		}(col)
 	}
 	syncLock.Wait()
 }

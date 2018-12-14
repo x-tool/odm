@@ -7,15 +7,15 @@ import (
 
 type myDocLabel struct {
 	// Name       string
-	Label      string
-	LabelName  string
+	Label      string `xodm:"notnull default:你好"`
+	LabelName  string `xodm:"default:"`
 	Labelfeild string
 }
 type myDoc struct {
 	NormalCol
-	Name       string
-	Id         int
-	myDocLabel `Handle:"extend"`
+	Name string `xodm:"notnull"`
+	Id   int
+	myDocLabel
 }
 
 func (m *myDoc) ColName() string {
@@ -36,7 +36,7 @@ func Test_connection(t *testing.T) {
 	db.SyncCols()
 
 	testdata := new(myDoc)
-	testdata.Name = "LiLei"
+	// testdata.Name = "LiLei"
 	testdata.Id = 1
 	errInsert := db.Insert(testdata)
 	// errInsert := db.Delete(testdata).Where("name = LiLei")

@@ -66,7 +66,6 @@ func newStructField(_odmStruct *odmStruct, d *StructFieldLst, t *reflect.StructF
 		extendDependLst: _extendDependLst,
 		odmTag:          *newTag(tag),
 	}
-
 	// set extendparent, parent extendChildLst
 	field.extendParent = getExtendParent(d, field)
 	if field.extendParent != nil {

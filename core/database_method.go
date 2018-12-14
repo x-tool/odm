@@ -10,11 +10,7 @@ import (
 )
 
 func (d *Database) SyncCols() {
-	var colLst []*Col
-	for _, col := range d.ColLst {
-		colLst = append(colLst, col)
-	}
-	d.dialect.SyncCols(colLst)
+	d.dialect.SyncCols(d.ColLst)
 }
 
 func (d *Database) setHistory() {
