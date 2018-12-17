@@ -2,6 +2,7 @@ package core
 
 import (
 	"fmt"
+	"reflect"
 	"strings"
 )
 
@@ -11,6 +12,7 @@ var (
 	tagItemSeparator = ":" // Ex: xodm:"name:value"
 	tagSeparator     = " " // Ex: xodm:"name1:value1;name2:value2"
 	tagMark          = "@" // Ex: xodm:"@mark"
+	tagDefault       = "default"
 )
 
 // `xodm:"@sign"`
@@ -18,10 +20,12 @@ type odmTag struct {
 	sourceTag string
 	mark      string // find docfield quick by custom string
 	notNull   bool
-	lst       map[string]string
+	// if value not null use default value, defalut value get from string, so must change type and cover in reflect.Value
+	defaultValue reflect.Value
+	lst          map[string]string
 }
 
-func newTag(s string) *odmTag {
+func newTag(s string, field *StructField) *odmTag {
 	_o := &odmTag{}
 	_o.lst = make(map[string]string)
 	_s := strings.TrimSpace(s)
@@ -50,6 +54,10 @@ func newTag(s string) *odmTag {
 		}
 		name = strings.TrimSpace(fieldLst[0])
 		value = strings.TrimSpace(fieldLst[1])
+		if name == tagDefault {
+
+			continue
+		}
 		_o.lst[name] = value
 	}
 	return _o

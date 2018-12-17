@@ -36,8 +36,16 @@ func kindToString(k core.Kind) (s string) {
 
 func valueToString(field *core.StructField, value *reflect.Value) (str string) {
 	var isZero = !value.IsValid()
-	if !field.NotNull() && isZero {
-		return "null"
+	// if value is zero value
+	if isZero {
+		if !field.NotNull() {
+			return "null"
+		} else {
+			has, value:=field.Default()
+			if has {
+				value = reflect.ValueOf
+			}
+		}
 	}
 	var kind = field.Kind()
 	// postgre type handle
