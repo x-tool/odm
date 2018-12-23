@@ -19,6 +19,7 @@ type Database struct {
 	mapCols   map[string]*Col // use map to get col by name
 	aliasFunc func(string) string
 	history   *history
+	customType
 	Hook
 }
 

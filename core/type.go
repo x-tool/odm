@@ -21,6 +21,7 @@ const (
 	TimeStamp
 	money
 	Struct
+	IP
 	Interface
 )
 
@@ -38,12 +39,21 @@ var typeStringMap = map[Kind]string{
 	DateTime:  "datetime",
 	TimeStamp: "timestamp",
 	Struct:    "struct",
+	IP:        "ip",
 }
 
 type Kind uint
 
-func (k Kind) String() (s string) {
-	return typeStringMap[k]
+type customType struct {
+	lst map[string]reflect.Type
+}
+
+type customTypeItem struct {
+	name string
+	_type reflect.Type
+}
+func (c *customType) RegisterType(name string, r reflect.Type) {
+	c.lst[name] = r
 }
 
 func (k Kind) isGroupType() (b bool) {

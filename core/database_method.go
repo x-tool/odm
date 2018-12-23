@@ -93,3 +93,4 @@ func (d *Database) RegisterCols(c ...interface{}) {
 	}
 	rigisterCols.Wait()
 }
+
