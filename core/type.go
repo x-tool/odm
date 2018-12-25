@@ -6,8 +6,7 @@ import (
 
 // xodm type
 const (
-	Invalid Kind = iota
-	Bool
+	Bool Kind = iota
 	Int
 	Byte
 	Float
@@ -23,6 +22,7 @@ const (
 	Struct
 	IP
 	Interface
+	Custom
 )
 
 var typeStringMap = map[Kind]string{
@@ -48,10 +48,18 @@ type customType struct {
 	lst map[string]reflect.Type
 }
 
+// user custom type, Ex: uuid
 type customTypeItem struct {
-	name string
-	_type reflect.Type
+	sourceType reflect.Type
+	method     customTypeInterface
 }
+
+type customTypeInterface interface {
+	String() string
+	Parse([]byte) (interface{}, error)
+	Default(interface{})
+}
+
 func (c *customType) RegisterType(name string, r reflect.Type) {
 	c.lst[name] = r
 }
