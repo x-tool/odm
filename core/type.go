@@ -4,6 +4,8 @@ import (
 	"reflect"
 )
 
+type Kind uint
+
 // xodm type
 const (
 	Bool Kind = iota
@@ -40,28 +42,6 @@ var typeStringMap = map[Kind]string{
 	TimeStamp: "timestamp",
 	Struct:    "struct",
 	IP:        "ip",
-}
-
-type Kind uint
-
-type customType struct {
-	lst map[string]reflect.Type
-}
-
-// user custom type, Ex: uuid
-type customTypeItem struct {
-	sourceType reflect.Type
-	method     customTypeInterface
-}
-
-type customTypeInterface interface {
-	String() string
-	Parse([]byte) (interface{}, error)
-	Default(interface{})
-}
-
-func (c *customType) RegisterType(name string, r reflect.Type) {
-	c.lst[name] = r
 }
 
 func (k Kind) isGroupType() (b bool) {
@@ -145,4 +125,42 @@ func reflectToKind(r *reflect.Type) (k Kind) {
 	}
 
 	return
+}
+
+///////////// Custom Type
+
+type customType struct {
+	defaultFuncMap map[string]func() interface{}
+	typeLst        map[string]reflect.Type
+}
+
+// user custom type, Ex: uuid
+type customTypeItem struct {
+	sourceType reflect.Type
+	method     customTypeInterface
+}
+
+type customTypeInterface interface {
+	String() string
+	Parse([]byte) (interface{}, error)
+}
+
+func newCustomType() customType {
+	c := customType{
+		defaultFuncMap: make(map[string]func() interface{}),
+		typeLst:        make(map[string]reflect.Type),
+	}
+	return c
+}
+
+func (c *customType) RegisterType(name string, r reflect.Type) {
+	if _, ok := c.typeLst[name]; !ok {
+		c.typeLst[name] = r
+	}
+}
+
+func (c *customType) RegisterDefaultValueFunc(name string, f func() interface{}) {
+	if _, ok := c.defaultFuncMap[name]; !ok {
+		c.defaultFuncMap[name] = f
+	}
 }

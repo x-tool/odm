@@ -20,7 +20,7 @@ type Database struct {
 	aliasFunc func(string) string
 	history   *history
 	customType
-	Hook
+	Hook // use for plugin
 }
 
 type config struct {
@@ -35,16 +35,17 @@ type history struct {
 	colNames []string
 }
 
-func NewDatabase(c *client.Client, d Dialect) *Database {
-	_d := new(Database)
-	_d.name = c.Config.DatabaseName
-	_d.client = c
-	_d.dialect = d
-	_d.mapStructs = make(map[string]*odmStruct)
-	_d.mapCols = make(map[string]*Col)
-	_d.setHistory()
-	_d.Hook = newHook(_d)
-	return _d
+func NewDatabase(c *client.Client, dialect Dialect) *Database {
+	d := new(Database)
+	d.name = c.Config.DatabaseName
+	d.client = c
+	d.dialect = dialect
+	d.mapStructs = make(map[string]*odmStruct)
+	d.mapCols = make(map[string]*Col)
+	d.setHistory()
+	d.customType = newCustomType()
+	d.Hook = newHook(d)
+	return d
 }
 
 func (d *Database) Name() string {
