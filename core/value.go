@@ -35,11 +35,11 @@ import (
 // }
 
 // check Endian
-var endian binary.ByteOrder
+var Endian binary.ByteOrder
 
 func systemEdian() {
 	var i int = 0x1
-	bs := (*[INT_SIZE]byte)(unsafe.Pointer(&i))
+	bs := (*[int(unsafe.Sizeof(0))]byte)(unsafe.Pointer(&i))
 	if bs[0] == 0 {
 		Endian = binary.LittleEndian
 	} else {
