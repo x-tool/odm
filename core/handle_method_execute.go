@@ -32,6 +32,7 @@ func (d *Handle) Insert(i interface{}) (err error) {
 	if d.checkHandleErr() != nil {
 		return d.Err
 	}
+	d.handleType = InsertData
 	d.writter = *newWritter(d)
 	d.writter.setWritterValue(i)
 	return d.Exec()
@@ -52,13 +53,14 @@ func (d *Handle) Delete(i interface{}) (err error) {
 
 func (d *Handle) Get(i interface{}) (err error) {
 	_d := d.Query(i)
+	_d.handleType = QueryData
 	return _d.Exec()
 }
 
 func (d *Handle) Exec() (err error) {
-	if len(d.handleCols) == 0 {
-		return errors.New("you should set col")
-	}
+	// if len(d.handleCols) == 0 {
+	// 	return errors.New("you should set col")
+	// }
 	switch d.handleType {
 	case InsertData:
 		err = d.db.dialect.Insert(d)
@@ -72,9 +74,9 @@ func (d *Handle) Exec() (err error) {
 	return
 }
 
-func (d *Handle) Query(i interface{}) (h *Handle) {
+func (d *Handle) Query(i interface{}) *Handle {
 	d.setResult(i)
-	return
+	return d
 }
 func (d *Handle) Key(s string) (h *Handle) {
 	if d.checkHandleErr() != nil {

@@ -3,6 +3,7 @@ package postgresql
 import (
 	"errors"
 	"fmt"
+	"log"
 	"reflect"
 	"strings"
 	"sync"
@@ -41,10 +42,10 @@ func valueToString(field *core.StructField, value *reflect.Value) (str string) {
 		if !field.NotNull() {
 			return "null"
 		} else {
-			has, value:=field.Default()
-			if has {
-				value = reflect.ValueOf
-			}
+			// has, value := field.Default()
+			// if has {
+			// 	value = reflect.ValueOf
+			// }
 		}
 	}
 	var kind = field.Kind()
@@ -60,9 +61,9 @@ func valueToString(field *core.StructField, value *reflect.Value) (str string) {
 		}
 		str = t.Format("2006-01-02 15:04:05")
 
-	// default use core default process mode
-	default:
-		str = core.ValueToString(value)
+		// default use core default process mode
+		// default:
+		// 	str = core.ValueToString(value)
 	}
 	if kind == core.Int {
 		if str == "" {
@@ -208,6 +209,7 @@ func (d *dialectpostgre) Delete(doc *core.Handle) (err error) {
 	return
 }
 func (d *dialectpostgre) Query(doc *core.Handle) (err error) {
+	err = d.Open("select name, label from mydoc", []*[]byte{})
 	return
 }
 
@@ -298,15 +300,21 @@ func (d *dialectpostgre) Open(sql string, results interface{}) (err error) {
 		resultItemT := resultT.Elem()
 		_tempResultItemLst := reflect.New(reflect.SliceOf(resultItemT))
 		tempResultItemLst := reflect.Indirect(_tempResultItemLst)
-		for rows.Next() {
-			newResult := reflect.Indirect(reflect.New(resultItemT))
-			var resultSlicePtr []interface{}
-			for i := 0; i < newResult.NumField(); i++ {
-				newResultField := newResult.Field(i).Addr().Interface()
-				resultSlicePtr = append(resultSlicePtr, newResultField)
+		for {
+			if !rows.Next() {
+				break
 			}
-			err := rows.Scan(resultSlicePtr...)
-			tempResultItemLst.Set(reflect.Append(tempResultItemLst, newResult))
+			// newResult := reflect.Indirect(reflect.New(resultItemT))
+			// var resultSlicePtr [][]byte
+			// for i := 0; i < newResult.NumField(); i++ {
+			// 	// newResultField := newResult.Field(i).Addr().Interface()
+			// 	resultSlicePtr = append(resultSlicePtr, []byte{})
+			// }
+			var a []byte
+			var b []byte
+			err := rows.Scan(&a, &b)
+			log.Println("asdf:", string(a), string(b))
+			// tempResultItemLst.Set(reflect.Append(tempResultItemLst, newResult))
 			if err != nil {
 				break
 			}

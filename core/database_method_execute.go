@@ -14,6 +14,11 @@ func (d *Database) Get(i interface{}) (err error) {
 	return
 }
 
+func (d *Database) Query(i interface{}) (err error) {
+	handle := newHandle(d)
+	return handle.Get(i)
+}
+
 func (d *Database) Exec() (err error) {
 	return
 }

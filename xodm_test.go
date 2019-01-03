@@ -1,7 +1,6 @@
 package odm
 
 import (
-	"log"
 	"testing"
 )
 
@@ -38,14 +37,14 @@ func Test_connection(t *testing.T) {
 	testdata := new(myDoc)
 	// testdata.Name = "LiLei"
 	testdata.Id = 1
-	errInsert := db.Insert(testdata)
+	// errInsert := db.Insert(testdata)
 	// errInsert := db.Delete(testdata).Where("name = LiLei")
-	// db.Query()
+	_ = db.Query(nil)
 	// col := db.GetCol(new(myDoc))
 	// _, err := col.data(testdata)
-	log.Print(errInsert)
+	// log.Print(errInsert)
 	// col.Key(testdata.Key).Delete()
-	t.Log(errInsert)
+	// t.Log(errInsert)
 }
 
 // func Test_formatType(t *testing.T) {
