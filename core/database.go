@@ -43,7 +43,6 @@ func NewDatabase(c *client.Client, dialect Dialect) *Database {
 	d.mapStructs = make(map[string]*odmStruct)
 	d.mapCols = make(map[string]*Col)
 	d.setHistory()
-	d.customType = newCustomType()
 	d.Hook = newHook(d)
 	return d
 }

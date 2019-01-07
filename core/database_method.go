@@ -93,3 +93,12 @@ func (d *Database) RegisterCols(c ...interface{}) {
 	}
 	rigisterCols.Wait()
 }
+
+func (d *Database) RegisterType(name string, value interface{}, funcs customTypeInterface) {
+	c := newCustomType(name, value, funcs)
+	customTypeBox.typeLst = append(customTypeBox.typeLst, c)
+}
+
+func (d *Database) RegisterDefaultFunc(name string, f func() interface{}) {
+	customTypeBox.defaultFuncMap[name] = f
+}

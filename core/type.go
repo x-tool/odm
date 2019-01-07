@@ -1,7 +1,9 @@
 package core
 
 import (
+	"encoding/binary"
 	"reflect"
+	"unsafe"
 )
 
 type Kind uint
@@ -42,6 +44,7 @@ var typeStringMap = map[Kind]string{
 	TimeStamp: "timestamp",
 	Struct:    "struct",
 	IP:        "ip",
+	Custom:    "custom",
 }
 
 func (k Kind) isGroupType() (b bool) {
@@ -127,15 +130,33 @@ func reflectToKind(r *reflect.Type) (k Kind) {
 	return
 }
 
-///////////// Custom Type
-
-type customType struct {
-	defaultFuncMap map[string]func() interface{}
-	typeLst        map[string]reflect.Type
+func init() {
+	systemEdian()
 }
 
-// user custom type, Ex: uuid
-type customTypeItem struct {
+//////////////// check Endian
+var Endian binary.ByteOrder
+
+func systemEdian() {
+	var i int = 0x1
+	bs := (*[int(unsafe.Sizeof(0))]byte)(unsafe.Pointer(&i))
+	if bs[0] == 0 {
+		Endian = binary.LittleEndian
+	} else {
+		Endian = binary.BigEndian
+	}
+}
+
+///////////// Custom Type
+var customTypeBox customBox
+
+type customBox struct {
+	typeLst        []customType
+	defaultFuncMap map[string]func() interface{}
+}
+
+type customType struct {
+	name       string
 	sourceType reflect.Type
 	method     customTypeInterface
 }
@@ -145,22 +166,9 @@ type customTypeInterface interface {
 	Parse([]byte) (interface{}, error)
 }
 
-func newCustomType() customType {
+func newCustomType(name string, value interface{}, method customTypeInterface) customType {
 	c := customType{
-		defaultFuncMap: make(map[string]func() interface{}),
-		typeLst:        make(map[string]reflect.Type),
+		method: method,
 	}
 	return c
-}
-
-func (c *customType) RegisterType(name string, r reflect.Type) {
-	if _, ok := c.typeLst[name]; !ok {
-		c.typeLst[name] = r
-	}
-}
-
-func (c *customType) RegisterDefaultValueFunc(name string, f func() interface{}) {
-	if _, ok := c.defaultFuncMap[name]; !ok {
-		c.defaultFuncMap[name] = f
-	}
 }

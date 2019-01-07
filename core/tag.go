@@ -25,7 +25,7 @@ type odmTag struct {
 	lst          map[string]string
 }
 
-func newTag(s string, field *StructField) *odmTag {
+func newTag(s string, field *StructField) (*odmTag, error) {
 	_o := &odmTag{}
 	_o.lst = make(map[string]string)
 	_s := strings.TrimSpace(s)
@@ -57,26 +57,21 @@ func newTag(s string, field *StructField) *odmTag {
 		if name == tagDefault {
 			var FuncIndex = strings.LastIndexAny(value, tagFunc)
 			var isFunc = FuncIndex == len(value)-len(tagFunc)
-			if isFunc() {
-
+			if isFunc {
+				funcName := value[:len(value)-len(tagFunc)]
+				if field.kind == Custom {
+					_o.defaultValue = customTypeBox.defaultFuncMap[funcName]
+				}
 			}
 			continue
 		}
 		_o.lst[name] = value
 	}
-	return _o
+	return _o, nil
 }
 
 func (t *odmTag) NotNull() bool {
 	return t.notNull
-}
-
-func (t *odmTag) DefaultValue() (hasDefault bool, value string) {
-	fmt.Print(t.lst)
-	if v, ok := t.lst["default"]; ok {
-		return true, v
-	}
-	return false, ""
 }
 
 func (t *odmTag) Lst() map[string]string {
