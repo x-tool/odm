@@ -36,19 +36,24 @@ func kindToString(k core.Kind) (s string) {
 }
 
 func valueToString(field *core.StructField, value *reflect.Value) (str string) {
-	var isZero = !value.IsValid()
 	// if value is zero value
+	var isZero = !value.IsValid()
 	if isZero {
-		if !field.NotNull() {
-			return "null"
+		if field.NotNull() {
+			has := field.HasDefault()
+			if has {
+				reflectV := reflect.Indirect(reflect.ValueOf(field.DefaultValue()))
+				return valueToString(field, &reflectV)
+			}
 		} else {
-			// has, value := field.Default()
-			// if has {
-			// 	value = reflect.ValueOf
-			// }
+			return "null"
 		}
+	} else {
+		str = field.String(value)
 	}
+
 	var kind = field.Kind()
+
 	// postgre type handle
 	switch kind {
 	case core.Time:
@@ -60,10 +65,6 @@ func valueToString(field *core.StructField, value *reflect.Value) (str string) {
 			t = value.Interface().(time.Time)
 		}
 		str = t.Format("2006-01-02 15:04:05")
-
-		// default use core default process mode
-		// default:
-		// 	str = core.ValueToString(value)
 	}
 	if kind == core.Int {
 		if str == "" {
@@ -156,11 +157,11 @@ func (d *dialectpostgre) SyncCols(colLst core.ColLst) {
 				if field.NotNull() {
 					constraints = "NOT NULL"
 				}
-				// ***** if use 'if else' at here. field map become map[],can't get value if default has value,why???
-				has, defaultValue := field.DefaultValue()
+				has := field.HasDefault()
 				if has {
-					reflectV := reflect.ValueOf(defaultValue)
-					constraints = fmt.Sprintf("%v Default %v", constraints, valueToString(field, &reflectV))
+					reflectV := reflect.Indirect(reflect.ValueOf(field.DefaultValue()))
+					_v := valueToString(field, &reflectV)
+					constraints = fmt.Sprintf("%v Default %v", constraints, _v)
 				}
 
 				fieldStringLst = append(fieldStringLst, fmt.Sprintf("%v %v %v", name, fieldKind, constraints))

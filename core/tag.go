@@ -2,6 +2,7 @@ package core
 
 import (
 	"fmt"
+	"reflect"
 	"strings"
 )
 
@@ -25,7 +26,7 @@ type odmTag struct {
 	lst          map[string]string
 }
 
-func newTag(s string, field *StructField) (*odmTag, error) {
+func newTag(s string, field *StructField) *odmTag {
 	_o := &odmTag{}
 	_o.lst = make(map[string]string)
 	_s := strings.TrimSpace(s)
@@ -59,15 +60,19 @@ func newTag(s string, field *StructField) (*odmTag, error) {
 			var isFunc = FuncIndex == len(value)-len(tagFunc)
 			if isFunc {
 				funcName := value[:len(value)-len(tagFunc)]
-				if field.kind == Custom {
-					_o.defaultValue = customTypeBox.defaultFuncMap[funcName]
+				_o.defaultValue = customTypeBox.defaultFuncMap[funcName]
+			} else {
+				_o.defaultValue = func() interface{} {
+					newValue := reflect.New(field.sourceType)
+					_ = field.Parse([]byte(value), newValue)
+					return newValue.Interface()
 				}
 			}
 			continue
 		}
 		_o.lst[name] = value
 	}
-	return _o, nil
+	return _o
 }
 
 func (t *odmTag) NotNull() bool {
@@ -77,4 +82,12 @@ func (t *odmTag) NotNull() bool {
 func (t *odmTag) Lst() map[string]string {
 	fmt.Print(t.lst)
 	return t.lst
+}
+
+func (t *odmTag) DefaultValue() interface{} {
+	return t.defaultValue()
+}
+
+func (t *odmTag) HasDefault() bool {
+	return t.defaultValue != nil
 }
