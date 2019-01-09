@@ -1,95 +1,100 @@
 package core
 
-// type filters []filter
+import (
+	"reflect"
+	"strings"
+)
 
-// type handleType int
+type filters []filter
 
-// const (
-// 	insertData handleType = iota
-// 	updateData
-// 	deleteData
-// 	queryData
-// )
+type handleType int
 
-// type filterCompare string
+const (
+	insertData handleType = iota
+	updateData
+	deleteData
+	queryData
+)
 
-// const (
-// 	sameCompare      filterCompare = "like"  // like
-// 	sameCompareLeft                = "?like" // ??like
-// 	sameCompareRight               = "like?" // like??
-// 	equalCompare                   = "=="    // ==
-// 	isNullCompare                  = "isNull"
-// 	betweenCompare                 = "between"
-// 	inCompare                      = "in"
-// )
+type filterCompare string
 
-// type filterJoin string
+const (
+	sameCompare      filterCompare = "like"  // like
+	sameCompareLeft                = "?like" // ??like
+	sameCompareRight               = "like?" // like??
+	equalCompare                   = "=="    // ==
+	isNullCompare                  = "isNull"
+	betweenCompare                 = "between"
+	inCompare                      = "in"
+)
 
-// const (
-// 	andFilter filterJoin = "and"
-// 	orFilter             = "or"
-// 	notFilter            = "not"
-// )
+type filterJoin string
 
-// type filterItem struct {
-// 	target       *StructField
-// 	compare      filterCompare
-// 	value        interface{}
-// 	connect      filterJoin
-// 	childFilters filters
-// }
+const (
+	andFilter filterJoin = "and"
+	orFilter             = "or"
+	notFilter            = "not"
+)
 
-// type filter struct {
-// 	Handle    *Handle
-// 	queryKind string
-// 	queryV    *reflect.Value
-// 	modeV     *reflect.Value
-// 	queryLst  []filterItem
-// 	limitNum  int
-// 	limitDesc bool
-// }
+type filterItem struct {
+	target       *StructField
+	compare      filterCompare
+	value        interface{}
+	connect      filterJoin
+	childFilters filters
+}
 
-// func newFilter(o *Handle) *filter {
-// 	r := &filter{
-// 		Handle: o,
-// 		// filterV:    rV,
-// 		// filterKind: t,
-// 	}
-// 	// r.setDependToDoc()
-// 	return r
-// }
+type filter struct {
+	Handle    *Handle
+	queryKind string
+	queryV    *reflect.Value
+	modeV     *reflect.Value
+	queryLst  []filterItem
+	limitNum  int
+	limitDesc bool
+}
 
-// func newfilterWithoutCol(rV *reflect.Value) *filter {
-// 	r := &filter{
-// 		filterV: rV,
-// 	}
-// 	return r
-// }
+func newFilter(o *Handle) *filter {
+	r := &filter{
+		Handle: o,
+		// filterV:    rV,
+		// filterKind: t,
+	}
+	// r.setDependToDoc()
+	return r
+}
 
-// func (r *filter) setDependToDoc() {
-// 	// T := r.filterV.Type()
-// 	// var value reflect.Type
-// 	// if T.Kind() == reflect.Slice {
-// 	// 	value = T.Elem()
-// 	// } else {
-// 	// 	value = T
-// 	// }
-// 	// var valueItem reflect.Value
-// 	// var valueItemT reflect.Type
-// 	// if value.Kind() == reflect.Slice {
-// 	// 	valueItem = r.filterV.Elem()
-// 	// } else {
-// 	// 	valueItem = *r.filterV
-// 	// }
-// 	// valueItemT = valueItem.Type()
-// 	// for i := 0; i < valueItem.NumField(); i++ {
-// 	// 	field := valueItem.Field(i)
-// 	// 	fieldT := valueItemT.Field(i)
-// 	// 	if isDocMode(fieldT.Name) {
-// 	// 		r.modeV = &field
-// 	// 	}
-// 	// 	newfilterItem := r.Handle.DependToDoc(strings.Split(fieldT.Tag.Get(tagName), "."), fieldT.Name)
-// 	// 	r.filterLst = append(r.filterLst, newfilterItem)
-// 	// }
+func newfilterWithoutCol(rV *reflect.Value) *filter {
+	r := &filter{
+		filterV: rV,
+	}
+	return r
+}
 
-// }
+func (r *filter) setDependToDoc() {
+	T := r.filterV.Type()
+	var value reflect.Type
+	if T.Kind() == reflect.Slice {
+		value = T.Elem()
+	} else {
+		value = T
+	}
+	var valueItem reflect.Value
+	var valueItemT reflect.Type
+	if value.Kind() == reflect.Slice {
+		valueItem = r.filterV.Elem()
+	} else {
+		valueItem = *r.filterV
+	}
+	valueItemT = valueItem.Type()
+	for i := 0; i < valueItem.NumField(); i++ {
+		field := valueItem.Field(i)
+		fieldT := valueItemT.Field(i)
+		if isDocMode(fieldT.Name) {
+			r.modeV = &field
+		}
+		newfilterItem := r.Handle.DependToDoc(strings.Split(fieldT.Tag.Get(tagName), "."), fieldT.Name)
+		r.filterLst = append(r.filterLst, newfilterItem)
+	}
+
+}

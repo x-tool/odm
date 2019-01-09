@@ -86,6 +86,7 @@ func (h *HandleField) formatFieldWithStructName(s string) (field *StructField, c
 	return h.formatField(_struct, fieldPath)
 }
 
+// format field from path
 func (r *HandleField) formatField(o *odmStruct, s string) (field *StructField, complexValues []string, err error) {
 	if s == "" {
 		err = fmt.Errorf("can't get field use ''")
