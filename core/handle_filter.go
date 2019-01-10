@@ -6,33 +6,22 @@ import (
 
 type filters []filter
 
-type handleType int
+type CompareKind int
 
 const (
-	insertData handleType = iota
-	updateData
-	deleteData
-	queryData
+	likeCompare    CompareKind = iota
+	equalCompare               // ==
+	isNullCompare              // isNull
+	betweenCompare             // between
+	inCompare                  // in
 )
 
-type filterCompare string
+type linkKind int
 
 const (
-	sameCompare      filterCompare = "like"
-	sameLeftCompare                = "?like"
-	sameRightCompare               = "like?"
-	equalCompare                   = "=="
-	isNullCompare                  = "isNull"
-	betweenCompare                 = "between"
-	inCompare                      = "in"
-)
-
-type filterJoin string
-
-const (
-	andFilter filterJoin = "and"
-	orFilter             = "or"
-	notFilter            = "not"
+	andLink linkKind = iota
+	orLink
+	notLink
 )
 
 type filter struct {
@@ -40,7 +29,6 @@ type filter struct {
 	queryKind string
 	queryV    *reflect.Value
 	modeV     *reflect.Value
-	queryLst  []filterItem
 	limitNum  int
 	limitDesc bool
 }
@@ -56,11 +44,13 @@ func newFilter(o *Handle) *filter {
 }
 
 type FilterBox struct {
-	andBoxs []FilterBox
-	orBoxs  []FilterBox
-	child   []FilterBox
+	linkKind
+	child []FilterBox
+	field *StructField
+	CompareKind
+	valueLst []reflect.Value
 }
 
-func (r *filter) parse(s string) {
-
+func (f *filter) parse(s string) (box FilterBox) {
+	return
 }
