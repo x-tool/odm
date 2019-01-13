@@ -4,19 +4,9 @@ import (
 	"reflect"
 )
 
+var formatBracketStr string
+
 type filters []filter
-
-type CompareKind int
-
-const (
-	likeCompare    CompareKind = iota
-	equalCompare               // ==
-	isNullCompare              // isNull
-	betweenCompare             // between
-	inCompare                  // in
-)
-
-type linkKind int
 
 const (
 	andLink linkKind = iota
@@ -43,14 +33,8 @@ func newFilter(o *Handle) *filter {
 	return r
 }
 
-type FilterBox struct {
-	linkKind
-	child []FilterBox
-	field *StructField
-	CompareKind
-	valueLst []reflect.Value
-}
-
-func (f *filter) parse(s string) (box FilterBox) {
-	return
+func (f *filter) parse(s string, values ...interface{}) (rootBox ASTTree, err error) {
+	rootBox = ASTTree{source: s}
+	err = setBracketsTree(&rootBox)
+	return rootBox, err
 }
