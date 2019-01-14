@@ -1,5 +1,10 @@
 package core
 
+import (
+	"fmt"
+	"reflect"
+)
+
 const (
 	bracketLeft  = "("
 	bracketRight = ")"
@@ -33,32 +38,34 @@ type ASTTree struct {
 }
 
 func setBracketsTree(s string) (err error) {
-	str := strings.TrimSpace(box.source)
-	var checkBrackets bool
-	lexer()
-	reg, err := regexp.Compile(bracketLeft + "|" + bracketRight)
+	lexerBoxs, err := lexerAnalysis(s)
+	if err != nil {
+		return err
+	}
+
 	return
 }
 
 type lexerKind int
 
 const (
-	bracketLeft lexerKind = iota
-	bracketRight
+	lexerBracketLeft lexerKind = iota
+	lexerBracketRight
 	lexerField
-	link
+	lexerAnd
+	lexerOr
+	lexerNot
 )
 
 type lexerBox struct {
-	
 }
 
-func lexer(s string) ()
-func getEndBracketIndex(s string, index) (i int, err error) {
-	var l = len(s[index:])
-	for i,v:= range l{
+func lexerAnalysis(s string) (boxs []lexerBox, err error) {
+
+	for i, v := range s {
 
 	}
+	return
 }
 
 func init() {
