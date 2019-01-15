@@ -61,17 +61,32 @@ type lexerBox struct {
 }
 
 func lexerAnalysis(s string) (boxs []lexerBox, err error) {
-	var isString bool
-	var isESC bool
+	var state_string bool
+	var state_string_esc bool
+	var state_func bool
 	for i, v := range s {
-		if !isString && v == "\"" {
-			isString = true
+		letter := string(v)
+		// in out state_string_esc
+		if !state_string_esc && letter == "\\" {
+			state_string_esc = true
 			continue
 		}
-		if isString && !isESC && v == "\"" {
-			isString = false
+		if state_string_esc {
+			state_string_esc = false
 			continue
 		}
+		// in out state_string
+		if letter == "\"" {
+			if !state_string {
+				state_string = true
+				continue
+			}
+			if state_string && !state_string_esc {
+				state_string = false
+				continue
+			}
+		}
+
 	}
 	return
 }
