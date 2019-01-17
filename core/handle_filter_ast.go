@@ -6,33 +6,45 @@ import (
 )
 
 const (
-	bracketLeft  = "("
-	bracketRight = ")"
-	codeNot      = "!"
-	codeAnd      = "&&"
-	codeOr       = "||"
-	filterNot    = "not"
-	filterAnd    = "and"
-	filterOr     = "or"
+	bracketLeft     = "("
+	bracketRight    = ")"
+	filterNot       = "not"
+	filterAnd       = "and"
+	filterOr        = "or"
+	stringValue     = "?"
+	oprationEQ      = "="
+	oprationNEQ     = "<>"
+	oprationNEQ2    = "!="
+	oprationGT      = ">"
+	oprationEGT     = ">="
+	oprationLT      = "<"
+	oprationELT     = "<="
+	oprationLike    = "like"
+	oprationBETWEEN = "between"
+	oprationNOTNULL = "is not null"
+	oprationNULL    = "is null"
+)
+
+const (
+	codeNot = "!"
+	codeAnd = "&&"
+	codeOr  = "||"
+	codeEQ  = "=="
 )
 
 type CompareKind int
 
 const (
-	likeCompare    CompareKind = iota
-	equalCompare               // ==
-	isNullCompare              // isNull
-	betweenCompare             // between
-	inCompare                  // in
+	CompareAnd = iota
+	CompareOr
+	CompareNot
 )
-
-type linkKind int
 
 type ASTTree struct {
 	source string // temp user iput
-	linkKind
-	child []ASTTree
-	field *StructField
+	link   string
+	child  []ASTTree
+	field  *StructField
 	CompareKind
 	valueLst []reflect.Value
 }
@@ -58,12 +70,14 @@ const (
 )
 
 type lexerBox struct {
+	lexerType
 }
 
 func lexerAnalysis(s string) (boxs []lexerBox, err error) {
 	var state_string bool
 	var state_string_esc bool
 	var state_func bool
+	var state_field bool
 	for i, v := range s {
 		letter := string(v)
 		// in out state_string_esc
