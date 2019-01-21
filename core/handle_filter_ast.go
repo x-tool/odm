@@ -3,6 +3,7 @@ package core
 import (
 	"fmt"
 	"reflect"
+	"regexp"
 )
 
 const (
@@ -32,6 +33,8 @@ const (
 	codeEQ  = "=="
 )
 
+var defaultVarsRegexp *regexp.Regexp
+
 type CompareKind int
 
 const (
@@ -49,80 +52,66 @@ type ASTTree struct {
 	valueLst []reflect.Value
 }
 
-func setBracketsTree(s string) (err error) {
-	lexerBoxs, err := lexerAnalysis(s)
-	if err != nil {
-		return err
-	}
-
-	return
-}
-
-type lexerKind int
-
-const (
-	lexerBracketLeft lexerKind = iota
-	lexerBracketRight
-	lexerField
-	lexerAnd
-	lexerOr
-	lexerNot
-)
-
-type lexerBox struct {
-	lexerType
-}
-
-func lexerAnalysis(s string) (boxs []lexerBox, err error) {
+func setBracketsTree(s string) (rootTree ASTTree, err error) {
 	var state_string bool
 	var state_string_esc bool
 	var state_func bool
 	var state_field bool
 	for i, v := range s {
 		letter := string(v)
-		// in out state_string_esc
-		if !state_string_esc && letter == "\\" {
-			state_string_esc = true
-			continue
-		}
-		if state_string_esc {
-			state_string_esc = false
-			continue
-		}
-		// in out state_string
-		if letter == "\"" {
-			if !state_string {
-				state_string = true
+		if state_string {
+			if state_string_esc {
+				state_string_esc = false
 				continue
 			}
-			if state_string && !state_string_esc {
+			if letter == "\"" {
 				state_string = false
 				continue
 			}
 		}
+		findStr := defaultVarsRegexp.FindStringSubmatch(s[i:])
+		if findStr != nil {
 
+		} else {
+
+			continue
+		}
 	}
 	return
 }
 
 func init() {
-	// init formatBracketStr
-	formatBracketStrLst := []string{
-		codeNot,
-		codeAnd,
-		codeOr,
+	// init defaultVarsRegexp
+	defaultVarsRegexpLst := []string{
+		bracketLeft,
+		bracketRight,
 		filterNot,
 		filterAnd,
 		filterOr,
+		stringValue,
+		oprationEQ,
+		oprationNEQ,
+		oprationNEQ2,
+		oprationGT,
+		oprationEGT,
+		oprationLT,
+		oprationELT,
+		oprationLike,
+		oprationBETWEEN,
+		oprationNOTNULL,
+		oprationNULL,
+		codeNot,
+		codeAnd,
+		codeOr,
+		codeEQ,
 	}
-	_regStr := fmt.Sprintf(" *%v|^ *%v", bracketLeft, bracketLeft)
-	var beforeBracketLeft string
-	for i, v := range formatBracketStrLst {
+	var rangeDefaultStr string
+	for i, v := range defaultVarsRegexpLst {
 		if i == 0 {
-			beforeBracketLeft = v
+			rangeDefaultStr = v
 		} else {
-			beforeBracketLeft = beforeBracketLeft + "|" + v
+			rangeDefaultStr = rangeDefaultStr + "|" + v
 		}
 	}
-	formatBracketStr = fmt.Sprintf("[%v]%v", beforeBracketLeft, _regStr)
+	defaultVarsRegexp, _ = regexp.Compile(fmt.Sprintf(" *^(%v)", rangeDefaultStr))
 }
