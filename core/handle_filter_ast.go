@@ -103,14 +103,18 @@ func setBracketsTree(s string) (rootTree *ASTTree, err error) {
 			}
 			continue
 		}
-		findStr := defaultVarsRegexp.FindStringSubmatch(s[i:])
-		if findStr != nil {
-			switch findStr[0] {
+		findStrIndexs := defaultVarsRegexp.FindStringSubmatchIndex(s[i:])
+		if findStrIndexs != nil {
+			switch focusTree.source[findStrIndexs[0]:findStrIndexs[1]] {
 			case bracketLeft:
-				newTree := new(ASTTree)
+				newTree := &ASTTree{source:focusTree.source[findStrIndexs[1]:]}
 				focusTree.child = append(focusTree.child, newTree)
 				focusTree = newTree
+			case bracketRight:
+				focusTree.source = focusTree.source[:findStrIndexs[0]]
+				focusTree.parent.source = 
 			}
+			
 		} else {
 			switch letter {
 			case "\"":
