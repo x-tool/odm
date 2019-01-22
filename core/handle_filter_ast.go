@@ -46,11 +46,13 @@ const (
 )
 
 type ASTTree struct {
-	parent *ASTTree
-	source string // temp user iput
-	link   string
-	child  []*ASTTree
-	field  *StructField
+	parent      *ASTTree
+	source      string // use for root tree
+	sourceStart int
+	sourceEnd   int
+	link        string
+	child       []*ASTTree
+	field       *StructField
 	CompareKind
 	valueLst []reflect.Value
 }
@@ -107,14 +109,14 @@ func setBracketsTree(s string) (rootTree *ASTTree, err error) {
 		if findStrIndexs != nil {
 			switch focusTree.source[findStrIndexs[0]:findStrIndexs[1]] {
 			case bracketLeft:
-				newTree := &ASTTree{source:focusTree.source[findStrIndexs[1]:]}
+				newTree := &ASTTree{source: focusTree.source[findStrIndexs[1]:]}
 				focusTree.child = append(focusTree.child, newTree)
 				focusTree = newTree
 			case bracketRight:
 				focusTree.source = focusTree.source[:findStrIndexs[0]]
-				focusTree.parent.source = 
+				// focusTree.parent.source =
 			}
-			
+
 		} else {
 			switch letter {
 			case "\"":
