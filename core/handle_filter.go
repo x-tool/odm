@@ -8,12 +8,6 @@ var formatBracketStr string
 
 type filters []filter
 
-const (
-	andLink linkKind = iota
-	orLink
-	notLink
-)
-
 type filter struct {
 	Handle    *Handle
 	queryKind string
@@ -33,8 +27,7 @@ func newFilter(o *Handle) *filter {
 	return r
 }
 
-func (f *filter) parse(s string, values ...interface{}) (rootBox ASTTree, err error) {
-	rootBox = ASTTree{source: s}
-	err = setBracketsTree(&rootBox)
+func (f *filter) parse(s string, values ...interface{}) (rootBox *ASTTree, err error) {
+	rootBox, err = setBracketsTree(s)
 	return rootBox, err
 }

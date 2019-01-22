@@ -7,23 +7,25 @@ import (
 )
 
 const (
-	bracketLeft     = "("
-	bracketRight    = ")"
-	filterNot       = "not"
-	filterAnd       = "and"
-	filterOr        = "or"
-	stringValue     = "?"
-	oprationEQ      = "="
-	oprationNEQ     = "<>"
-	oprationNEQ2    = "!="
-	oprationGT      = ">"
-	oprationEGT     = ">="
-	oprationLT      = "<"
-	oprationELT     = "<="
-	oprationLike    = "like"
-	oprationBETWEEN = "between"
-	oprationNOTNULL = "is not null"
-	oprationNULL    = "is null"
+	bracketLeft        = "("
+	bracketRight       = ")"
+	filterNot          = "not"
+	filterAnd          = "and"
+	filterOr           = "or"
+	stringValue        = "?"
+	oprationEQ         = "="
+	oprationNEQ        = "<>"
+	oprationNEQ2       = "!="
+	oprationGT         = ">"
+	oprationEGT        = ">="
+	oprationLT         = "<"
+	oprationELT        = "<="
+	oprationLike       = "like"
+	oprationBETWEEN    = "between"
+	oprationBETWEENAnd = "and"
+	oprationIN         = "in"
+	oprationNOTNULL    = "is not null"
+	oprationNULL       = "is null"
 )
 
 const (
@@ -44,15 +46,22 @@ const (
 )
 
 type ASTTree struct {
+	parent *ASTTree
 	source string // temp user iput
 	link   string
-	child  []ASTTree
+	child  []*ASTTree
 	field  *StructField
 	CompareKind
 	valueLst []reflect.Value
 }
 
-func setBracketsTree(s string) (rootTree ASTTree, err error) {
+func (a *ASTTree) IsBox() bool {
+	return len(a.child) != 0
+}
+
+func setBracketsTree(s string) (rootTree *ASTTree, err error) {
+	rootTree.source = s
+	focusTree := rootTree
 	var state_string bool
 	var state_string_esc bool
 	var state_number bool
@@ -70,33 +79,38 @@ func setBracketsTree(s string) (rootTree ASTTree, err error) {
 			}
 			continue
 		}
-		if state_field  {
-			switch letter{
+		if state_field {
+			switch letter {
 			case " ":
 				state_field = false
-			case "(" :
+			case "(":
 				state_field = false
 				state_func = true
 			}
 			continue
 		}
 		if state_func {
-			switch letter{
-			case ")" :
+			switch letter {
+			case ")":
 				state_func = false
 			}
 			continue
 		}
 		if state_number {
-			switch letter{
-				case " "
+			switch letter {
+			case " ":
 				state_number = false
 			}
 			continue
 		}
 		findStr := defaultVarsRegexp.FindStringSubmatch(s[i:])
 		if findStr != nil {
-
+			switch findStr[0] {
+			case bracketLeft:
+				newTree := new(ASTTree)
+				focusTree.child = append(focusTree.child, newTree)
+				focusTree = newTree
+			}
 		} else {
 			switch letter {
 			case "\"":
