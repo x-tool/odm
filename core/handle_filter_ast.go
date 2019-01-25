@@ -1,8 +1,8 @@
 package core
 
 import (
+	"errors"
 	"fmt"
-	"reflect"
 	"regexp"
 )
 
@@ -12,7 +12,7 @@ const (
 	filterNot          = "not"
 	filterAnd          = "and"
 	filterOr           = "or"
-	stringValue        = "?"
+	placeholderValue   = "?"
 	oprationEQ         = "="
 	oprationNEQ        = "<>"
 	oprationNEQ2       = "!="
@@ -46,29 +46,36 @@ const (
 )
 
 type ASTTree struct {
-	parent      *ASTTree
-	source      string // use for root tree
-	sourceStart int
-	sourceEnd   int
-	link        string
-	child       []*ASTTree
-	field       *StructField
+	parent *ASTTree
+	source string
+	Link   string
+	child  []*ASTTree
+	Field  *StructField
 	CompareKind
-	valueLst []reflect.Value
+	valueLst []interface{}
 }
 
 func (a *ASTTree) IsBox() bool {
 	return len(a.child) != 0
 }
 
-func setBracketsTree(s string) (rootTree *ASTTree, err error) {
+func setBracketsTree(s string, values ...interface{}) (rootTree *ASTTree, err error) {
 	rootTree.source = s
 	focusTree := rootTree
+	var valuesIndex = 0
+	var valuesLen = len(values)
+	var getValue = func() (interface{}, error) {
+		if valuesIndex+1 >= valuesLen {
+			return nil, errors.New("input values lenght less than '?' in string")
+		}
+		return values, nil
+	}
 	var state_string bool
 	var state_string_esc bool
 	var state_number bool
 	var state_func bool
 	var state_field bool
+	var valueStartIndex int
 	for i, v := range s {
 		letter := string(v)
 		if state_string {
@@ -78,6 +85,7 @@ func setBracketsTree(s string) (rootTree *ASTTree, err error) {
 			}
 			if letter == "\"" {
 				state_string = false
+				focusTree.valueLst = append(focusTree.valueLst, s[valueStartIndex+1:i])
 			}
 			continue
 		}
@@ -107,7 +115,8 @@ func setBracketsTree(s string) (rootTree *ASTTree, err error) {
 		}
 		findStrIndexs := defaultVarsRegexp.FindStringSubmatchIndex(s[i:])
 		if findStrIndexs != nil {
-			switch focusTree.source[findStrIndexs[0]:findStrIndexs[1]] {
+			_v := focusTree.source[findStrIndexs[0]:findStrIndexs[1]]
+			switch _v {
 			case bracketLeft:
 				newTree := &ASTTree{source: focusTree.source[findStrIndexs[1]:]}
 				focusTree.child = append(focusTree.child, newTree)
@@ -115,6 +124,51 @@ func setBracketsTree(s string) (rootTree *ASTTree, err error) {
 			case bracketRight:
 				focusTree.source = focusTree.source[:findStrIndexs[0]]
 				// focusTree.parent.source =
+			case placeholderValue:
+				value, err := getValue()
+				if err != nil {
+					return nil, err
+				}
+				focusTree.valueLst = append(focusTree.valueLst, value)
+			case filterNot:
+				fallthrough
+			case codeNot:
+				focusTree.CompareKind = CompareNot
+			case filterAnd:
+				fallthrough
+			case codeAnd:
+				focusTree.CompareKind = CompareAnd
+			case filterOr:
+				fallthrough
+			case codeOr:
+				focusTree.CompareKind = CompareOr
+			case codeEQ:
+				_v = oprationEQ
+				fallthrough
+			case oprationEQ:
+				fallthrough
+			case oprationNEQ:
+				fallthrough
+			case oprationNEQ2:
+				fallthrough
+			case oprationGT:
+				fallthrough
+			case oprationEGT:
+				fallthrough
+			case oprationLT:
+				fallthrough
+			case oprationELT:
+				fallthrough
+			case oprationNOTNULL:
+				fallthrough
+			case oprationNULL:
+				fallthrough
+			case oprationIN:
+				fallthrough
+			case oprationBETWEEN:
+				fallthrough
+			case oprationLike:
+				focusTree.Link = _v
 			}
 
 		} else {
@@ -160,7 +214,7 @@ func init() {
 		filterNot,
 		filterAnd,
 		filterOr,
-		stringValue,
+		placeholderValue,
 		oprationEQ,
 		oprationNEQ,
 		oprationNEQ2,
