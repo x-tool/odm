@@ -118,12 +118,11 @@ func setBracketsTree(s string, values ...interface{}) (rootTree *ASTTree, err er
 			_v := focusTree.source[findStrIndexs[0]:findStrIndexs[1]]
 			switch _v {
 			case bracketLeft:
-				newTree := &ASTTree{source: focusTree.source[findStrIndexs[1]:]}
+				newTree := &ASTTree{}
 				focusTree.child = append(focusTree.child, newTree)
 				focusTree = newTree
 			case bracketRight:
-				focusTree.source = focusTree.source[:findStrIndexs[0]]
-				// focusTree.parent.source =
+				focusTree = focusTree.parent
 			case placeholderValue:
 				value, err := getValue()
 				if err != nil {
@@ -200,6 +199,7 @@ func setBracketsTree(s string, values ...interface{}) (rootTree *ASTTree, err er
 			default:
 				state_field = true
 			}
+			valueStartIndex = i
 			continue
 		}
 	}
