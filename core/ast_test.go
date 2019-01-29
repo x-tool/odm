@@ -8,6 +8,6 @@ import (
 
 func Test_AST(t *testing.T) {
 	tree, err := setBracketsTree("a = b")
-
-	fmt.Println(json.Marshal(tree), err)
+	str, err := json.Marshal(tree)
+	fmt.Println(str, err)
 }

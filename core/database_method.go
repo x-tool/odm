@@ -25,7 +25,7 @@ func (d *Database) setHistory() {
 func (d *Database) getStructByName(name string) (o *odmStruct, err error) {
 	o = d.mapStructs[name]
 	if o == nil {
-		err = errors.New(fmt.Sprintf("Can't find struct name %d in database", name))
+		err = fmt.Errorf("Can't find struct name %v in database", name)
 	}
 	return
 }

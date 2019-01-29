@@ -3,6 +3,7 @@ package core
 import (
 	"errors"
 	"fmt"
+	"log"
 	"regexp"
 )
 
@@ -60,7 +61,7 @@ func (a *ASTTree) IsBox() bool {
 }
 
 func setBracketsTree(s string, values ...interface{}) (rootTree *ASTTree, err error) {
-	rootTree.source = s
+	rootTree = &ASTTree{source: s}
 	focusTree := rootTree
 	var valuesIndex = 0
 	var valuesLen = len(values)
@@ -113,6 +114,7 @@ func setBracketsTree(s string, values ...interface{}) (rootTree *ASTTree, err er
 			}
 			continue
 		}
+		log.Printf("%T", s[i:])
 		findStrIndexs := defaultVarsRegexp.FindStringSubmatchIndex(s[i:])
 		if findStrIndexs != nil {
 			_v := focusTree.source[findStrIndexs[0]:findStrIndexs[1]]
@@ -236,8 +238,30 @@ func init() {
 		if i == 0 {
 			rangeDefaultStr = v
 		} else {
-			rangeDefaultStr = rangeDefaultStr + "|" + v
+			var value string
+			for _, _v := range v {
+				_value := string(_v)
+				switch _value {
+				case "(":
+					fallthrough
+				case ")":
+					fallthrough
+				case "?":
+					fallthrough
+				case "|":
+					value = value + "\\" + _value
+				default:
+					value = value + _value
+				}
+			}
+			rangeDefaultStr = rangeDefaultStr + "|" + value
 		}
 	}
-	defaultVarsRegexp, _ = regexp.Compile(fmt.Sprintf(" *^(%v)", rangeDefaultStr))
+	var err error
+	var str = fmt.Sprintf(" *^(%v)", rangeDefaultStr)
+	log.Println(str)
+	defaultVarsRegexp, err = regexp.Compile(str)
+	if err != nil {
+		log.Println(err)
+	}
 }

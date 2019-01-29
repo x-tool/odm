@@ -52,7 +52,7 @@ func newHandleField(h *Handle, s string) (field *HandleField, err error) {
 				col, err = h.getColByStr(structName)
 				field.col = col
 				if len(regId) == 0 || err != nil {
-					return field, fmt.Errorf("can't get col name from %v's tag", f.Name)
+					return field, fmt.Errorf("can't get col name from %v's tag", f.Name())
 				}
 
 			}
