@@ -46,13 +46,13 @@ const (
 )
 
 type ASTTree struct {
-	parent *ASTTree
-	source string
-	Link   string
-	child  []*ASTTree
-	Field  *StructField
+	parent   *ASTTree
+	source   string
+	Left     *StructField
+	Link     string
+	RightLst []interface{}
+	child    []*ASTTree
 	CompareKind
-	valueLst []interface{}
 }
 
 func (a *ASTTree) IsBox() bool {
