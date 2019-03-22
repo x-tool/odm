@@ -48,9 +48,8 @@ const (
 type ASTTree struct {
 	parent   *ASTTree
 	source   string
-	Left     *StructField
 	Link     string
-	RightLst []interface{}
+	valueLst []interface{}
 	child    []*ASTTree
 	CompareKind
 }
