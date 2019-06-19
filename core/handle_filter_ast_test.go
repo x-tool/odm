@@ -11,3 +11,11 @@ func Test_AST(t *testing.T) {
 	str, err := json.Marshal(tree)
 	fmt.Println(string(str), err)
 }
+
+
+odm.Where(
+	odm.And(
+		odm.And(value, "in", a),
+		odm.And()
+	)
+)

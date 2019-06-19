@@ -12,6 +12,7 @@ type myDocLabel struct {
 	LabelName  string `xodm:"default:"`
 	Labelfeild string
 }
+
 type myDoc struct {
 	NormalCol
 	Name string `xodm:"notnull"`
@@ -29,6 +30,11 @@ func Test_Insert(t *testing.T) {
 	testdata.Id = 1
 	errInsert := db.Insert(testdata)
 	t.Log(errInsert)
+	test(`
+		a = b
+		and	b = c
+		or c = d
+	`)
 }
 
 func Test_Query(t *testing.T) {
