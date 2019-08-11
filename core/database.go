@@ -1,7 +1,7 @@
 package core
 
 import (
-	"github.com/x-tool/odm/client"
+	"github.com/x-tool/odm/module/client"
 )
 
 // database

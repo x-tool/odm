@@ -1,7 +1,7 @@
 package core
 
 func (d *Database) Insert(i interface{}) (err error) {
-	handle := newHandle(d)
+	handle := newHandle(d,runtimeFunctionCall(i))
 	return handle.Insert(i)
 }
 

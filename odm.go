@@ -3,8 +3,8 @@ package odm
 import (
 	"errors"
 
-	"github.com/x-tool/odm/client"
 	"github.com/x-tool/odm/core"
+	"github.com/x-tool/odm/module/client"
 	"github.com/x-tool/tool"
 )
 

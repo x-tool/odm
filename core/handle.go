@@ -12,6 +12,7 @@ const (
 // handle struct is hock for plugin
 type Handle struct {
 	db    *Database
+	runtimeFunctionCalls 
 	alias map[string]*odmStruct // register struct alias,not col alias
 	handleType
 	handleCols // colLst with alias name
@@ -21,7 +22,7 @@ type Handle struct {
 	Err error
 }
 
-func newHandle(db *Database) *Handle {
+func newHandle(db *Database, runtimeFunctionCall *functionCall) *Handle {
 	d := &Handle{
 		db: db,
 	}

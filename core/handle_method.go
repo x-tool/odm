@@ -14,6 +14,9 @@ func (h *Handle) GetDBName() (s string, e error) {
 	}
 }
 
+func (h *Handle) addRuntimeFunctionCall (r *functionCall) {
+	h.func
+}
 func (h *Handle) getStructByStr(s string) (o *odmStruct, err error) {
 	for k, v := range h.alias {
 		if s == k {
