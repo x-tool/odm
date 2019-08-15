@@ -164,6 +164,7 @@ type customType struct {
 type customTypeInterface interface {
 	String() string
 	Parse([]byte) (interface{}, error)
+	Check(interface{}) bool
 }
 
 func newCustomType(name string, value interface{}, method customTypeInterface) customType {

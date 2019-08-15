@@ -8,7 +8,6 @@ import (
 )
 
 type odmStruct struct {
-	id              int // register struct to DB, use id
 	name            string
 	path            string
 	allName         string // name+path

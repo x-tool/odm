@@ -1,26 +1,13 @@
 package core
 
 import (
-	"errors"
 	"fmt"
 	"reflect"
 	"sync"
-
-	"github.com/x-tool/tool"
 )
 
-func (d *Database) SyncCols() {
-	d.dialect.SyncCols(d.ColLst)
-}
-
-func (d *Database) setHistory() {
-	var err error
-	d.history = new(history)
-	d.history.colNames, err = d.dialect.GetColNames()
-	if err != nil {
-		tool.Panic("DB", errors.New("Get colNames ERROR"))
-	}
-}
+var rigisterCols sync.WaitGroup
+var rigisterStructs sync.WaitGroup
 
 func (d *Database) getStructByName(name string) (o *odmStruct, err error) {
 	o = d.mapStructs[name]
@@ -51,11 +38,6 @@ func (d *Database) RegisterStructs(c ...interface{}) {
 		go d.RegisterStruct(v)
 	}
 	rigisterStructs.Wait()
-	// set struct id
-	_len := len(d.odmStructLst)
-	for i := 0; i < _len; i++ {
-		d.odmStructLst[i].id = i + 1
-	}
 }
 
 func (d *Database) GetCol(i interface{}) (c *Col, err error) {
@@ -74,9 +56,6 @@ func (d *Database) GetCol(i interface{}) (c *Col, err error) {
 	return
 }
 
-var rigisterCols sync.WaitGroup
-var rigisterStructs sync.WaitGroup
-
 func (d *Database) RegisterCol(c interface{}) {
 	_col := newCol(d, c)
 	d.ColLst = append(d.ColLst, _col)
@@ -94,6 +73,10 @@ func (d *Database) RegisterCols(c ...interface{}) {
 	rigisterCols.Wait()
 }
 
+func (d *Database) SyncCols() {
+	d.dialect.SyncCols(d.ColLst)
+}
+
 func (d *Database) RegisterType(name string, value interface{}, funcs customTypeInterface) {
 	c := newCustomType(name, value, funcs)
 	customTypeBox.typeLst = append(customTypeBox.typeLst, c)
@@ -101,4 +84,8 @@ func (d *Database) RegisterType(name string, value interface{}, funcs customType
 
 func (d *Database) RegisterDefaultFunc(name string, f func() interface{}) {
 	customTypeBox.defaultFuncMap[name] = f
+}
+
+func (d *Database) newHandle() (h *Handle) {
+	return newHandle(d)
 }

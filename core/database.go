@@ -18,7 +18,6 @@ type Database struct {
 	ColLst
 	mapCols   map[string]*Col // use map to get col by name
 	aliasFunc func(string) string
-	history   *history
 	customType
 	Hook // use for plugin
 }
@@ -31,19 +30,15 @@ type states struct {
 	isSyncCols bool
 }
 
-type history struct {
-	colNames []string
-}
-
 func NewDatabase(c *client.Client, dialect Dialect) *Database {
-	d := new(Database)
-	d.name = c.Config.DatabaseName
-	d.client = c
-	d.dialect = dialect
-	d.mapStructs = make(map[string]*odmStruct)
-	d.mapCols = make(map[string]*Col)
-	d.setHistory()
-	d.Hook = newHook(d)
+	d := &Database{
+		name:       c.config.DatabaseName,
+		client:     c,
+		dialect:    dialect,
+		mapStructs: make(map[string]*odmStruct),
+		mapCols:    make(map[string]*Col),
+		Hook:       newHook(d),
+	}
 	return d
 }
 
