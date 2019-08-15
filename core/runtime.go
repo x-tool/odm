@@ -9,14 +9,15 @@ type functionCall struct {
 	functionName string
 }
 
-func runtimeFunctionCall(functionName string, values ...interface{}) (call *functionCall) {
+func runtimeFunctionCall(values ...interface{}) (call *functionCall) {
 
 	stackLayer := 2 // user use database method stack layer
-	_, filePath, line, ok := runtime.Caller(stackLayer)
+	pcptr, filePath, line, ok := runtime.Caller(stackLayer)
+	_func := runtim.FuncForPC(pcptr)
 	return &functionCall{
 		filePath:     filePath,
 		line:         line,
 		inputValues:  values,
-		functionName: functionName,
+		functionName: _func.Name(),
 	}
 }

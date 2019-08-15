@@ -1,9 +1,7 @@
 package core
 
 import (
-	"encoding/binary"
 	"reflect"
-	"unsafe"
 )
 
 type Kind uint
@@ -134,25 +132,12 @@ func init() {
 	systemEdian()
 }
 
-//////////////// check Endian
-var Endian binary.ByteOrder
-
-func systemEdian() {
-	var i int = 0x1
-	bs := (*[int(unsafe.Sizeof(0))]byte)(unsafe.Pointer(&i))
-	if bs[0] == 0 {
-		Endian = binary.LittleEndian
-	} else {
-		Endian = binary.BigEndian
-	}
-}
-
-///////////// Custom Type
+///////////// Custom data type
 var customTypeBox customBox
 
 type customBox struct {
-	typeLst        []customType
-	defaultFuncMap map[string]func() interface{}
+	typeLst []customType
+	// defaultFuncMap map[string]func() interface{}
 }
 
 type customType struct {
@@ -163,8 +148,8 @@ type customType struct {
 
 type customTypeInterface interface {
 	String() string
-	Parse([]byte) (interface{}, error)
-	Check(interface{}) bool
+	Parse([]byte) (interface{}, error) // byte to user custom
+	Check(interface{}) bool            // check allow value
 }
 
 func newCustomType(name string, value interface{}, method customTypeInterface) customType {

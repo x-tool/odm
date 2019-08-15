@@ -5,12 +5,11 @@ func (d *Database) Insert(i interface{}) (err error) {
 }
 
 func (d *Database) Delete(i interface{}) (err error) {
-	handle := newHandle(d)
-	return handle.Delete(i)
+	return d.newHandle().Delete(runtimeFunctionCall(i), i)
 }
 
 func (d *Database) Get(i interface{}) (err error) {
-	return
+	return d.newHandle().Get(runtimeFunctionCall(i), i)
 }
 
 func (d *Database) Query(i interface{}) (err error) {
