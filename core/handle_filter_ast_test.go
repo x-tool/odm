@@ -14,10 +14,14 @@ func Test_AST(t *testing.T) {
 
 
 odm.Where(
-	odm.And(
-		odm.And(value, "in", a),
-		odm.And()
-	)
+	db.Link(
+		"a", "b", 
+		odm.Where(
+			odm.And("o.bb in ?", a),
+			odm.And()
+		)
+	).alias("z")
+
 )
 
 odm.link(odm.link{

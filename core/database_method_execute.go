@@ -1,15 +1,18 @@
 package core
 
 func (d *Database) Insert(i interface{}) (err error) {
-	return d.newHandle().Insert(runtimeFunctionCall(i), i)
+	runtimeCall := newRuntimeCall(i)
+	return d.newHandle().Insert(runtimeCall, i)
 }
 
 func (d *Database) Delete(i interface{}) (err error) {
-	return d.newHandle().Delete(runtimeFunctionCall(i), i)
+	runtimeCall := newRuntimeCall(i)
+	return d.newHandle().Delete(runtimeCall, i)
 }
 
 func (d *Database) Get(i interface{}) (err error) {
-	return d.newHandle().Get(runtimeFunctionCall(i), i)
+	runtimeCall := newRuntimeCall(i)
+	return d.newHandle().Get(runtimeCall, i)
 }
 
 func (d *Database) Query(i interface{}) (err error) {

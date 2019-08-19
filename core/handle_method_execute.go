@@ -25,7 +25,7 @@ func (h *Handle) Alias(m map[string]string) *Handle {
 	return h
 }
 
-func (d *Handle) Insert(i interface{}) (err error) {
+func (d *Handle) Insert(r runtimCall, i interface{}) (err error) {
 	value := reflect.Indirect(reflect.ValueOf(i))
 	d.setColbyValue(&value)
 	d.execBefore()
