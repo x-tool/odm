@@ -6,10 +6,6 @@ type filterTree struct {
 	children     []filterTree
 	isConnectOr  bool
 	isConnectNot bool
-	isGroup      bool
-	filed        *StructField
-	operator
-	value interface{}
 }
 
 func newFilter(values ...interface{}) (f *filterTree, err error) {

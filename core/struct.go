@@ -8,10 +8,9 @@ import (
 )
 
 type odmStruct struct {
-	name            string
-	path            string
-	allName         string // name+path
-	parent          *StructField
+	name string
+	path string
+	// parent          *StructField
 	fields          StructFieldLst
 	rootFields      StructFieldLst
 	sourceType      *reflect.Type
@@ -89,7 +88,7 @@ func makeStructFieldLstNameMap(d *odmStruct) map[string]StructFieldLst {
 func makerootFieldNameMap(d *odmStruct) (lst []*StructField) {
 	_d := d.fields
 	for _, v := range _d {
-		if v.extendParent == nil && v.IsExtend() == false {
+		if v.logicParent == nil && v.isAnonymous() == false {
 			lst = append(lst, v)
 		}
 	}

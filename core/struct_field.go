@@ -5,12 +5,12 @@ import (
 )
 
 type StructField struct {
-	odmStruct  *odmStruct
-	name       string
-	sourceType reflect.Type
-	kind       Kind
-	id         int
-	isExtend   bool // is Anonymous field
+	odmStruct   *odmStruct
+	name        string
+	sourceType  reflect.Type
+	kind        Kind
+	id          int
+	isAnonymous bool // is Anonymous field
 	odmTag
 	// fields relation with golang struct
 	childLst      StructFieldLst
@@ -18,9 +18,9 @@ type StructField struct {
 	parent        *StructField // field golang stack parent real
 	dependLst     dependLst    // depend chain, include self
 	// fields relastion with logic struct
-	extendChildLst  StructFieldLst
-	extendParent    *StructField // field Handle parent
-	extendDependLst dependLst    // depend chain, include self
+	logicChildLst  StructFieldLst
+	logicParent    *StructField // field Handle parent
+	logicDependLst dependLst    // depend chain, include self
 }
 
 func (d *StructField) Name() string {
@@ -34,8 +34,8 @@ func (d *StructField) ID() int {
 func (d *StructField) Kind() Kind {
 	return d.kind
 }
-func (d *StructField) IsExtend() bool {
-	return d.isExtend
+func (d *StructField) isAnonymous() bool {
+	return d.isAnonymous
 }
 
 func (d *StructField) isSingleType() (b bool) {
@@ -51,41 +51,41 @@ func newStructField(_odmStruct *odmStruct, d *StructFieldLst, t *reflect.StructF
 	reflectType := fieldType.Type
 	tag := fieldType.Tag.Get(tagName)
 	kind := reflectToKind(&reflectType)
-	isExtend := checkStructFieldisExtend(t)
+	isAnonymous := checkStructFieldisAnonymous(t)
 	var _dependLst dependLst
-	var _extendDependLst dependLst
+	var _logicDependLst dependLst
 
 	field := &StructField{
-		odmStruct:       _odmStruct,
-		name:            t.Name,
-		sourceType:      reflectType,
-		kind:            kind,
-		parent:          parent,
-		isExtend:        isExtend,
-		dependLst:       _dependLst,
-		extendDependLst: _extendDependLst,
+		odmStruct:      _odmStruct,
+		name:           t.Name,
+		sourceType:     reflectType,
+		kind:           kind,
+		parent:         parent,
+		isAnonymous:    isAnonymous,
+		dependLst:      _dependLst,
+		logicDependLst: _logicDependLst,
 	}
 	field.odmTag = *newTag(tag, field)
-	// set extendparent, parent extendChildLst
-	field.extendParent = getExtendParent(d, field)
-	if field.extendParent != nil {
-		field.extendParent.extendChildLst = append(field.extendParent.extendChildLst, field)
+	// set logicParent, parent logicChildLst
+	field.logicParent = getlogicParent(d, field)
+	if field.logicParent != nil {
+		field.logicParent.logicChildLst = append(field.logicParent.logicChildLst, field)
 	}
 
-	// set dependLst, extendDependLst, parent childLst
+	// set dependLst, logicDependLst, parent childLst
 	// root field's parent is nil
 	if parent != nil {
 		field.dependLst = append(parent.dependLst, parent)
-		if isExtend {
-			field.extendDependLst = parent.extendDependLst
+		if isAnonymous {
+			field.logicDependLst = parent.logicDependLst
 		} else {
-			field.extendDependLst = append(parent.extendDependLst, parent)
+			field.logicDependLst = append(parent.logicDependLst, parent)
 		}
 		parent.childLst = append(parent.childLst, field)
 
 	} else {
 		field.dependLst = append(field.dependLst, field)
-		field.extendDependLst = append(field.extendDependLst, field)
+		field.logicDependLst = append(field.logicDependLst, field)
 	}
 
 	// set complexParent
@@ -120,7 +120,7 @@ func newStructField(_odmStruct *odmStruct, d *StructFieldLst, t *reflect.StructF
 	}
 }
 
-func checkStructFieldisExtend(r *reflect.StructField) (b bool) {
+func checkStructFieldisAnonymous(r *reflect.StructField) (b bool) {
 	return r.Anonymous
 }
 
@@ -145,7 +145,7 @@ func (d *StructFieldLst) getFieldsByName(name string) (o StructFieldLst) {
 
 func (d *StructFieldLst) getExtendFieldLst() (rd StructFieldLst) {
 	for _, v := range *d {
-		if v.IsExtend() {
+		if v.isAnonymous() {
 			rd = append(rd, v)
 		}
 	}
@@ -169,12 +169,12 @@ func (d *StructFieldLst) getGroupTypeFieldLst() (rd StructFieldLst) {
 	return
 }
 
-func getExtendParent(d *StructFieldLst, field *StructField) (f *StructField) {
+func getlogicParent(d *StructFieldLst, field *StructField) (f *StructField) {
 	if field.parent == nil {
 		f = nil
 	} else {
-		if field.parent.isExtend {
-			f = getExtendParent(d, field.parent)
+		if field.parent.isAnonymous {
+			f = getlogicParent(d, field.parent)
 		} else {
 			f = field.parent
 		}

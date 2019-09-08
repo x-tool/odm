@@ -12,7 +12,7 @@ func (d *odmStruct) getFieldByMark(tag string) (o *StructField) {
 
 func (d *odmStruct) getExtendFields() (lst StructFieldLst) {
 	for _, v := range d.fields {
-		if v.isExtend {
+		if v.isAnonymous {
 			lst = append(lst, v)
 		}
 	}

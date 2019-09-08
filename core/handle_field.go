@@ -158,7 +158,7 @@ func (r *HandleField) formatField(o *odmStruct, s string) (field *StructField, c
 				if checkItem.isGroupType() {
 					complexParent = checkItem
 				}
-				fieldLst = checkItem.extendChildLst
+				fieldLst = checkItem.logicChildLst
 				if i == lenPath-1 {
 					field = checkItem
 				}
