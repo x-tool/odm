@@ -8,26 +8,35 @@ type Kind uint
 
 // xodm type
 const (
+	// bool
 	Bool Kind = iota
-	Int
+	// bit
+	Bit
+	BitVar
+	// byte
 	Byte
+	// num
+	Int
 	Float
-	Complex
-	Array
-	Map
-	String
+	// time
+	Interval
 	Time
 	Date
 	DateTime
 	TimeStamp
-	money
+	// string
+	String
+	// group
+	Array
+	Map
 	Struct
+	// ip
 	IP
-	Interface
-	Custom
+	// any
+	Any
 )
 
-var typeStringMap = map[Kind]string{
+var kindStringMap = map[Kind]string{
 	Bool:      "bool",
 	Int:       "int",
 	Byte:      "byte",
@@ -44,6 +53,8 @@ var typeStringMap = map[Kind]string{
 	IP:        "ip",
 	Custom:    "custom",
 }
+
+var stringKindMap = map[string]Kind{}
 
 func (k Kind) isGroupType() (b bool) {
 	switch k {
@@ -130,6 +141,9 @@ func reflectToKind(r *reflect.Type) (k Kind) {
 
 func init() {
 	systemEdian()
+	for k, v := range kindStringMap {
+		stringKindMap[v] = k
+	}
 }
 
 ///////////// Custom data type

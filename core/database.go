@@ -30,9 +30,9 @@ type states struct {
 	isSyncCols bool
 }
 
-func NewDatabase(c *client.Client, dialect Dialect) *Database {
-	d := &Database{
-		name:       c.config.DatabaseName,
+func NewDatabase(c *client.Client, dialect Dialect) (d *Database) {
+	d = &Database{
+		name:       c.Config.DatabaseName,
 		client:     c,
 		dialect:    dialect,
 		mapStructs: make(map[string]*odmStruct),

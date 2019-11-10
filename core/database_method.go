@@ -17,7 +17,7 @@ func (d *Database) getStructByName(name string) (o *odmStruct, err error) {
 	return
 }
 
-func (d *Database) RegisterStruct(c interface{}) {
+func (d *Database) RegisterStruct(c interface{}, err error) {
 	var _struct *odmStruct
 	if v, ok := c.(odmStruct); ok {
 		_struct = &v
