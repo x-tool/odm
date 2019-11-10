@@ -22,7 +22,6 @@ const (
 	Interval
 	Time
 	Date
-	DateTime
 	TimeStamp
 	// string
 	String
@@ -32,6 +31,8 @@ const (
 	Struct
 	// ip
 	IP
+	// uuid
+	Uuid
 	// any
 	Any
 )
@@ -41,17 +42,14 @@ var kindStringMap = map[Kind]string{
 	Int:       "int",
 	Byte:      "byte",
 	Float:     "float",
-	Complex:   "complex",
 	Array:     "array",
 	Map:       "map",
 	String:    "string",
 	Time:      "time",
 	Date:      "date",
-	DateTime:  "datetime",
 	TimeStamp: "timestamp",
 	Struct:    "struct",
 	IP:        "ip",
-	Custom:    "custom",
 }
 
 var stringKindMap = map[string]Kind{}
