@@ -1,4 +1,4 @@
-package core
+package types
 
 import "reflect"
 
@@ -6,8 +6,7 @@ type Type interface {
 	Name() string
 	Kind() Kind
 	ToString() (string, error)
-	Parse() interface{}
-	IsGroup() bool
+	Parse() intersface{}
 }
 
 type TypeStruct struct {

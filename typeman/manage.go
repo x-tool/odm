@@ -1,4 +1,4 @@
-package core
+package typeman
 
 type Kind int
 
@@ -28,8 +28,9 @@ const (
 	IP
 	// uuid
 	Uuid
-	// custom
-	Custom
 	// any
 	Any
 )
+
+type typeManager struct {
+}
