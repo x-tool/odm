@@ -1,36 +1,13 @@
 package typeman
 
-type Kind int
+type Config struct {
+	IsValid func(i interface{}) bool
+}
+type TypeManager struct {
+	typeLst []Type
+}
 
-// xodm type
-const (
-	// bool
-	Bool Kind = iota
-	// bit
-	Bit
-	// byte
-	Byte
-	// num
-	Int
-	Float
-	// time
-	Interval
-	Time
-	Date
-	TimeStamp
-	// string
-	String
-	// group
-	Array
-	Map
-	Struct
-	// ip
-	IP
-	// uuid
-	Uuid
-	// any
-	Any
-)
+func (t *TypeManager) Register(typ interface{}, conf Config) (err error) {
 
-type typeManager struct {
+	return
 }
